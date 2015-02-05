@@ -24,6 +24,8 @@
 		3767F1531A830DC600AFD6D6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3767F1511A830D4700AFD6D6 /* CoreData.framework */; };
 		3767F1561A830E1100AFD6D6 /* BIP39EnglishWords.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3767F1541A830E1100AFD6D6 /* BIP39EnglishWords.plist */; };
 		3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */; };
+		377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A18EE1A8424A8007AA1CD /* BCMnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A18EF1A8424A8007AA1CD /* BCMnemonic.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */; };
@@ -102,6 +104,8 @@
 		3767F1511A830D4700AFD6D6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3767F1541A830E1100AFD6D6 /* BIP39EnglishWords.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = BIP39EnglishWords.plist; path = ../../breadwallet/BreadWallet/BIP39EnglishWords.plist; sourceTree = "<group>"; };
 		3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Breadcrumb-Prefix.pch"; sourceTree = "<group>"; };
+		377A18EE1A8424A8007AA1CD /* BCMnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCMnemonic.h; path = Mnemonic/BCMnemonic.h; sourceTree = "<group>"; };
+		377A18EF1A8424A8007AA1CD /* BCMnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCMnemonic.m; path = Mnemonic/BCMnemonic.m; sourceTree = "<group>"; };
 		37BFECB91A82D1460081BE4B /* Breadcrumb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breadcrumb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECBD1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37BFECBE1A82D1460081BE4B /* Breadcrumb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Breadcrumb.h; sourceTree = "<group>"; };
@@ -187,6 +191,7 @@
 		3767EC7B1A82E56C00AFD6D6 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				377A18ED1A842467007AA1CD /* Mnemonic */,
 			);
 			name = Interfaces;
 			sourceTree = "<group>";
@@ -379,6 +384,15 @@
 			name = String;
 			sourceTree = "<group>";
 		};
+		377A18ED1A842467007AA1CD /* Mnemonic */ = {
+			isa = PBXGroup;
+			children = (
+				377A18EE1A8424A8007AA1CD /* BCMnemonic.h */,
+				377A18EF1A8424A8007AA1CD /* BCMnemonic.m */,
+			);
+			name = Mnemonic;
+			sourceTree = "<group>";
+		};
 		37BFECAF1A82D1460081BE4B = {
 			isa = PBXGroup;
 			children = (
@@ -516,6 +530,7 @@
 				37BFED381A82D49A0081BE4B /* BRPeerEntity.h in Headers */,
 				3767F1461A830C9300AFD6D6 /* NSManagedObject+Sugar.h in Headers */,
 				3767F1481A830C9300AFD6D6 /* NSMutableData+Bitcoin.h in Headers */,
+				377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */,
 				37BFED071A82D35B0081BE4B /* BRKey+BIP38.h in Headers */,
 				37BFED191A82D35B0081BE4B /* BRWalletManager.h in Headers */,
 			);
@@ -621,6 +636,7 @@
 			files = (
 				37BFECEC1A82D29C0081BE4B /* Reachability.m in Sources */,
 				37BFED0E1A82D35B0081BE4B /* BRPaymentProtocol.m in Sources */,
+				377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */,
 				37BFED391A82D49A0081BE4B /* BRPeerEntity.m in Sources */,
 				3767F14B1A830C9300AFD6D6 /* NSString+Base58.m in Sources */,
 				37BFED3B1A82D49A0081BE4B /* BRTransactionEntity.m in Sources */,

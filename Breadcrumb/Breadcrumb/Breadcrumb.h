@@ -14,8 +14,9 @@ FOUNDATION_EXPORT double BreadcrumbVersionNumber;
 //! Project version string for Breadcrumb.
 FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <Breadcrumb/PublicHeader.h>
+// In this header, you should import all the public headers of your framework
+// using statements like #import <Breadcrumb/PublicHeader.h>
 
-
+#import <Breadcrumb/BCMnemonic.h>
 
 #import <Breadcrumb/BreadcrumbCore.h>
