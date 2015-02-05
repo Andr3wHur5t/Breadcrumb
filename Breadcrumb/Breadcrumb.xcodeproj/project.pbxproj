@@ -771,7 +771,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"${BUILD_DIR}",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/breadcrumb-bmrnjelsrmzvlregahthicctbqku/Build/Products/Debug-iphoneos",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -799,7 +798,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"${BUILD_DIR}",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/breadcrumb-bmrnjelsrmzvlregahthicctbqku/Build/Products/Debug-iphoneos",
 					"$(SDKROOT)/usr/lib/system",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
