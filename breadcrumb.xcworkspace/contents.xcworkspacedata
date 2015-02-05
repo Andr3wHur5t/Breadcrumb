@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Breadcrumb Example/Breadcrumb Example.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Breadcrumb/Breadcrumb.xcodeproj">
    </FileRef>
    <FileRef
