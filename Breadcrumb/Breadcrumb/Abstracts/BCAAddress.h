@@ -10,4 +10,18 @@
 
 @interface BCAAddress : NSObject
 
+#pragma mark Construction
+/*!
+ @brief Constructs a address object with the bitcoin address string.
+
+ @param addressString The address string to construct the object with.
+ */
+- (instancetype)initWithAddressString:(NSString *)addressString;
+
+#pragma mark Info
+/*!
+ @brief Gets the string representation of the address.
+ */
+@property(weak, nonatomic, readonly) NSString *stringRepresentation;
+
 @end

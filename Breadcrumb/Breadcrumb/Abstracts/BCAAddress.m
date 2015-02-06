@@ -7,8 +7,23 @@
 //
 
 #import "BCAAddress.h"
+#import "BreadcrumbCore.h"
 
 @implementation BCAAddress
+
+#pragma mark Construction
+
+- (instancetype)initWithAddressString:(NSString *)addressString {
+  NSAssert(FALSE, @"Called method on abstract class.");
+  return NULL;
+}
+
+#pragma mark Info
+
+- (NSString *)stringRepresentation {
+  NSAssert(FALSE, @"Called method on abstract class.");
+  return NULL;
+}
 
 #pragma mark Debugging
 
@@ -17,7 +32,15 @@
 }
 
 - (NSString *)description {
-  return @"";
+  return self.stringRepresentation;
+}
+
+#pragma mark Comparison
+
+- (BOOL)isEqual:(id)object {
+  if (![object isKindOfClass:[self class]]) return FALSE;
+  return [self.stringRepresentation
+      isEqualToString:((BCAAddress *)object).stringRepresentation];
 }
 
 @end
