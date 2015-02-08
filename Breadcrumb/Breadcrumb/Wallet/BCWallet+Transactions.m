@@ -12,7 +12,7 @@
 
 - (void)UTXOforAmount:(NSNumber *)amount
          withCallback:(void (^)(NSArray *, NSError *))callback {
-  // TODO: Get our public addresses.
+  // TODO: Get our public addresses for UTXOs
   [self.provider UTXOforAmount:amount
                   andAddresses:@[ @"1K4nPxBMy6sv7jssTvDLJWk1ADHBZEoUVb" ]
                   withCallback:callback];
@@ -25,34 +25,43 @@
   __block NSNumber *sAmount;
   __block BCAddress *sAddress;
   __block void (^sCallback)(BCTransaction *, NSError *);
+  // TODO: Validate Input
 
   sAmount = amount;
   sAddress = address;
   sCallback = callback;
+  // Get UTXOs optimized for the specified ammount from our provider so we can
+  // build the transaction.
   [self UTXOforAmount:amount
          withCallback:^(NSArray *UTXOs, NSError *error) {
-             id transaction;
+             BCTransaction *transaction;
+
              if ([error isKindOfClass:[NSError class]]) {
+               // Report error
                sCallback(NULL, error);
 
              } else if ([UTXOs isKindOfClass:[NSArray class]]) {
-               // We got UTXOs build transaction
-               transaction =
-                   [BCTransaction buildTransactionWith:UTXOs
-                                             forAmount:sAmount
-                                                    to:sAddress
-                                                feePerK:@6000
-                                     withChangeAddress:self.currentAddress];
+               // Build the reansaction with the inputted UTXOs
+               transaction = [BCTransaction
+                   buildTransactionWith:UTXOs
+                              forAmount:sAmount
+                                     to:sAddress
+                                feePerK:@6000  // Get Fee from wallet settings
+                      withChangeAddress:self.currentAddress];
 
-               if (![transaction isKindOfClass:[NSObject class]]) {
+               // Check if we failed
+               if (![transaction isKindOfClass:[BCTransaction class]]) {
                  sCallback(
                      NULL,
                      [[self class] failedToCreateUnsignedTransactionError]);
                  return;
                }
+
+               // Report the unsigned transaction
                sCallback(transaction, NULL);
 
              } else {
+               // Report failure
                sCallback(NULL, [[self class] failedToRetriveUTXOsError]);
              }
          }];
@@ -60,13 +69,14 @@
 
 - (BCTransaction *)signTransaction:(BCTransaction *)transaction {
   @autoreleasepool {  // Ensure immediate deallocation of sensitive data.
-    // TODO: build the unsigned transaction.
+    // TODO: sign the inputted transaction with the related keys.
     return NULL;
   }
 }
 
 - (void)publishTransaction:(id)transaction
             withCompletion:(void (^)(NSError *))completion {
+  // Publish the reansaction to the network through our provider
   [self.provider publishTransaction:transaction withCompletion:completion];
 }
 

@@ -10,8 +10,27 @@
 #import "BCTransaction.h"
 #import "BreadcrumbCore.h"
 
+// Chain Error Constants
+static NSString *const kBCChainProvider_ErrorDomain =
+    @"com.breadcrumb.chainProvider";
+
+// Chain Response Constants
+static NSString *const kBCChainProvider_ErrorMessage = @"message";
+static NSString *const kBCChainProvider_ErrorCode = @"code";
+static NSString *const kBCChainProvider_Addresses = @"addresses";
+static NSString *const kBCChainProvider_Script = @"script_hex";
+static NSString *const kBCChainProvider_Hash = @"transaction_hash";
+static NSString *const kBCChainProvider_Value = @"value";
+static NSString *const kBCChainProvider_Spent = @"spent";
+static NSString *const kBCChainProvider_Confirmations = @"confirmations";
+
+// Chain API
 // TODO: Get API Key From Plist?
 static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
+
+#define kChainBasePath @"https://api.chain.com/v2"
+static NSString *const kChainUTXOsURL =
+    kChainBasePath @"/bitcoin/addresses/%@/unspents?api-key-id=%@";
 
 @implementation BCProviderChain
 
@@ -43,25 +62,15 @@ static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
   NSString *requestString, *addressesSting;
   NSURLRequest *request;
   __block void (^sCallback)(NSArray *, NSError *);
+  NSParameterAssert(callback);
   NSParameterAssert([addresses isKindOfClass:[NSArray class]] &&
                     addresses.count > 0);
-  NSParameterAssert(callback);
   if (![addresses isKindOfClass:[NSArray class]] || addresses.count == 0 ||
       !callback)
     return;
 
   // Create Address list
-  for (NSString *addr in addresses) {
-    // Check if the address is a valid bitcoin address
-    if ([addr.toBitcoinAddress isKindOfClass:[BCAddress class]]) {
-      if ([addressesSting isKindOfClass:[NSString class]]) {
-        addressesSting =
-            [NSString stringWithFormat:@"%@,%@", addressesSting, addr];
-      } else {
-        addressesSting = addr;
-      }
-    }
-  }
+  addressesSting = [self addressListForAddresses:addresses];
   if (![addressesSting isKindOfClass:[NSString class]]) {
     // Failed to construct address string.
     return;
@@ -69,9 +78,7 @@ static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
 
   // Create Request String
   requestString =
-      [NSString stringWithFormat:@"https://api.chain.com/v2/bitcoin/addresses/"
-                                 @"%@/unspents?api-key-id=%@",
-                                 addressesSting, kChainAPIKey];
+      [NSString stringWithFormat:kChainUTXOsURL, addressesSting, kChainAPIKey];
   if (![requestString isKindOfClass:[NSString class]]) {
     // Failed to create request string
     return;
@@ -119,65 +126,14 @@ static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
   // Convert transactions to native object
   utxos = [[NSMutableArray alloc] init];
   for (NSDictionary *transaction in response)
-    _transaction = [self transactionFromChainTransaction:transaction];
+    _transaction = [BCTransaction transactionFromChainTransaction:transaction];
   if ([_transaction isKindOfClass:[BCTransaction class]])
     [utxos addObject:_transaction];
 
   callback([NSArray arrayWithArray:utxos], NULL);
 }
 
-+ (BCTransaction *)transactionFromChainTransaction:
-                       (NSDictionary *)chainTransaction {
-  NSArray *rawAddresses;
-  NSMutableArray *addresses;
-  BCScript *script;
-  NSString *scriptHex, *transactionHash;
-  NSNumber *value, *spent, *confirmations, *isSigned;
-
-  rawAddresses = [chainTransaction objectForKey:@"addresses"];
-  if (![rawAddresses isKindOfClass:[NSArray class]]) return NULL;
-
-  // Validate Addresses
-  addresses = [[NSMutableArray alloc] init];
-  BCAddress *currentAddress;
-  for (NSString *address in rawAddresses) {
-    currentAddress = address.toBitcoinAddress;
-    if ([currentAddress isKindOfClass:[BCAddress class]])
-      [addresses addObject:currentAddress];
-    else
-      return NULL;
-  }
-
-  scriptHex = [chainTransaction objectForKey:@"script_hex"];
-  if (![scriptHex isKindOfClass:[NSString class]]) return NULL;
-
-  script = [[BCScript alloc] initWithData:scriptHex.hexToData];
-  if (![script isKindOfClass:[BCScript class]]) return NULL;
-
-  transactionHash = [chainTransaction objectForKey:@"transaction_hash"];
-  if (![transactionHash isKindOfClass:[NSString class]]) return NULL;
-
-  value = [chainTransaction objectForKey:@"value"];
-  if (![value isKindOfClass:[NSNumber class]]) return NULL;
-
-  spent = [chainTransaction objectForKey:@"spent"];
-  if (![spent isKindOfClass:[NSNumber class]]) return NULL;
-
-  confirmations = [chainTransaction objectForKey:@"confirmations"];
-  if (![confirmations isKindOfClass:[NSNumber class]]) return NULL;
-
-  // Create Transaction
-  return [[BCTransaction alloc]
-      initWithAddresses:[NSArray arrayWithArray:addresses]
-                 script:script
-                   hash:transactionHash
-                  value:value
-                  spent:spent
-          confirmations:confirmations
-              andSigned:[isSigned boolValue]];
-}
-
-#pragma mark Connection Utilities
+#pragma mark Utilities
 
 + (void (^)(NSURLResponse *, NSData *, NSError *))
     connectionProcessingWithResult:(void (^)(NSHTTPURLResponse *, id,
@@ -228,6 +184,29 @@ static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
   };
 }
 
++ (NSString *)addressListForAddresses:(NSArray *)addresses {
+  NSString *addressesSting;
+  NSParameterAssert([addresses isKindOfClass:[NSArray class]] &&
+                    addresses.count != 0);
+  if (![addresses isKindOfClass:[NSArray class]] || addresses.count == 0)
+    return NULL;
+
+  // Composite the addresses
+  for (NSString *address in addresses)
+    if ([address.toBitcoinAddress isKindOfClass:[BCAddress class]]) {
+      if ([addressesSting isKindOfClass:[NSString class]])
+        addressesSting =
+            [NSString stringWithFormat:@"%@,%@", addressesSting, address];
+      else
+        addressesSting = address;
+    }
+
+  return [addressesSting isKindOfClass:[NSString class]] ? addressesSting
+                                                         : NULL;
+}
+
+#pragma mark Errors
+
 + (NSError *)processChainError:(NSData *)responseBody {
   NSString *message, *code, *composite;
   NSError *parseError;
@@ -242,18 +221,76 @@ static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
   if ([parseError isKindOfClass:[NSError class]]) return NULL;
   if (![body isKindOfClass:[NSDictionary class]]) return NULL;
 
-  message = [body objectForKey:@"message"];
+  // Extract the message and code to put in the error object.
+  message = [body objectForKey:kBCChainProvider_ErrorMessage];
   if (![message isKindOfClass:[NSString class]]) return NULL;
 
-  code = [body objectForKey:@"code"];
+  code = [body objectForKey:kBCChainProvider_ErrorCode];
   if (![code isKindOfClass:[NSString class]]) return NULL;
 
   composite = [NSString stringWithFormat:@"%@(Chain Code:%@)", message, code];
   if (![composite isKindOfClass:[NSString class]]) return NULL;
 
-  return [NSError errorWithDomain:@"com.breadcrumb.chainProvider"
+  return [NSError errorWithDomain:kBCChainProvider_ErrorDomain
                              code:0
                          userInfo:@{NSLocalizedDescriptionKey : composite}];
+}
+
+@end
+
+@implementation BCTransaction (BCProviderChain)
+
++ (BCTransaction *)transactionFromChainTransaction:
+                       (NSDictionary *)chainTransaction {
+  NSArray *rawAddresses;
+  NSMutableArray *addresses;
+  BCScript *script;
+  NSString *scriptHex, *transactionHash;
+  NSNumber *value, *spent, *confirmations, *isSigned;
+
+  rawAddresses = [chainTransaction objectForKey:kBCChainProvider_Addresses];
+  if (![rawAddresses isKindOfClass:[NSArray class]]) return NULL;
+
+  // Validate Addresses
+  addresses = [[NSMutableArray alloc] init];
+  BCAddress *currentAddress;
+  for (NSString *address in rawAddresses) {
+    currentAddress = address.toBitcoinAddress;
+    if ([currentAddress isKindOfClass:[BCAddress class]])
+      [addresses addObject:currentAddress];
+    else
+      return NULL;
+  }
+
+  // Get values and type check
+  scriptHex = [chainTransaction objectForKey:kBCChainProvider_Script];
+  if (![scriptHex isKindOfClass:[NSString class]]) return NULL;
+
+  script = [[BCScript alloc] initWithData:scriptHex.hexToData];
+  if (![script isKindOfClass:[BCScript class]]) return NULL;
+
+  transactionHash = [chainTransaction objectForKey:kBCChainProvider_Hash];
+  if (![transactionHash isKindOfClass:[NSString class]]) return NULL;
+
+  value = [chainTransaction objectForKey:kBCChainProvider_Value];
+  if (![value isKindOfClass:[NSNumber class]]) return NULL;
+
+  spent = [chainTransaction objectForKey:kBCChainProvider_Spent];
+  if (![spent isKindOfClass:[NSNumber class]]) return NULL;
+
+  confirmations =
+      [chainTransaction objectForKey:kBCChainProvider_Confirmations];
+  if (![confirmations isKindOfClass:[NSNumber class]]) return NULL;
+
+  // Create Transaction
+  return [[BCTransaction alloc]
+      initWithAddresses:[NSArray arrayWithArray:addresses]
+                 script:script
+                   hash:transactionHash
+                  value:value
+                  spent:spent
+          confirmations:confirmations
+              andSigned:[isSigned boolValue]];
 }
 
 @end

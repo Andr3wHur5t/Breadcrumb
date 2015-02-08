@@ -13,6 +13,15 @@
 #import "BCProviderChain.h"
 #import "NSData+Encryption.h"
 
+// Crypto Queue Label
+static const char *kBCCryptQueueLabel = "com.Breadcrumb.crypto";
+
+// Errors
+static NSString *const kBCWalletError_Domain =
+    @"com.breadcrumb.transactionBuilder";
+static NSString *const kBCWalletError_FailedToSign =
+    @"Failed to sign transaction.";
+
 // Restoration Keys
 static NSString *const kBCRestoration_Seed = @"seed";
 static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
@@ -104,7 +113,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
                     password:(NSData *)password
               withCompletion:(void (^)(id))completion {
   @autoreleasepool {
-    // TODO: Process
+    // TODO: Process info and restore
     return;
   }
 }
@@ -118,7 +127,9 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     __block NSString *sMnemonic = mnemonic;
     __block NSData *sPassword = password;
     __block void (^sCallback)() = callback;
-    dispatch_async(dispatch_queue_create("com.Breadcrumb.crypto", 0), ^{
+    // Dispatch async becaue scrypt from the password takes about 5 sec which is
+    // too long to run on the main thread.
+    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
         [self _setMnemonic:sMnemonic withPassword:sPassword];
         sMnemonic = NULL;
         sPassword = NULL;
@@ -148,11 +159,13 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 }
 
 - (void)mnemonicPhraseWithPassword:(NSData *)password
-                      usingCallback:(void (^)(NSString *))callback {
+                     usingCallback:(void (^)(NSString *))callback {
   @autoreleasepool {
     __block NSData *sPassword = password;
     __block void (^sCallback)(NSString *) = callback;
-    dispatch_async(dispatch_queue_create("com.Breadcrumb.crypto", 0), ^{
+    // Dispatch async becaue scrypt from the password takes about 5 sec which is
+    // too long to run on the main thread.
+    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
         __block NSString *phrase = [self mnemonicWithPassword:sPassword];
         sPassword = NULL;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -194,7 +207,9 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   @autoreleasepool {
     __block NSData *sPassword = password, *sSeed = seed;
     __block void (^sCallback)() = callback;
-    dispatch_async(dispatch_queue_create("com.Breadcrumb.crypto", 0), ^{
+    // Dispatch async becaue scrypt from the password takes about 5 sec which is
+    // too long to run on the main thread.
+    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
         [self _setSeed:sSeed withPassword:sPassword];
         sPassword = NULL;
         sSeed = NULL;
@@ -239,7 +254,10 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   @autoreleasepool {
     __block void (^sCallback)(NSData *) = callback;
     __block NSData *sPassword = password;
-    dispatch_async(dispatch_queue_create("com.Breadcrumb.crypto", 0), ^{
+    // Dispatch async becaue scrypt from the password takes about 5 sec which is
+    // too long to run on the main thread.
+    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
+        // TODO: Dispatch on Main so the user dosn't need to thing about queues
         sCallback([self seedWithPassword:sPassword]);
         sPassword = NULL;
     });
@@ -267,7 +285,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 
 - (BCAddress *)currentAddress {
   // Need to get address from UTXO. Or Get current Index
-  return NULL;
+  return [@"1K4nPxBMy6sv7jssTvDLJWk1ADHBZEoUVb" toBitcoinAddress];
 }
 
 #pragma mark Transactions
@@ -344,7 +362,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 }
 
 + (NSData *)saltData {
-  // TODO: Get salt on a per user basis?
+  // TODO: Get salt on a per user basis
   return @"0X0X0X0XEFFF".hexToData;
 }
 
@@ -363,12 +381,12 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 #pragma mark Errors
 
 + (NSError *)failedToSignTransactionError {
-  return [NSError
-      errorWithDomain:@"com.breadcrumb.transactionBuilder"
-                 code:1
-             userInfo:@{
-               NSLocalizedDescriptionKey : @"Failed to sign transaction."
-             }];
+  return
+      [NSError errorWithDomain:kBCWalletError_Domain
+                          code:1
+                      userInfo:@{
+                        NSLocalizedDescriptionKey : kBCWalletError_FailedToSign
+                      }];
 }
 
 @end

@@ -11,6 +11,14 @@
 
 @interface BCScript (DefaultScripts)
 
+#pragma mark Transactions
+/*!
+ @brief Creates a standard transaction script using the inputted address.
+
+ @param address The output address for the transaction.
+ */
 + (instancetype)standardTransactionScript:(BCAddress *)address;
+
+#pragma mark Messages
 
 @end

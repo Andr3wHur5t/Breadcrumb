@@ -15,3 +15,14 @@
 @interface BCProviderChain : BCAProvider
 
 @end
+
+@interface BCTransaction (BCProviderChain)
+/*!
+ @brief Instantiates the transaction from transaction data formatted in a Chain
+ response.
+
+ @param chainTransaction The chain response to build the transaction with.
+ */
++ (instancetype)transactionFromChainTransaction:
+        (NSDictionary *)chainTransaction;
+@end

@@ -60,7 +60,7 @@
   NSData *password;
   BCAddress *address;
   NSNumber *amount;
-  // This is an example of our simple interface
+  // This is an example of our high level simple interface
 
   // The password is an NSData object so that you can easily use touch
   // authentication, and other authentication sources.
@@ -71,21 +71,22 @@
   // phrase.
   BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
 
-  // Sending Bitcoin is as easy as one line Just specify the amount of satoshi,
+  // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
   address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
   amount = [@2 toSatoshi];
   [wallet send:amount to:address withCallback:^(NSError *error) { return; }];
-  
+
+  // TODO: Need to set actions to queue so when starting up things will execute
+  // in order, this is my temp work around. :(
   sleep(5);
 
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password
   [wallet mnemonicPhraseWithPassword:password
                        usingCallback:^(NSString *mnemonic) {
-                           // TODO: Need to set actions to queue so when
-                           // starting up things will execute in order.
+                           // Show the user their mnemonic phrase.
                            [self showAlertWithTitle:@"Your Phrase"
                                          andMessage:mnemonic];
                        }];

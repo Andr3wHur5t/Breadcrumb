@@ -59,8 +59,10 @@
 }
 
 - (void)writeBytes:(NSData *)data {
-  if (data.length == 0) return;
+  NSParameterAssert([data isKindOfClass:[NSData class]] && data.length != 0);
+  if (data.length == 0 || ![data isKindOfClass:[NSData class]]) return;
 
+  // Check which mode to write the data, and write the opCode/length.
   if (data.length < OP_PUSHDATA1) {
     [self.buffer appendUInt8:data.length];
   } else if (data.length < UINT8_MAX) {
@@ -74,12 +76,14 @@
     [self.buffer appendUInt32:(uint32_t)data.length];
   }
 
+  // Append the data after the opcode, and size.
   [self.buffer appendData:data];
 }
 
 #pragma mark Representation
 
 - (NSData *)toData {
+  // write our current bytes into an immutable object, and return it
   return [NSData dataWithBytes:self.buffer.bytes length:self.buffer.length];
 }
 
@@ -123,6 +127,8 @@
 - (NSString *)processPushedData:(const char *)bytes atIndex:(NSUInteger *)i {
   NSString *processedValue;
   NSUInteger lengthToRead;
+
+  // Look For Push Data Opcodes and extract the length needed to read.
   if (bytes[*i] < OP_PUSHDATA1)
     lengthToRead = [self.buffer UInt8AtOffset:*i];
   else if (bytes[*i] == OP_PUSHDATA2)
@@ -132,17 +138,26 @@
   else
     return NULL;
 
+  // Processes the pushed bytes into hex.
   processedValue = @"";
   for (NSUInteger q = 0; q < lengthToRead; ++q) {
     processedValue = [processedValue
         stringByAppendingString:[NSString stringWithFormat:@"%02hhx",
                                                            bytes[*i + 1 + q]]];
   }
+
+  // Jump pass the bytes we just proccessed
   *i += lengthToRead;
+
+  // Retun the hex of the values
   return processedValue;
 }
 
 #pragma mark Debug
+
+- (NSString *)debugDescription {
+  return [self toString];
+}
 
 - (NSString *)description {
   return [self toString];

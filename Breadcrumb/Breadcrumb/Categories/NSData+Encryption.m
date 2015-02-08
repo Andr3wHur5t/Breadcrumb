@@ -118,18 +118,6 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
   return d;
 }
 
-// static NSData *derive_key(NSData *passpoint, uint32_t addresshash,
-//                          uint64_t entropy) {
-//  NSMutableData *salt = [NSMutableData secureData];
-//
-//  [salt appendBytes:&addresshash length:sizeof(addresshash)];
-//  [salt appendBytes:&entropy
-//             length:sizeof(entropy)];  // salt = addresshash + entropy
-//
-//  return scrypt(passpoint, salt, BIP38_SCRYPT_EC_N, BIP38_SCRYPT_EC_R,
-//                BIP38_SCRYPT_EC_P, 64);
-//}
-
 @implementation NSData (Encryption)
 
 - (NSData *)AES256Encrypt:(NSData *)key {
@@ -158,21 +146,18 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
     size_t bufferSize = dataLength + kCCBlockSizeAES128;
     void *buffer = malloc(bufferSize);
 
-    size_t numBytesDecrypted = 0;
+    size_t numBytes = 0;
     CCCryptorStatus cryptStatus = CCCrypt(
         operation, kCCAlgorithmAES128, kCCOptionPKCS7Padding, keyData.bytes,
         kCCKeySizeAES256, NULL /* initialization vector (optional) */,
         [self bytes], dataLength, /* input */
         buffer, bufferSize,       /* output */
-        &numBytesDecrypted);
+        &numBytes);
 
-    if (cryptStatus == kCCSuccess) {
-      // the returned NSData takes ownership of the buffer and will free it on
-      // deallocation
-      return [NSData dataWithBytesNoCopy:buffer length:numBytesDecrypted];
-    }
+    if (cryptStatus == kCCSuccess)
+      return [NSData dataWithBytesNoCopy:buffer length:numBytes];
 
-    free(buffer);  // free the buffer;
+    free(buffer);
     return nil;
   }
 }
