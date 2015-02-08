@@ -18,11 +18,15 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 // using statements like #import <Breadcrumb/PublicHeader.h>
 
 #pragma mark Abstract Interfaces
-#import <Breadcrumb/BCAAddress.h>
 #import <Breadcrumb/BCAWallet.h>
 
 #pragma mark Concrete Interfaces
-#import <Breadcrumb/BCMnemonic.h>
+#import <Breadcrumb/BCWallet.h>
+#import <Breadcrumb/BCTransaction.h>
 #import <Breadcrumb/BCAmount.h>
+#import <Breadcrumb/BCAddress.h>
+
+#pragma mark Utilities
+#import <Breadcrumb/BCMnemonic.h>
 
 #import <Breadcrumb/BreadcrumbCore.h>

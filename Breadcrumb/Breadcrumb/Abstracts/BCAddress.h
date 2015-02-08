@@ -1,5 +1,5 @@
 //
-//  BCAAddress.h
+//  BCAddress.h
 //  Breadcrumb
 //
 //  Created by Andrew Hurst on 2/5/15.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface BCAAddress : NSObject
+@interface BCAddress : NSObject
 
 #pragma mark Construction
 /*!
@@ -18,10 +18,28 @@
  */
 - (instancetype)initWithAddressString:(NSString *)addressString;
 
+/*!
+ @brief Constructs a address object with the bitcoin address string.
+
+ @param addressString The address string to construct the object with.
+ */
++ (instancetype)addressWithString:(NSString *)address;
+
 #pragma mark Info
 /*!
- @brief Gets the string representation of the address.
+ @brief Converts the address to a string.
  */
-@property(weak, nonatomic, readonly) NSString *stringRepresentation;
+- (NSString *)toString;
+
+/*!
+ @brief Converts the address to data.
+ */
+- (NSData *)toData;
+
+@end
+
+@interface NSString (BCAddress)
+
+- (BCAddress *)toBitcoinAddress;
 
 @end

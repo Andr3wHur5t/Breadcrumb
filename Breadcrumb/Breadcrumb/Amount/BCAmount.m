@@ -8,6 +8,21 @@
 
 #import "BCAmount.h"
 
-@implementation BCAmount
+@implementation NSNumber (BCAmount)
+
+- (NSNumber *)toSatoshi {
+  unsigned long long value = [self unsignedLongLongValue];
+  return [NSNumber numberWithUnsignedLong:value];
+}
+
+- (NSNumber *)toBits {
+  unsigned long long value = [self unsignedLongLongValue];
+  return [NSNumber numberWithUnsignedLong:value];
+}
+
+- (NSNumber *)toBitcoin {
+  unsigned long long value = [self unsignedLongLongValue];
+  return [NSNumber numberWithUnsignedLong:value];
+}
 
 @end

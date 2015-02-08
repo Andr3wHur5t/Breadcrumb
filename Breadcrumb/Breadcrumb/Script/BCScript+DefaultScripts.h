@@ -6,8 +6,11 @@
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import "BCScript.h"
+#import "BCAddress.h"
 
-@interface BCScript_DefaultScripts : BCScript+DefaultScripts
+@interface BCScript (DefaultScripts)
+
++ (instancetype)standardTransactionScript:(BCAddress *)address;
 
 @end

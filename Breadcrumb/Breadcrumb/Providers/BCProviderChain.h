@@ -8,6 +8,10 @@
 
 #import "BCAProvider.h"
 
+/*!
+ @brief A sample provider using the Chain API with a local cache, that publishes
+ transactions to the bitcoin network.
+ */
 @interface BCProviderChain : BCAProvider
 
 @end

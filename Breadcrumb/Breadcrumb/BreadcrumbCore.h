@@ -8,6 +8,7 @@
 
 #import <Breadcrumb/NSMutableData+Bitcoin.h>
 #import <Breadcrumb/NSData+Bitcoin.h>
+#import <Breadcrumb/NSData+Encryption.h>
 
 #import <Breadcrumb/NSString+Base58.h>
 #import <Breadcrumb/BRMnemonic.h>

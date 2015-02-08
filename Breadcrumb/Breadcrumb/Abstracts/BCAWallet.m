@@ -18,20 +18,20 @@
 
 #pragma mark Wallet Info
 
-- (BCAmount *)balance {
+- (NSNumber *)balance {
   NSAssert(FALSE, @"Called method on abstract class.");
   return NULL;
 }
 
-- (BCAAddress *)currentAddress {
+- (BCAddress *)currentAddress {
   NSAssert(FALSE, @"Called method on abstract class.");
   return NULL;
 }
 
 #pragma mark Transactions
 
-- (void)send:(BCAmount *)amount
-              to:(BCAAddress *)address
+- (void)send:(NSNumber *)amount
+              to:(BCAddress *)address
     withCallback:(void (^)(NSError *))callback {
   NSAssert(FALSE, @"Called method on abstract class.");
 }

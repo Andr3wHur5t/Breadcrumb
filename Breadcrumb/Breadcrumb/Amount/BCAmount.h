@@ -8,9 +8,21 @@
 
 #import <Foundation/Foundation.h>
 
+@interface NSNumber (BCAmount)
+
 /*!
- @brief Specifies an amount that can be converted into other currencies.
+ @brief Gets a copy of the current number as an amount in Satoshi.
  */
-@interface BCAmount : NSNumber
+- (NSNumber *)toSatoshi;
+
+/*!
+ @brief Gets a copy of the current number as an amount in Bits.
+ */
+- (NSNumber *)toBits;
+
+/*!
+ @brief Gets a copy of the current number as an amount in Bitcoin.
+ */
+- (NSNumber *)toBitcoin;
 
 @end
