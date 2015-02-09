@@ -80,9 +80,9 @@
  @discussion This optimizes transaction will target the smallest UTXOs first to
  attempt to reduce the number of UTXO.
 
- @param utxos Unsigned transactions to use as inputs.
- @param amount       The amount the transaction is for.
- @param address      The address the transaction will send the amount to.
+ @param utxos         Unsigned transactions to use as inputs.
+ @param amount        The amount the transaction is for.
+ @param address       The address the transaction will send the amount to.
 
  @return The built unsigned transaction.
  */
@@ -91,4 +91,5 @@
                                   to:(BCAddress *)address
                              feePerK:(NSNumber *)feePerK
                    withChangeAddress:(BCAddress *)changeAddress;
+
 @end
