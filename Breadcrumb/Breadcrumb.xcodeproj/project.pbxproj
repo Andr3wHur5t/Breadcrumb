@@ -49,6 +49,10 @@
 		377A19341A875F16007AA1CD /* BCScriptOpCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19331A875F16007AA1CD /* BCScriptOpCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19351A879185007AA1CD /* BCScript+DefaultScripts.h */; };
 		377A19381A879185007AA1CD /* BCScript+DefaultScripts.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19361A879185007AA1CD /* BCScript+DefaultScripts.m */; };
+		377A193D1A88871E007AA1CD /* BCTransactionOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A193B1A88871E007AA1CD /* BCTransactionOutput.h */; };
+		377A193E1A88871E007AA1CD /* BCTransactionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A193C1A88871E007AA1CD /* BCTransactionOutput.m */; };
+		377A19421A888741007AA1CD /* BCTransactionInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19401A888741007AA1CD /* BCTransactionInput.h */; };
+		377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19411A888741007AA1CD /* BCTransactionInput.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */; };
@@ -152,6 +156,10 @@
 		377A19331A875F16007AA1CD /* BCScriptOpCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCScriptOpCodes.h; sourceTree = "<group>"; };
 		377A19351A879185007AA1CD /* BCScript+DefaultScripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "BCScript+DefaultScripts.h"; path = "Script/BCScript+DefaultScripts.h"; sourceTree = "<group>"; };
 		377A19361A879185007AA1CD /* BCScript+DefaultScripts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "BCScript+DefaultScripts.m"; path = "Script/BCScript+DefaultScripts.m"; sourceTree = "<group>"; };
+		377A193B1A88871E007AA1CD /* BCTransactionOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCTransactionOutput.h; path = Transaction/BCTransactionOutput.h; sourceTree = "<group>"; };
+		377A193C1A88871E007AA1CD /* BCTransactionOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCTransactionOutput.m; path = Transaction/BCTransactionOutput.m; sourceTree = "<group>"; };
+		377A19401A888741007AA1CD /* BCTransactionInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCTransactionInput.h; path = Transaction/BCTransactionInput.h; sourceTree = "<group>"; };
+		377A19411A888741007AA1CD /* BCTransactionInput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCTransactionInput.m; path = Transaction/BCTransactionInput.m; sourceTree = "<group>"; };
 		37BFECB91A82D1460081BE4B /* Breadcrumb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breadcrumb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECBD1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37BFECBE1A82D1460081BE4B /* Breadcrumb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Breadcrumb.h; sourceTree = "<group>"; };
@@ -522,6 +530,8 @@
 		377A19281A870C36007AA1CD /* Transaction */ = {
 			isa = PBXGroup;
 			children = (
+				377A193F1A888725007AA1CD /* Inputs */,
+				377A193A1A888706007AA1CD /* Outputs */,
 				377A19291A870C67007AA1CD /* BCTransaction.h */,
 				377A192A1A870C67007AA1CD /* BCTransaction.m */,
 			);
@@ -547,6 +557,24 @@
 				377A19361A879185007AA1CD /* BCScript+DefaultScripts.m */,
 			);
 			name = Script;
+			sourceTree = "<group>";
+		};
+		377A193A1A888706007AA1CD /* Outputs */ = {
+			isa = PBXGroup;
+			children = (
+				377A193B1A88871E007AA1CD /* BCTransactionOutput.h */,
+				377A193C1A88871E007AA1CD /* BCTransactionOutput.m */,
+			);
+			name = Outputs;
+			sourceTree = "<group>";
+		};
+		377A193F1A888725007AA1CD /* Inputs */ = {
+			isa = PBXGroup;
+			children = (
+				377A19401A888741007AA1CD /* BCTransactionInput.h */,
+				377A19411A888741007AA1CD /* BCTransactionInput.m */,
+			);
+			name = Inputs;
 			sourceTree = "<group>";
 		};
 		37BFECAF1A82D1460081BE4B = {
@@ -683,7 +711,9 @@
 				37BFED3C1A82D49A0081BE4B /* BRTxInputEntity.h in Headers */,
 				377A191A1A858DB3007AA1CD /* BCAProvider.h in Headers */,
 				377A190B1A84446C007AA1CD /* BCAddress.h in Headers */,
+				377A19421A888741007AA1CD /* BCTransactionInput.h in Headers */,
 				3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */,
+				377A193D1A88871E007AA1CD /* BCTransactionOutput.h in Headers */,
 				37BFED0A1A82D35B0081BE4B /* BRMerkleBlock.h in Headers */,
 				37BFED111A82D35B0081BE4B /* BRPeer.h in Headers */,
 				37BFED171A82D35B0081BE4B /* BRWallet.h in Headers */,
@@ -821,6 +851,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */,
 				37BFECEC1A82D29C0081BE4B /* Reachability.m in Sources */,
 				37BFED0E1A82D35B0081BE4B /* BRPaymentProtocol.m in Sources */,
 				377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */,
@@ -853,6 +884,7 @@
 				377A191B1A858DB3007AA1CD /* BCAProvider.m in Sources */,
 				377A19081A8441CD007AA1CD /* BCAWallet.m in Sources */,
 				377A191F1A858FFF007AA1CD /* BCProviderChain.m in Sources */,
+				377A193E1A88871E007AA1CD /* BCTransactionOutput.m in Sources */,
 				377A19111A844D76007AA1CD /* BCWallet.m in Sources */,
 				37BFED101A82D35B0081BE4B /* BRPaymentRequest.m in Sources */,
 				37BFED081A82D35B0081BE4B /* BRKey+BIP38.m in Sources */,

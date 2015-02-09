@@ -29,6 +29,7 @@
 - (instancetype)initWithAddresses:(NSArray *)addresses
                            script:(BCScript *)script
                              hash:(NSString *)hash
+                      outputIndex:(uint32_t)outputIndex
                             value:(NSNumber *)value
                             spent:(NSNumber *)spent
                     confirmations:(NSNumber *)confirmations
@@ -49,6 +50,8 @@
  @brief The transactions hash.
  */
 @property(strong, nonatomic, readonly) NSString *hash;
+
+@property(assign, nonatomic, readonly) uint32_t outputIndex;
 
 /*!
  @brief The value of the transaction.

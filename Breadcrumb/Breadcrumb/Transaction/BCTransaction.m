@@ -10,11 +10,15 @@
 #import "BCScript+DefaultScripts.h"
 #import "BreadcrumbCore.h"
 
+#import "BCTransactionOutput.h"
+#import "BCTransactionInput.h"
+
 @implementation BCTransaction
 
 @synthesize addresses = _addresses;
 @synthesize script = _script;
 @synthesize hash = _hash;
+@synthesize outputIndex = _outputIndex;
 
 @synthesize value = _value;
 @synthesize spent = _spent;
@@ -27,6 +31,7 @@
 - (instancetype)initWithAddresses:(NSArray *)addresses
                            script:(BCScript *)script
                              hash:(NSString *)hash
+                      outputIndex:(uint32_t)outputIndex
                             value:(NSNumber *)value
                             spent:(NSNumber *)spent
                     confirmations:(NSNumber *)confirmations
@@ -44,6 +49,8 @@
     _script = script;
     if (![hash isKindOfClass:[NSString class]]) return NULL;
     _hash = hash;
+
+    _outputIndex = outputIndex;
 
     if (![value isKindOfClass:[NSNumber class]]) return NULL;
     _value = value;
@@ -70,12 +77,13 @@
       addresses = [address toString];
     }
 
-  return
-      [NSString stringWithFormat:
-                    @"[Address(es): %@\nValue: %@\nSpent: %@\n"
-                    @"Confirmations: %@\nHash: %@\nscript: %@\nisSigned: %@]\n",
-                    addresses, self.value, self.spent, self.confirmations,
-                    self.hash, self.script, self.isSigned ? @"true" : @"false"];
+  return [NSString stringWithFormat:@"Address(es): %@\nValue: %@\nSpent: %@\n"
+                                    @"Confirmations: %@\nHash: %@\nOutput "
+                                    @"Index:%@\nScript: '%@'\nisSigned: %@\n",
+                                    addresses, self.value, self.spent,
+                                    self.confirmations, self.hash,
+                                    @(self.outputIndex), self.script,
+                                    self.isSigned ? @"true" : @"false"];
 }
 
 #pragma mark Transaction Building
@@ -94,7 +102,10 @@
                                   to:(BCAddress *)address
                              feePerK:(NSNumber *)feePerK
                    withChangeAddress:(BCAddress *)changeAddress {
-  BCScript *outputTargetScript, *changeScript;
+  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0;
+  BCTransactionOutput *targetOutput, *changeOutput;
+  BCTransactionInput *utxoInput;
+  BCTransaction *newTransaction;
   // Validate addresses
   if (![address isKindOfClass:[BCAddress class]] ||
       ![changeAddress isKindOfClass:[BCAddress class]])
@@ -108,23 +119,50 @@
     if (tx.isSigned) return NULL;
   }
 
-  // Validate Amount Within Params
+  // Set our target amount as a usable value
+  targetAmount = [amount unsignedIntegerValue];
+
+  // Validate target amount within params
 
   // Create Mutable Transaction
+  newTransaction = [[BCTransaction alloc] init];
 
-  // Should we assume the UTXOs are optimized?
   // Set Inputs From UTXOs
+  for (BCTransaction *utxo in utxos) {
+    // Convert utxo into transactionInput
+    utxoInput = [[BCTransactionInput alloc] initWithTransaction:utxo];
+    // Add Transaction Input
+
+    // Sum the UTXOs values
+    utxoSumAmount += [utxo.value unsignedIntegerValue];
+  }
+
+  // Calculate the fee Based off of the transaction size.
+  feeAmount = 1;
+
+  if (utxoSumAmount < (targetAmount + feeAmount)) {
+    // not enough Funds Error
+    return NULL;
+  }
+
+  // Because transactions in bitcoin require you to spend an entire transaction
+  // to keep the leftover we need a change address so that you only spend the
+  // desired amount. Anything left over in the transaction is considered the
+  // mining fee.
+  changeAmount = utxoSumAmount - (targetAmount + feeAmount);
 
   // Set Target Outputs
-  outputTargetScript = [BCScript standardTransactionScript:address];
-  if (![outputTargetScript isKindOfClass:[BCScript class]]) return NULL;
+  targetOutput = [BCTransactionOutput standardOutputForAmount:@(targetAmount)
+                                                    toAddress:address];
+  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
 
   // Set Change Output
-  changeScript = [BCScript standardTransactionScript:changeAddress];
-  if (![changeScript isKindOfClass:[BCScript class]]) return NULL;
+  changeOutput = [BCTransactionOutput standardOutputForAmount:@(changeAmount)
+                                                    toAddress:changeAddress];
+  if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
 
-  // Return
-  return NULL;
+  // Return the built transaction
+  return newTransaction;
 }
 
 #pragma mark Old

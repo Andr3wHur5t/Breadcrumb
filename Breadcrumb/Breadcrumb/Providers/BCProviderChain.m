@@ -20,6 +20,7 @@ static NSString *const kBCChainProvider_ErrorCode = @"code";
 static NSString *const kBCChainProvider_Addresses = @"addresses";
 static NSString *const kBCChainProvider_Script = @"script_hex";
 static NSString *const kBCChainProvider_Hash = @"transaction_hash";
+static NSString *const kBCChainProvider_OutputIndex = @"output_index";
 static NSString *const kBCChainProvider_Value = @"value";
 static NSString *const kBCChainProvider_Spent = @"spent";
 static NSString *const kBCChainProvider_Confirmations = @"confirmations";
@@ -125,10 +126,11 @@ static NSString *const kChainUTXOsURL =
 
   // Convert transactions to native object
   utxos = [[NSMutableArray alloc] init];
-  for (NSDictionary *transaction in response)
+  for (NSDictionary *transaction in response) {
     _transaction = [BCTransaction transactionFromChainTransaction:transaction];
-  if ([_transaction isKindOfClass:[BCTransaction class]])
-    [utxos addObject:_transaction];
+    if ([_transaction isKindOfClass:[BCTransaction class]])
+      [utxos addObject:_transaction];
+  }
 
   callback([NSArray arrayWithArray:utxos], NULL);
 }
@@ -246,7 +248,7 @@ static NSString *const kChainUTXOsURL =
   NSMutableArray *addresses;
   BCScript *script;
   NSString *scriptHex, *transactionHash;
-  NSNumber *value, *spent, *confirmations, *isSigned;
+  NSNumber *value, *spent, *confirmations, *isSigned, *outputIndex;
 
   rawAddresses = [chainTransaction objectForKey:kBCChainProvider_Addresses];
   if (![rawAddresses isKindOfClass:[NSArray class]]) return NULL;
@@ -272,6 +274,9 @@ static NSString *const kChainUTXOsURL =
   transactionHash = [chainTransaction objectForKey:kBCChainProvider_Hash];
   if (![transactionHash isKindOfClass:[NSString class]]) return NULL;
 
+  outputIndex = [chainTransaction objectForKey:kBCChainProvider_OutputIndex];
+  if (![outputIndex isKindOfClass:[NSNumber class]]) return NULL;
+
   value = [chainTransaction objectForKey:kBCChainProvider_Value];
   if (![value isKindOfClass:[NSNumber class]]) return NULL;
 
@@ -287,6 +292,7 @@ static NSString *const kChainUTXOsURL =
       initWithAddresses:[NSArray arrayWithArray:addresses]
                  script:script
                    hash:transactionHash
+            outputIndex:[outputIndex unsignedIntValue]
                   value:value
                   spent:spent
           confirmations:confirmations
