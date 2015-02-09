@@ -716,6 +716,7 @@
 				37BFECB51A82D1460081BE4B /* Frameworks */,
 				37BFECB61A82D1460081BE4B /* Headers */,
 				37BFECB71A82D1460081BE4B /* Resources */,
+				377A19391A882CEF007AA1CD /* Make Univeral Framework */,
 			);
 			buildRules = (
 			);
@@ -797,6 +798,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		377A19391A882CEF007AA1CD /* Make Univeral Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Make Univeral Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Compiles the framework into a universal framework\nSCRIPT_SRC=$(find \"$PROJECT_DIR/../\" -name 'makeUniversalFramework.sh')\nif [ ! \"${SCRIPT_SRC}\" ]; then\necho \"Make Universal Framework Failed: err: script not found. Make sure that you're including script in your project directory\"\nexit 1\nfi\nsource \"${SCRIPT_SRC}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		37BFECB41A82D1460081BE4B /* Sources */ = {
