@@ -6,23 +6,22 @@ With minimalistic interfaces you can quickly get started working with Bitcoin, a
 
 Explore the capabilities of the block chain by publishing, and building custom transactions, and scripts.
 
-Making a wallet is so easy you can start receiving, and sending Bitcoin in no time.
+Making a wallet is so easy you can start sending, and receiving Bitcoin in less than 15 lines of code.
 
 ## How to get started
 
-To get started include `Breadcurmb.framework`, `CommonCrypto.framework`, and `CoreData.framework` into your Xcode project.
+Include `Breadcrumb.framework`, `CommonCrypto.framework`, and `CoreData.framework` into your Xcode project.
 
-You will need to include the breadcrumb headers by adding `#import <Breadcrumb/Breadcrumb.h>` to one of your applications' source file.
+Add `#import <Breadcrumb/Breadcrumb.h>` to one of your applications' source files.
 
-
-Finally you can start working with **Breadcrumb**.
+Make a wallet, and start sending Bitcoin.
 
 ```Objective-C
   NSData *password = [@"password" dataUsingEncoding:NSUTF8StringEncoding];
   BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
 
   BCAddress *address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
-  NSNumber *amount = [@200 toSatoshi];
+  NSNumber *amount = @20000; // Satoshi
   [wallet send:amount to:address usingPassword:password withCallback:
   ^(NSError *error) { 
        if ( [error isKindOfClass:[NSError class]] )
