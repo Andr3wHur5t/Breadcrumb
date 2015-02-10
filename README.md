@@ -1,33 +1,24 @@
 # Breadcrumb
 
-Breadcrumb takes away the complexity that you normally encounter when working with other Bitcoin, or Blockchain libraries. 
+**Breadcrumb** takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
 
-With minimalistic interfaces you can quickly get started working with Bitcoin, and the Blockchain.
+With minimalistic interfaces you can quickly get started working with **Bitcoin**, and the **Blockchain**.
 
-Explore the capabilities of the block chain by publishing, and building custom transactions, and scripts.
+Explore the capabilities of the block chain by **publishing**, and **building** custom **transactions**, and **scripts**.
 
-Making a wallet is so easy you can start receiving, and sending Bitcoin in just 4 lines.
+Making a wallet is so easy you can start receiving, and sending Bitcoin in no time.
 
 ## How to get started
 
-To get started include Breadcurmb.framework, CommonCrypto.framework, and CoreData.framework into your xCode project then include the breadcrumb headers “#import <Breadcrumb/Breadcrumb.h>” to your applications.
+To get started include `Breadcurmb.framework`, `CommonCrypto.framework`, and `CoreData.framework` into your Xcode project then include the breadcrumb headers by adding `#import <Breadcrumb/Breadcrumb.h>` to one of your applications' source file.
 
 
-Finally you can start working with breadcrumb.
+Finally you can start working with **Breadcrumb**.
 
-```
-  // The password is an NSData object so that you can easily use touch
-  // authentication, and other authentication sources.
+```Objective-C
   NSData *password = [@"password" dataUsingEncoding:NSUTF8StringEncoding];
-
-  // When you instantiate a wallet it requires a password to decrypt private
-  // restoration data, or encrypt new private data such as the wallets' seed
-  // phrase.
   BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
 
-  // Sending Bitcoin is as easy just specify the amount of satoshi,
-  // the address to send to, and a completion. The wallet, and service provider
-  // will handle the rest.
   BCAddress *address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
   NSNumber *amount = [@200 toSatoshi];
   [wallet send:amount to:address usingPassword:password withCallback:
@@ -36,8 +27,6 @@ Finally you can start working with breadcrumb.
        		NSLog(@"Transaction Failed: '%@'",error.localizedDescription); 
   }];
 
-  // You can retrieve the wallets protected info like is mnemonic phrase using
-  // the password
   [wallet mnemonicPhraseWithPassword:password
                        usingCallback:^(NSString *mnemonic) { 
   	NSLog(@"Brainwallet Phrase: %@",mnemonic);
@@ -48,7 +37,7 @@ Finally you can start working with breadcrumb.
 
 
 ## License
-Breadcrumb is under MIT license, and uses source from Breadwallet (also under MIT) 
+Breadcrumb is under **MIT license**, and uses source from **Breadwallet** (also under MIT) 
 
 
 The MIT License (MIT)
