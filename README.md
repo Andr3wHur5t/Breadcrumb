@@ -2,9 +2,9 @@
 
 **Breadcrumb** takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
 
-With minimalistic interfaces you can quickly get started working with **Bitcoin**, and the **Blockchain**.
+With minimalistic interfaces you can quickly get started working with Bitcoin, and the Blockchain.
 
-Explore the capabilities of the block chain by **publishing**, and **building** custom **transactions**, and **scripts**.
+Explore the capabilities of the block chain by publishing, and building custom transactions, and scripts.
 
 Making a wallet is so easy you can start receiving, and sending Bitcoin in no time.
 
