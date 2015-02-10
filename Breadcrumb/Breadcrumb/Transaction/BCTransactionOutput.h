@@ -36,6 +36,10 @@
  */
 @property(strong, nonatomic, readonly) BCScript *script;
 
+#pragma mark Fee Calculation
+
+- (NSUInteger)size;
+
 #pragma mark Representations
 
 /*!

@@ -12,17 +12,6 @@
 
 @interface BCWallet (Transactions)
 /*!
- @brief Gets UTXOs (unspent transaction outputs) for a transaction with the
- specified amount from the wallets provider.
-
- @param amount    The minimum amount that the sum of UTXO should equal to.
- @param callback  The callback to call with the resulting UTXOs, or operation
- errors.
- */
-- (void)UTXOforAmount:(NSNumber *)amount
-         withCallback:(void (^)(NSArray *, NSError *))callback;
-
-/*!
  @brief Creates a transaction for the current wallet at the specified amount to
  the specified address.
 
@@ -31,32 +20,8 @@
  @param callback The callback to call with the unsigned transaction, or an
  operational error.
  */
-- (void)unsignedTransactionForAmount:(NSNumber *)amount
+- (void)_unsignedTransactionForAmount:(NSNumber *)amount
                                   to:(BCAddress *)address
                         withCallback:
                             (void (^)(BCMutableTransaction *, NSError *))callback;
-
-/*!
- @brief Signs the inputted transaction.
-
- @param transaction The transaction to sign.
-
- @return The signed transaction.
- */
-- (BCMutableTransaction *)signTransaction:(BCMutableTransaction *)transaction;
-
-/*!
- @brief Publishes the transaction to the wallets provider.
-
- @param transaction   The transaction to publish.
- @param completion    The completion to call when the operation completes, or
- fails.
- */
-- (void)publishTransaction:(BCMutableTransaction *)transaction
-            withCompletion:(void (^)(NSError *))completion;
-
-#pragma mark Errors
-
-+ (NSError *)failedToCreateUnsignedTransactionError;
-+ (NSError *)failedToRetriveUTXOsError;
 @end

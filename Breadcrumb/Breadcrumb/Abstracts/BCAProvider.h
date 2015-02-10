@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "BCAddress.h"
+#import "BCMutableTransaction.h"
 #import "BCTransaction.h"
+#import "BCAddress.h"
 #import "BCAmount.h"
 
 @interface BCAProvider : NSObject
@@ -39,7 +40,7 @@
  @param completion  The completion to call once the transaction has been
  published, or the operation failed.
  */
-- (void)publishTransaction:(BCTransaction *)transaction
+- (void)publishTransaction:(BCMutableTransaction *)transaction
             withCompletion:(void (^)(NSError *))completion;
 
 @end

@@ -57,22 +57,7 @@
 - (void)mnemonicPhraseWithPassword:(NSData *)password
                      usingCallback:(void (^)(NSString *))callback;
 
-/*!
- @brief Gets the wallets private information in its password protected format to
- be used in restoration.
-
- @return Dictionary with the wallets private info password protected.
- */
-- (NSDictionary *)privateInfo;
-
-/*!
- @brief Public wallet info to be used for restoration.
-
- @return Public information about the wallet in clear text.
- */
-- (NSDictionary *)publicInfo;
-
-#pragma mark Address Management
+#pragma mark Addresses
 
 #pragma mark Delegate Classes
 /*!

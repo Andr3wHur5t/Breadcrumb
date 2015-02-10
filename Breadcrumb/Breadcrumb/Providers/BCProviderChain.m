@@ -8,6 +8,8 @@
 
 #import "BCProviderChain.h"
 #import "BCTransaction.h"
+#import "BCMutableTransaction.h"
+#import "NSData+ConversionUtilties.h"
 #import "BreadcrumbCore.h"
 
 // Chain Error Constants
@@ -49,11 +51,11 @@ static NSString *const kChainUTXOsURL =
 // Need to get optimized UTXOs for transaction amounts
 
 #pragma mark Publish Interface
-- (void)publishTransaction:(BCTransaction *)transaction
+- (void)publishTransaction:(BCMutableTransaction *)transaction
             withCompletion:(void (^)(NSError *))completion {
   // Publish to the Bitcoin Network.
-
-  NSLog(@"Do Things");
+  NSLog(@"Publish Trasaction:\n'%@'", [[transaction toData] toHex]);
+  completion(NULL);
 }
 
 #pragma mark Chain API interface

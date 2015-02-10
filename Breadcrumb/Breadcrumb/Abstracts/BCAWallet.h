@@ -42,7 +42,8 @@
  @param callback The callback to call when the operation completes or fails
  */
 - (void)send:(NSNumber *)amount
-              to:(BCAddress *)address
-    withCallback:(void (^)(NSError *))callback;
+               to:(BCAddress *)address
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSError *))callback;
 
 @end

@@ -7,52 +7,9 @@
 //
 
 #import "BCWallet.h"
+#import "_BCWallet.h"
 #import "BCMnemonic.h"
-#import "BCWallet+Transactions.h"
-#import "BreadcrumbCore.h"
-#import "BCProviderChain.h"
-#import "NSData+Encryption.h"
 
-// Crypto Queue Label
-static const char *kBCCryptQueueLabel = "com.Breadcrumb.crypto";
-
-// Errors
-static NSString *const kBCWalletError_Domain =
-    @"com.breadcrumb.transactionBuilder";
-static NSString *const kBCWalletError_FailedToSign =
-    @"Failed to sign transaction.";
-
-// Restoration Keys
-static NSString *const kBCRestoration_Seed = @"seed";
-static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
-
-@interface BCWallet ()
-
-/*!
- @brief The cypher text of the mnemonic key.
- */
-@property(strong, nonatomic, readonly) NSData *mnemonicCypherText;
-
-/*!
- @brief The cypher text of the seed.
- */
-@property(strong, nonatomic, readonly) NSData *seedCypherText;
-
-#pragma mark HD
-/*!
- @brief The master public key of the BIP32 hierarchal wallet.
- */
-@property(strong, nonatomic, readonly) NSData *masterPublicKey;
-
-/*!
- @brief The BIP32 sequence utility object.
-
- @discussion I see no reason for this to be in a instance object, I will change
- its' methods into class methods.
- */
-@property(strong, nonatomic, readonly) BRBIP32Sequence *keySequence;
-
-@end
 
 @implementation BCWallet
 
@@ -129,7 +86,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     __block void (^sCallback)() = callback;
     // Dispatch async becaue scrypt from the password takes about 5 sec which is
     // too long to run on the main thread.
-    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
+    dispatch_async(self.queue, ^{
         [self _setMnemonic:sMnemonic withPassword:sPassword];
         sMnemonic = NULL;
         sPassword = NULL;
@@ -146,7 +103,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
                        allowLossyConversion:FALSE];
     if (![clearText isKindOfClass:[NSData class]]) return;
 
-    key = [[self class] keyFromPassword:password];
+    key = [[self class] _keyFromPassword:password];
     if (![key isKindOfClass:[NSData class]]) return;
 
     // Encrypt the cleartext with the password
@@ -165,8 +122,8 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     __block void (^sCallback)(NSString *) = callback;
     // Dispatch async becaue scrypt from the password takes about 5 sec which is
     // too long to run on the main thread.
-    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
-        __block NSString *phrase = [self mnemonicWithPassword:sPassword];
+    dispatch_async(self.queue, ^{
+        __block NSString *phrase = [self _mnemonicWithPassword:sPassword];
         sPassword = NULL;
         dispatch_async(dispatch_get_main_queue(), ^{
             sCallback(phrase);
@@ -176,7 +133,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   }
 }
 
-- (NSString *)mnemonicWithPassword:(NSData *)password {
+- (NSString *)_mnemonicWithPassword:(NSData *)password {
   @autoreleasepool {
     NSData *clearData, *key;
     NSString *clearText;
@@ -184,7 +141,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
         ![password isKindOfClass:[NSData class]])
       return NULL;
 
-    key = [[self class] keyFromPassword:password];
+    key = [[self class] _keyFromPassword:password];
     if (![key isKindOfClass:[NSData class]]) return NULL;
 
     clearData = [_mnemonicCypherText AES256Decrypt:key];
@@ -209,7 +166,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     __block void (^sCallback)() = callback;
     // Dispatch async becaue scrypt from the password takes about 5 sec which is
     // too long to run on the main thread.
-    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
+    dispatch_async(self.queue, ^{
         [self _setSeed:sSeed withPassword:sPassword];
         sPassword = NULL;
         sSeed = NULL;
@@ -222,7 +179,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   @autoreleasepool {
     NSData *key, *cypherText;
 
-    key = [[self class] keyFromPassword:password];
+    key = [[self class] _keyFromPassword:password];
     if (![key isKindOfClass:[NSData class]]) return;
 
     cypherText = [seed AES256Encrypt:key];
@@ -234,11 +191,11 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   }
 }
 
-- (NSData *)seedWithPassword:(NSData *)password {
+- (NSData *)_seedWithPassword:(NSData *)password {
   @autoreleasepool {
     NSData *clearText, *key;
 
-    key = [[self class] keyFromPassword:password];
+    key = [[self class] _keyFromPassword:password];
     if (![key isKindOfClass:[NSData class]]) return NULL;
 
     clearText = [_seedCypherText AES256Decrypt:key];
@@ -256,9 +213,9 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     __block NSData *sPassword = password;
     // Dispatch async becaue scrypt from the password takes about 5 sec which is
     // too long to run on the main thread.
-    dispatch_async(dispatch_queue_create(kBCCryptQueueLabel, 0), ^{
+    dispatch_async(self.queue, ^{
         // TODO: Dispatch on Main so the user dosn't need to thing about queues
-        sCallback([self seedWithPassword:sPassword]);
+        sCallback([self _seedWithPassword:sPassword]);
         sPassword = NULL;
     });
   }
@@ -288,58 +245,11 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
   return [@"1K4nPxBMy6sv7jssTvDLJWk1ADHBZEoUVb" toBitcoinAddress];
 }
 
-#pragma mark Transactions
+#pragma mark Queue
 
-- (void)send:(NSNumber *)amount
-              to:(BCAddress *)address
-    withCallback:(void (^)(NSError *))callback {
-  NSParameterAssert([amount isKindOfClass:[NSNumber class]]);
-  NSParameterAssert([address isKindOfClass:[BCAddress class]]);
-  NSParameterAssert([(id)callback isKindOfClass:NSClassFromString(@"NSBlock")]);
-  if (![amount isKindOfClass:[NSNumber class]] ||
-      ![address isKindOfClass:[BCAddress class]] ||
-      ![(id)callback isKindOfClass:NSClassFromString(@"NSBlock")])
-    return;
-
-  [self unsignedTransactionForAmount:amount
-                                  to:address
-                        withCallback:
-                            [self signTransactionBlockForCallback:callback]];
-}
-
-- (void (^)(id, NSError *))signTransactionBlockForCallback:
-                               (void (^)(NSError *))callback {
-  __block void (^sCallback)(NSError *);
-  NSParameterAssert([(id)callback isKindOfClass:NSClassFromString(@"NSBlock")]);
-  if (![(id)callback isKindOfClass:NSClassFromString(@"NSBlock")]) return NULL;
-
-  // Set Block Safe vars
-  sCallback = callback;
-
-  return ^(id unsignedTransaction, NSError *error) {
-      id signedTransaction;
-
-      if ([error isKindOfClass:[NSError class]]) {
-        // The operation failed report error
-        sCallback(error);
-
-      } else if ([unsignedTransaction isKindOfClass:[NSObject class]]) {
-        // We Created the unsigned transaction, we need to sign it
-        signedTransaction = [self signTransaction:unsignedTransaction];
-        if (![unsignedTransaction isKindOfClass:[NSObject class]]) {
-          // We Failed to sign the transaction
-          sCallback([[self class] failedToSignTransactionError]);
-          return;
-        }
-
-        // Publish the transaction to the provider
-        [self publishTransaction:signedTransaction withCompletion:sCallback];
-
-      } else {
-        // Failed to create an unsigned transaction
-        sCallback([[self class] failedToCreateUnsignedTransactionError]);
-      }
-  };
+- (dispatch_queue_t)queue {
+  if (!__queue) __queue = dispatch_queue_create(kBCWalletQueueLabel, NULL);
+  return __queue;
 }
 
 #pragma mark Defaults
@@ -349,22 +259,6 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 }
 
 #pragma mark Utilities
-
-+ (NSData *)keyFromPassword:(NSData *)password {
-  @autoreleasepool {
-    NSData *keyData;
-    keyData = [NSData scryptPassword:password
-                           usingSalt:[self saltData]
-                    withOutputLength:32];
-
-    return keyData;
-  }
-}
-
-+ (NSData *)saltData {
-  // TODO: Get salt on a per user basis
-  return @"0X0X0X0XEFFF".hexToData;
-}
 
 + (NSDictionary *)privateInfoWithEncryptedSeed:(NSData *)seed
                              encryptedMnemonic:(NSData *)mnemonic {
@@ -377,16 +271,4 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
     return @{kBCRestoration_Seed : seed, kBCRestoration_Mnemonic : mnemonic};
   }
 }
-
-#pragma mark Errors
-
-+ (NSError *)failedToSignTransactionError {
-  return
-      [NSError errorWithDomain:kBCWalletError_Domain
-                          code:1
-                      userInfo:@{
-                        NSLocalizedDescriptionKey : kBCWalletError_FailedToSign
-                      }];
-}
-
 @end

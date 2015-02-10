@@ -19,9 +19,9 @@
 
 #pragma mark Construction
 
-- (instancetype) init {
+- (instancetype)init {
   self = [super init];
-  if ( self ) {
+  if (self) {
     self.lockTime = 0;
   }
   return self;
@@ -110,6 +110,20 @@
   return TRUE;
 }
 
+#pragma mark Fee Calculation
+
+- (NSUInteger)currentSize {
+  NSUInteger size = sizeof(BC_BITCOIN_VERSION) + sizeof(self.lockTime);
+  if (![self inputsAreValid] || ![self outputsAreValid]) return 0;
+
+  for (NSUInteger i = 0; i < self.outputs.count; ++i)
+    size += [((BCTransactionOutput *)[self.outputs objectAtIndex:i])size];
+  for (NSUInteger i = 0; i < self.inputs.count; ++i)
+    size += [((BCTransactionInput *)[self.inputs objectAtIndex:i])size];
+
+  return size;
+}
+
 #pragma mark Debug
 
 - (NSString *)description {
@@ -118,9 +132,6 @@
 
 #pragma mark Transaction Building
 
-// TODO: make sure transaction is less than TX_MAX_SIZE
-// TODO: use up all UTXOs for all used addresses to avoid leaving funds in
-// addresses whose public key is revealed
 // TODO: avoid combining addresses in a single transaction when possible to
 // reduce information leakage
 // TODO: use any UTXOs received from output addresses to mitigate an
@@ -132,16 +143,16 @@
                                             to:(BCAddress *)address
                                        feePerK:(NSNumber *)feePerK
                              withChangeAddress:(BCAddress *)changeAddress {
-  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0;
+  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0, transactionSize = 0;
   BCTransactionOutput *targetOutput, *changeOutput;
   BCTransactionInput *utxoInput;
   BCMutableTransaction *newTransaction;
-  
+
   // Validate addresses
   if (![address isKindOfClass:[BCAddress class]] ||
       ![changeAddress isKindOfClass:[BCAddress class]])
     return NULL;
-  
+
   // Validate UTXOs
   if (![utxos isKindOfClass:[NSArray class]]) return NULL;
   for (NSUInteger i = 0; i < utxos.count; ++i) {
@@ -149,30 +160,40 @@
     if (![tx isKindOfClass:[BCTransaction class]]) return NULL;
     if (tx.isSigned) return NULL;
   }
-  
+
   // Set our target amount as a usable value
   targetAmount = [amount unsignedIntegerValue];
-  
+
   // Validate target amount within params
-  
+
   // Create Mutable Transaction
   newTransaction = [BCMutableTransaction mutableTransaction];
-  
+
   // Set Inputs From UTXOs
   for (BCTransaction *utxo in utxos) {
     // Convert utxo into transactionInput
     utxoInput = [[BCTransactionInput alloc] initWithTransaction:utxo];
+
     // Add Transaction Input
     [newTransaction addInput:utxoInput];
-    
-    utxoInput = [[BCTransactionInput alloc] initWithData:[utxoInput toData]];
+
     // Sum the UTXOs values
     utxoSumAmount += [utxo.value unsignedIntegerValue];
   }
-  
-  // Calculate the fee Based off of the transaction size.
-  feeAmount = 1;
-  
+
+  // Set Target Outputs
+  targetOutput = [BCTransactionOutput standardOutputForAmount:@(targetAmount)
+                                                    toAddress:address];
+  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
+  [newTransaction addOutput:targetOutput];
+
+  // Calculate the fee Based off of the transaction size. Assume Change Output
+  transactionSize = [newTransaction currentSize] + 39;
+  feeAmount =
+      ((CGFloat)transactionSize / 1000.0f) * [feePerK unsignedIntegerValue];
+  feeAmount = MAX(feeAmount, 10000);
+
+  // Check For Funds
   if (utxoSumAmount < (targetAmount + feeAmount)) {
     // not enough Funds Error
     return NULL;
@@ -184,18 +205,19 @@
   // mining fee.
   changeAmount = utxoSumAmount - (targetAmount + feeAmount);
   
-  // Set Target Outputs
-  targetOutput = [BCTransactionOutput standardOutputForAmount:@(targetAmount)
-                                                    toAddress:address];
-  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
-  [newTransaction addOutput:targetOutput];
-  
+  // Check if we are over the limit for standard transactions
+  if ( transactionSize >= 100000 ) {
+    // Non Standard Transactions, Over size limit.
+    return NULL;
+  }
+
+
   // Set Change Output
   changeOutput = [BCTransactionOutput standardOutputForAmount:@(changeAmount)
                                                     toAddress:changeAddress];
   if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
   [newTransaction addOutput:changeOutput];
-  
+
   // Return the built transaction
   return newTransaction;
 }

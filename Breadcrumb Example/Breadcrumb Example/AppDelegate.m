@@ -71,17 +71,6 @@
   // phrase.
   BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
 
-  // Sending Bitcoin is as easy just specify the amount of satoshi,
-  // the address to send to, and a completion. The wallet, and service provider
-  // will handle the rest.
-  address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
-  amount = [@2 toSatoshi];
-  [wallet send:amount to:address withCallback:^(NSError *error) { return; }];
-
-  // TODO: Need to set actions to queue so when starting up things will execute
-  // in order, this is my temp work around. :(
-  sleep(5);
-
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password
   [wallet mnemonicPhraseWithPassword:password
@@ -90,6 +79,22 @@
                            [self showAlertWithTitle:@"Your Phrase"
                                          andMessage:mnemonic];
                        }];
+
+  // Sending Bitcoin is as easy just specify the amount of satoshi,
+  // the address to send to, and a completion. The wallet, and service provider
+  // will handle the rest.
+  address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
+  amount = [@200 toSatoshi];
+  [wallet send:amount
+                 to:address
+      usingPassword:password
+       withCallback:^(NSError *error) {
+           if ([error isKindOfClass:[NSError class]])
+             [self showAlertWithTitle:@"Woops"
+                           andMessage:error.localizedDescription];
+           else
+             [self showAlertWithTitle:@"Sent!" andMessage:@"You Sent Bitcoin!"];
+       }];
 }
 
 - (void)showAlertWithTitle:(NSString *)title andMessage:(NSString *)message {

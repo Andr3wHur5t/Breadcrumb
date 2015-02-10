@@ -31,8 +31,9 @@
 #pragma mark Transactions
 
 - (void)send:(NSNumber *)amount
-              to:(BCAddress *)address
-    withCallback:(void (^)(NSError *))callback {
+               to:(BCAddress *)address
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSError *))callback {
   NSAssert(FALSE, @"Called method on abstract class.");
 }
 

@@ -86,6 +86,12 @@
   return self;
 }
 
+#pragma mark Fee Calculation
+
+- (NSUInteger)size {
+  return [self toData].length;
+}
+
 #pragma mark Representations
 
 - (NSString *)toString {

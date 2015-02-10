@@ -48,6 +48,10 @@
  */
 @property(assign, nonatomic, readonly) BOOL isSigned;
 
+#pragma mark Fee Calculation
+
+- (NSUInteger)size;
+
 #pragma mark Representations
 
 - (NSString *)toString;
