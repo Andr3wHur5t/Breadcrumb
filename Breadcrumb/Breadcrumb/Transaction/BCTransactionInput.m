@@ -23,16 +23,15 @@
 - (instancetype)initWithData:(NSData *)data {
   NSUInteger position, length, scriptLength;
   uint32_t transactionIndex, sequence;
-  NSString *transactionHash;
-  NSData *scriptData;
+  NSData *scriptData, *transactionHash;
   BCScript *script;
   NSParameterAssert([data isKindOfClass:[NSData class]]);
   if (![data isKindOfClass:[NSData class]]) return NULL;
 
   // Parse Data
   position = 0;
-  transactionHash = [data stringAtOffset:0 length:&length];
-  position += length;
+  transactionHash = [data subdataWithRange:NSMakeRange(position, 32)];
+  position += 32;
   transactionIndex = [data UInt32AtOffset:position];
   position += sizeof(uint32_t);
   scriptLength = [data varIntAtOffset:position length:&length];
@@ -58,10 +57,10 @@
 
   return [self initWithHash:transaction.hash
               previousIndex:transaction.outputIndex
-                  andScript:NULL];
+                  andScript:transaction.script];
 }
 
-- (instancetype)initWithHash:(NSString *)hash
+- (instancetype)initWithHash:(NSData *)hash
                previousIndex:(uint32_t)index
                    andScript:(BCScript *)script {
   return [self initWithHash:hash
@@ -70,12 +69,12 @@
                 andSequence:UINT32_MAX];
 }
 
-- (instancetype)initWithHash:(NSString *)hash
+- (instancetype)initWithHash:(NSData *)hash
                previousIndex:(uint32_t)index
                       script:(BCScript *)script
                  andSequence:(uint32_t)sequence {
-  NSParameterAssert([hash isKindOfClass:[NSString class]]);
-  if (![hash isKindOfClass:[NSString class]]) return NULL;
+  NSParameterAssert([hash isKindOfClass:[NSData class]]);
+  if (![hash isKindOfClass:[NSData class]]) return NULL;
   self = [self init];
   if (self) {
     _previousOutputHash = hash;
@@ -101,7 +100,6 @@
 - (NSData *)toData {
   NSData *scriptData;
   NSMutableData *buffer;
-  if (!self.isSigned) return NULL;
 
   buffer = [[NSMutableData alloc] init];
 
@@ -109,7 +107,7 @@
   scriptData = [self.scriptSig toData];
   if (![scriptData isKindOfClass:[NSData class]]) return NULL;
 
-  [buffer appendString:self.previousOutputHash];
+  [buffer appendData:self.previousOutputHash];
   [buffer appendUInt32:self.previousOutputIndex];
   [buffer appendVarInt:scriptData.length];
   [buffer appendData:scriptData];

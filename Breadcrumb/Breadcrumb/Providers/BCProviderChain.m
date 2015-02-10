@@ -291,7 +291,7 @@ static NSString *const kChainUTXOsURL =
   return [[BCTransaction alloc]
       initWithAddresses:[NSArray arrayWithArray:addresses]
                  script:script
-                   hash:transactionHash
+                   hash:transactionHash.hexToData
             outputIndex:[outputIndex unsignedIntValue]
                   value:value
                   spent:spent

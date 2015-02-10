@@ -25,7 +25,7 @@
 /*!
  @brief The previous outputs hash.
  */
-@property(strong, nonatomic, readonly) NSString *previousOutputHash;
+@property(strong, nonatomic, readonly) NSData *previousOutputHash;
 
 /*!
  @brief The previous outputs index.

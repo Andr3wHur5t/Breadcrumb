@@ -28,7 +28,7 @@
  */
 - (instancetype)initWithAddresses:(NSArray *)addresses
                            script:(BCScript *)script
-                             hash:(NSString *)hash
+                             hash:(NSData *)hash
                       outputIndex:(uint32_t)outputIndex
                             value:(NSNumber *)value
                             spent:(NSNumber *)spent
@@ -49,7 +49,7 @@
 /*!
  @brief The transactions hash.
  */
-@property(strong, nonatomic, readonly) NSString *hash;
+@property(strong, nonatomic, readonly) NSData *hash;
 
 @property(assign, nonatomic, readonly) uint32_t outputIndex;
 
@@ -74,25 +74,5 @@
  @brief States if the transaction has been signed.
  */
 @property(assign, nonatomic, readonly) BOOL isSigned;
-
-#pragma mark Transaction Building
-
-/*!
- @brief Builds a transaction with the inputed UTXOs, amount, and output address.
-
- @discussion This optimizes transaction will target the smallest UTXOs first to
- attempt to reduce the number of UTXO.
-
- @param utxos         Unsigned transactions to use as inputs.
- @param amount        The amount the transaction is for.
- @param address       The address the transaction will send the amount to.
-
- @return The built unsigned transaction.
- */
-+ (instancetype)buildTransactionWith:(NSArray *)utxos
-                           forAmount:(NSNumber *)amount
-                                  to:(BCAddress *)address
-                             feePerK:(NSNumber *)feePerK
-                   withChangeAddress:(BCAddress *)changeAddress;
 
 @end

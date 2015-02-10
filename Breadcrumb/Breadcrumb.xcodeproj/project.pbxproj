@@ -53,6 +53,10 @@
 		377A193E1A88871E007AA1CD /* BCTransactionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A193C1A88871E007AA1CD /* BCTransactionOutput.m */; };
 		377A19421A888741007AA1CD /* BCTransactionInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19401A888741007AA1CD /* BCTransactionInput.h */; };
 		377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19411A888741007AA1CD /* BCTransactionInput.m */; };
+		377A19461A897F94007AA1CD /* BCMutableTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19441A897F94007AA1CD /* BCMutableTransaction.h */; };
+		377A19471A897F94007AA1CD /* BCMutableTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19451A897F94007AA1CD /* BCMutableTransaction.m */; };
+		377A194A1A8984ED007AA1CD /* NSData+ConversionUtilties.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19481A8984ED007AA1CD /* NSData+ConversionUtilties.h */; };
+		377A194B1A8984ED007AA1CD /* NSData+ConversionUtilties.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19491A8984ED007AA1CD /* NSData+ConversionUtilties.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */; };
@@ -160,6 +164,10 @@
 		377A193C1A88871E007AA1CD /* BCTransactionOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCTransactionOutput.m; path = Transaction/BCTransactionOutput.m; sourceTree = "<group>"; };
 		377A19401A888741007AA1CD /* BCTransactionInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCTransactionInput.h; path = Transaction/BCTransactionInput.h; sourceTree = "<group>"; };
 		377A19411A888741007AA1CD /* BCTransactionInput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCTransactionInput.m; path = Transaction/BCTransactionInput.m; sourceTree = "<group>"; };
+		377A19441A897F94007AA1CD /* BCMutableTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCMutableTransaction.h; path = Transaction/BCMutableTransaction.h; sourceTree = "<group>"; };
+		377A19451A897F94007AA1CD /* BCMutableTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCMutableTransaction.m; path = Transaction/BCMutableTransaction.m; sourceTree = "<group>"; };
+		377A19481A8984ED007AA1CD /* NSData+ConversionUtilties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+ConversionUtilties.h"; path = "Categories/NSData+ConversionUtilties.h"; sourceTree = "<group>"; };
+		377A19491A8984ED007AA1CD /* NSData+ConversionUtilties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+ConversionUtilties.m"; path = "Categories/NSData+ConversionUtilties.m"; sourceTree = "<group>"; };
 		37BFECB91A82D1460081BE4B /* Breadcrumb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breadcrumb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECBD1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37BFECBE1A82D1460081BE4B /* Breadcrumb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Breadcrumb.h; sourceTree = "<group>"; };
@@ -423,6 +431,8 @@
 				3767F13B1A830C9300AFD6D6 /* NSData+Hash.m */,
 				377A19201A85A5FC007AA1CD /* NSData+Encryption.h */,
 				377A19211A85A5FC007AA1CD /* NSData+Encryption.m */,
+				377A19481A8984ED007AA1CD /* NSData+ConversionUtilties.h */,
+				377A19491A8984ED007AA1CD /* NSData+ConversionUtilties.m */,
 			);
 			name = Data;
 			sourceTree = "<group>";
@@ -534,6 +544,8 @@
 				377A193A1A888706007AA1CD /* Outputs */,
 				377A19291A870C67007AA1CD /* BCTransaction.h */,
 				377A192A1A870C67007AA1CD /* BCTransaction.m */,
+				377A19441A897F94007AA1CD /* BCMutableTransaction.h */,
+				377A19451A897F94007AA1CD /* BCMutableTransaction.m */,
 			);
 			name = Transaction;
 			sourceTree = "<group>";
@@ -686,6 +698,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				377A194A1A8984ED007AA1CD /* NSData+ConversionUtilties.h in Headers */,
 				377A191E1A858FFF007AA1CD /* BCProviderChain.h in Headers */,
 				37BFED251A82D4070081BE4B /* BRBloomFilter.h in Headers */,
 				377A19221A85A5FC007AA1CD /* NSData+Encryption.h in Headers */,
@@ -719,6 +732,7 @@
 				37BFED171A82D35B0081BE4B /* BRWallet.h in Headers */,
 				377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */,
 				37BFED0F1A82D35B0081BE4B /* BRPaymentRequest.h in Headers */,
+				377A19461A897F94007AA1CD /* BCMutableTransaction.h in Headers */,
 				37BFED091A82D35B0081BE4B /* BRKeySequence.h in Headers */,
 				37BFED3A1A82D49A0081BE4B /* BRTransactionEntity.h in Headers */,
 				37BFED051A82D35B0081BE4B /* BRKey.h in Headers */,
@@ -864,7 +878,9 @@
 				37BFED121A82D35B0081BE4B /* BRPeer.m in Sources */,
 				37BFED161A82D35B0081BE4B /* BRTransaction.m in Sources */,
 				37BFED1A1A82D35B0081BE4B /* BRWalletManager.m in Sources */,
+				377A194B1A8984ED007AA1CD /* NSData+ConversionUtilties.m in Sources */,
 				377A192C1A870C67007AA1CD /* BCTransaction.m in Sources */,
+				377A19471A897F94007AA1CD /* BCMutableTransaction.m in Sources */,
 				3767F1431A830C9300AFD6D6 /* NSData+Bitcoin.m in Sources */,
 				37BFED1E1A82D3DC0081BE4B /* BRBIP32Sequence.m in Sources */,
 				37BFED181A82D35B0081BE4B /* BRWallet.m in Sources */,

@@ -20,11 +20,11 @@
 
 - (void)unsignedTransactionForAmount:(NSNumber *)amount
                                   to:(BCAddress *)address
-                        withCallback:(void (^)(BCTransaction *,
+                        withCallback:(void (^)(BCMutableTransaction *,
                                                NSError *))callback {
   __block NSNumber *sAmount;
   __block BCAddress *sAddress;
-  __block void (^sCallback)(BCTransaction *, NSError *);
+  __block void (^sCallback)(BCMutableTransaction *, NSError *);
   // TODO: Validate Input
 
   sAmount = amount;
@@ -42,7 +42,7 @@
 
              } else if ([UTXOs isKindOfClass:[NSArray class]]) {
                // Build the reansaction with the inputted UTXOs
-               transaction = [BCTransaction
+               transaction = [BCMutableTransaction
                    buildTransactionWith:UTXOs
                               forAmount:sAmount
                                      to:sAddress

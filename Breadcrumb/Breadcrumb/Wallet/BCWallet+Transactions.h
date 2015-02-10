@@ -8,6 +8,7 @@
 
 #import "BCWallet.h"
 #import "BCTransaction.h"
+#import "BCMutableTransaction.h"
 
 @interface BCWallet (Transactions)
 /*!
@@ -33,7 +34,7 @@
 - (void)unsignedTransactionForAmount:(NSNumber *)amount
                                   to:(BCAddress *)address
                         withCallback:
-                            (void (^)(BCTransaction *, NSError *))callback;
+                            (void (^)(BCMutableTransaction *, NSError *))callback;
 
 /*!
  @brief Signs the inputted transaction.
@@ -42,7 +43,7 @@
 
  @return The signed transaction.
  */
-- (BCTransaction *)signTransaction:(BCTransaction *)transaction;
+- (BCMutableTransaction *)signTransaction:(BCMutableTransaction *)transaction;
 
 /*!
  @brief Publishes the transaction to the wallets provider.
@@ -51,7 +52,7 @@
  @param completion    The completion to call when the operation completes, or
  fails.
  */
-- (void)publishTransaction:(BCTransaction *)transaction
+- (void)publishTransaction:(BCMutableTransaction *)transaction
             withCompletion:(void (^)(NSError *))completion;
 
 #pragma mark Errors
