@@ -20,6 +20,11 @@ Make a wallet, and start sending Bitcoin.
   NSData *password = [@"password" dataUsingEncoding:NSUTF8StringEncoding];
   BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
 
+  [wallet mnemonicPhraseWithPassword:password
+                       usingCallback:^(NSString *mnemonic) { 
+  	NSLog(@"Brainwallet Phrase: %@",mnemonic);
+  }];
+  
   BCAddress *address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
   NSNumber *amount = @20000; // Satoshi
   [wallet send:amount to:address usingPassword:password withCallback:
@@ -27,12 +32,7 @@ Make a wallet, and start sending Bitcoin.
        if ( [error isKindOfClass:[NSError class]] )
        		NSLog(@"Transaction Failed: '%@'",error.localizedDescription); 
   }];
-
-  [wallet mnemonicPhraseWithPassword:password
-                       usingCallback:^(NSString *mnemonic) { 
-  	NSLog(@"Brainwallet Phrase: %@",mnemonic);
-  }];
-                       
+                  
 ```
 
 
