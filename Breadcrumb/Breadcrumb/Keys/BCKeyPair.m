@@ -16,6 +16,12 @@
  @brief The protected private key.
  */
 @property(strong, nonatomic, readonly) BCProtectedData *privateKey;
+
+/*!
+ @brief I will be removing this soon so don't get too attached.
+ */
+@property(strong, nonatomic, readonly) BRBIP32Sequence *sequenceHelper;
+
 @end
 
 @implementation BCKeyPair
@@ -23,6 +29,8 @@
 @synthesize address = _address;
 @synthesize publicKey = _publicKey;
 @synthesize privateKey = _privateKey;
+
+@synthesize sequenceHelper = _sequenceHelper;
 
 #pragma mark Construction
 
@@ -73,18 +81,17 @@
   }
 }
 
-#pragma mark Child Retrevial
+#pragma mark Child Retrieval
 
-#pragma mark Siging Operations
+#pragma mark Signing Operations
 
 - (NSData *)sign:(NSData *)data withMemoryKey:(NSData *)memoryKey {
-  // TODO: Implment https://github.com/bitcoin/secp256k1 for signing, and
-  // signiture verification.
+  // TODO: Implement https://github.com/bitcoin/secp256k1 for signing, and
+  // signature verification.
   // ECDSA Sign
   return data;
 }
 
-#pragma mark Deriviation Operations
+#pragma mark Derivation Operations
 
-- ()
 @end

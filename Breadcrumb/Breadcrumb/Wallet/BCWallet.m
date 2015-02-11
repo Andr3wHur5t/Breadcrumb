@@ -84,8 +84,8 @@
         }
 
         // Create our key sequence, secure our private key with our memory key.
-        _keys = [[BCKeySequence alloc] initWithSeed:privateKey
-                                      withMemoryKey:memoryKey];
+        _keys = [[BCKeySequence alloc] initWithPrivateKey:privateKey
+                                             andMemoryKey:memoryKey];
         if (![_keys isKindOfClass:[BCKeySequence class]]) {
           NSLog(@"Failed to generate wallet key sequence!");
           return;
