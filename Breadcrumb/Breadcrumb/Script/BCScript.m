@@ -100,8 +100,9 @@
   for (NSUInteger i = 0; i < [self.buffer length]; i++) {
     // Attempt to get an op code from the current byte, append with a string for
     // readability
-    nextSegment =
-        [stringFromScriptOpCode(bytes[i]) stringByAppendingString:@" "];
+    nextSegment = [stringFromScriptOpCode(bytes[i])
+        stringByAppendingString:i + 1 < [self.buffer length] ? @" " : @""];
+
     if (![nextSegment isKindOfClass:[NSString class]]) {
       // Failed to get an op code, attempt to look for pushed data. pass an
       // index

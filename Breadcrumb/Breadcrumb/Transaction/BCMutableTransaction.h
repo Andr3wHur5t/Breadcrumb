@@ -17,6 +17,8 @@
  */
 + (instancetype)mutableTransaction;
 
+- (instancetype)initWithData:(NSData *)data;
+
 #pragma mark Configuration
 
 /*!

@@ -5,22 +5,31 @@
 //  Created by Andrew Hurst on 2/5/15.
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
+//
+//  Interface Notes:
+//  The wallet will operate on its' own queue, I'm building under the assumption
+//  that the user is operating in the main queue with UI. All _internal methods
+//  will be synchronous, but normal interface methods should automatically add
+//  it self to the wallet queue.
+//
+//  I will only use this type of interface when I consider high level
+//  interaction is occurring. This way low level users can interface without
+//  having to deal with ping pong dispatching.
+//
+//  Calls should be built for async interaction anyway because most calls
+//  through the wallet have to deal with the network, and if not will have long
+//  running lookup operations.
 
 #import "BCWallet.h"
 #import "_BCWallet.h"
 #import "BCMnemonic.h"
 
-
 @implementation BCWallet
 
-@synthesize balance = _balance;
 @synthesize provider = _provider;
 
-@synthesize mnemonicCypherText = _mnemonicCypherText;
-@synthesize seedCypherText = _seedCypherText;
-
-@synthesize keySequence = _keySequence;
-@synthesize masterPublicKey = _masterPublicKey;
+@synthesize protectedMnemonic = _protectedMnemonic;
+@synthesize keys = _keys;
 
 #pragma mark Construction
 
@@ -37,81 +46,78 @@
 - (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
                             andPassword:(NSData *)password {
   @autoreleasepool {
-    NSData *seedData;
+    __block NSData *sPassword;
+    __block NSString *sPhrase;
     NSParameterAssert([phrase isKindOfClass:[NSString class]]);
     if (![phrase isKindOfClass:[NSString class]]) return NULL;
 
     self = [super init];
-    if (self) {
-      phrase = [BCMnemonic sanitizePhrase:phrase];
-      if (![phrase isKindOfClass:[NSString class]]) return NULL;
+    if (!self) return NULL;
 
-      // Get the seed extract the seed data.
-      seedData = [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:phrase
-                                                        withPassphrase:nil];
-      if (![seedData isKindOfClass:[NSData class]]) return NULL;
+    // Sanitize the phrase
+    sPhrase = [BCMnemonic sanitizePhrase:phrase];
+    if (![sPhrase isKindOfClass:[NSString class]]) return NULL;
 
-      // Set the seed Async
-      [self _setSeed:seedData withPassword:password withCallback:^{}];
+    // Set the password to something block safe
+    sPassword = password;
 
-      // Set the public master key with the sequence utilities
-      _masterPublicKey = [self.keySequence masterPublicKeyFromSeed:seedData];
-      seedData = NULL;
+    // We will be doing some long running operations, run them on a background
+    // queue
+    dispatch_async(self.queue, ^() {
+        NSData *privateKey, *memoryKey;
 
-      // Set Phrase Async
-      [self _setMnemonic:phrase withPassword:password withCallback:^{}];
-    }
+        // Generate the memory key using the inputted password
+        memoryKey = [[self class] _keyFromPassword:password];
+        if (![memoryKey isKindOfClass:[NSData class]]) {
+          NSLog(@"Failed to generate wallet memory key!");
+          return;
+        }
+
+        // Generate the private key from the phrase
+        privateKey =
+            [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:sPhrase
+                                                   withPassphrase:nil];
+        sPhrase = NULL;
+        if (![privateKey isKindOfClass:[NSData class]]) {
+          NSLog(@"Failed to generate wallet private key!");
+          return;
+        }
+
+        // Create our key sequence, secure our private key with our memory key.
+        _keys = [[BCKeySequence alloc] initWithSeed:privateKey
+                                      withMemoryKey:memoryKey];
+        if (![_keys isKindOfClass:[BCKeySequence class]]) {
+          NSLog(@"Failed to generate wallet key sequence!");
+          return;
+        }
+
+        // Secure our phrase data
+        [self _setMnemonic:phrase withMemoryKey:memoryKey];
+
+        privateKey = NULL;
+        memoryKey = NULL;
+    });
     return self;
-  }
-}
-
-+ (void)initUsingPrivateInfo:(NSDictionary *)privInfo
-                  publicInfo:(NSDictionary *)pubInfo
-                    password:(NSData *)password
-              withCompletion:(void (^)(id))completion {
-  @autoreleasepool {
-    // TODO: Process info and restore
-    return;
   }
 }
 
 #pragma mark Mnemonic
 
-- (void)_setMnemonic:(NSString *)mnemonic
-        withPassword:(NSData *)password
-        withCallback:(void (^)())callback {
+- (void)_setMnemonic:(NSString *)mnemonic withMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
-    __block NSString *sMnemonic = mnemonic;
-    __block NSData *sPassword = password;
-    __block void (^sCallback)() = callback;
-    // Dispatch async becaue scrypt from the password takes about 5 sec which is
-    // too long to run on the main thread.
-    dispatch_async(self.queue, ^{
-        [self _setMnemonic:sMnemonic withPassword:sPassword];
-        sMnemonic = NULL;
-        sPassword = NULL;
-        if (sCallback) sCallback();
-    });
-  }
-}
+    NSData *clearText;
 
-- (void)_setMnemonic:(NSString *)mnemonic withPassword:(NSData *)password {
-  @autoreleasepool {
-    NSData *clearText, *cypherText, *key;
-
-    clearText = [mnemonic dataUsingEncoding:NSUTF8StringEncoding
-                       allowLossyConversion:FALSE];
+    // Convert String into data
+    clearText = [NSMutableData
+        secureDataWithData:[mnemonic dataUsingEncoding:NSUTF8StringEncoding
+                                  allowLossyConversion:FALSE]];
     if (![clearText isKindOfClass:[NSData class]]) return;
 
-    key = [[self class] _keyFromPassword:password];
-    if (![key isKindOfClass:[NSData class]]) return;
+    // Protect the data with the inputted key.
+    _protectedMnemonic = [clearText protectedWithKey:memoryKey];
 
-    // Encrypt the cleartext with the password
-    cypherText = [clearText AES256Encrypt:key];
-    if (![cypherText isKindOfClass:[NSData class]]) return;
-
-    // Set the cypher text data to the Ivar
-    _mnemonicCypherText = cypherText;
+    memoryKey = NULL;
+    clearText = NULL;
   }
 }
 
@@ -120,11 +126,21 @@
   @autoreleasepool {
     __block NSData *sPassword = password;
     __block void (^sCallback)(NSString *) = callback;
-    // Dispatch async becaue scrypt from the password takes about 5 sec which is
-    // too long to run on the main thread.
+    // Dispatch async because scrypt from the password takes about 5 sec which
+    // is too long to run on the main thread.
     dispatch_async(self.queue, ^{
-        __block NSString *phrase = [self _mnemonicWithPassword:sPassword];
+        __block NSString *phrase;
+        NSData *memoryKey;
+
+        // Derive the memory key from the password
+        memoryKey = [[self class] _keyFromPassword:sPassword];
         sPassword = NULL;
+
+        // Get the phrase
+        phrase = [self _mnemonicWithMemoryKey:memoryKey];
+
+        // Dispatch on main so they don't need to think about what queue they
+        // are on.
         dispatch_async(dispatch_get_main_queue(), ^{
             sCallback(phrase);
             phrase = NULL;
@@ -133,111 +149,37 @@
   }
 }
 
-- (NSString *)_mnemonicWithPassword:(NSData *)password {
+- (NSString *)_mnemonicWithMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
-    NSData *clearData, *key;
+    NSData *clearData;
     NSString *clearText;
-    if (![_mnemonicCypherText isKindOfClass:[NSData class]] ||
-        ![password isKindOfClass:[NSData class]])
+    // Validate
+    if (![_protectedMnemonic isKindOfClass:[BCProtectedData class]] ||
+        ![memoryKey isKindOfClass:[NSData class]])
       return NULL;
 
-    key = [[self class] _keyFromPassword:password];
-    if (![key isKindOfClass:[NSData class]]) return NULL;
-
-    clearData = [_mnemonicCypherText AES256Decrypt:key];
-    key = NULL;
+    // Get the clear text data
+    clearData = [_protectedMnemonic dataUsingMemoryKey:memoryKey];
+    memoryKey = NULL;
     if (![clearData isKindOfClass:[NSData class]]) return NULL;
 
+    // Convert the data into Text
     clearText =
         [[NSString alloc] initWithData:clearData encoding:NSUTF8StringEncoding];
     clearData = NULL;
 
+    // Return the phrase
     return [clearText isKindOfClass:[NSString class]] ? clearText : NULL;
   }
-}
-
-#pragma mark Seed
-
-- (void)_setSeed:(NSData *)seed
-    withPassword:(NSData *)password
-    withCallback:(void (^)())callback {
-  @autoreleasepool {
-    __block NSData *sPassword = password, *sSeed = seed;
-    __block void (^sCallback)() = callback;
-    // Dispatch async becaue scrypt from the password takes about 5 sec which is
-    // too long to run on the main thread.
-    dispatch_async(self.queue, ^{
-        [self _setSeed:sSeed withPassword:sPassword];
-        sPassword = NULL;
-        sSeed = NULL;
-        sCallback();
-    });
-  }
-}
-
-- (void)_setSeed:(NSData *)seed withPassword:(NSData *)password {
-  @autoreleasepool {
-    NSData *key, *cypherText;
-
-    key = [[self class] _keyFromPassword:password];
-    if (![key isKindOfClass:[NSData class]]) return;
-
-    cypherText = [seed AES256Encrypt:key];
-    key = NULL;
-    if (![cypherText isKindOfClass:[NSData class]]) return;
-
-    _seedCypherText = cypherText;
-    cypherText = NULL;
-  }
-}
-
-- (NSData *)_seedWithPassword:(NSData *)password {
-  @autoreleasepool {
-    NSData *clearText, *key;
-
-    key = [[self class] _keyFromPassword:password];
-    if (![key isKindOfClass:[NSData class]]) return NULL;
-
-    clearText = [_seedCypherText AES256Decrypt:key];
-    key = NULL;
-    if (![clearText isKindOfClass:[NSData class]]) return NULL;
-
-    return clearText;
-  }
-}
-
-- (void)seedWithPassword:(NSData *)password
-             andCallback:(void (^)(NSData *))callback {
-  @autoreleasepool {
-    __block void (^sCallback)(NSData *) = callback;
-    __block NSData *sPassword = password;
-    // Dispatch async becaue scrypt from the password takes about 5 sec which is
-    // too long to run on the main thread.
-    dispatch_async(self.queue, ^{
-        // TODO: Dispatch on Main so the user dosn't need to thing about queues
-        sCallback([self _seedWithPassword:sPassword]);
-        sPassword = NULL;
-    });
-  }
-}
-
-#pragma mark Keys
-
-- (BRBIP32Sequence *)keySequence {
-  if (!_keySequence) _keySequence = [BRBIP32Sequence new];
-  return _keySequence;
 }
 
 #pragma mark Wallet Info
 
 - (BCAProvider *)provider {
-  // Use Chain as the default provider.
+  // Allow them to set the provider with by changing the returned class
+  // TODO: Allow passing startup params
   if (!_provider) _provider = [[[[self class] defaultProvider] alloc] init];
   return _provider;
-}
-
-- (NSNumber *)balance {
-  return _balance;
 }
 
 - (BCAddress *)currentAddress {
@@ -258,17 +200,4 @@
   return [BCProviderChain class];
 }
 
-#pragma mark Utilities
-
-+ (NSDictionary *)privateInfoWithEncryptedSeed:(NSData *)seed
-                             encryptedMnemonic:(NSData *)mnemonic {
-  @autoreleasepool {
-    NSParameterAssert([seed isKindOfClass:[NSData class]]);
-    NSParameterAssert([mnemonic isKindOfClass:[NSData class]]);
-    if (![seed isKindOfClass:[NSData class]] ||
-        ![mnemonic isKindOfClass:[NSData class]])
-      return NULL;
-    return @{kBCRestoration_Seed : seed, kBCRestoration_Mnemonic : mnemonic};
-  }
-}
 @end

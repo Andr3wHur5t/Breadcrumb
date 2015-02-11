@@ -20,6 +20,7 @@
   // Override point for customization after application launch.
 
   [self walletDemo];
+  [self rawParseDemo];
   return YES;
 }
 
@@ -54,6 +55,24 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if
   // appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)rawParseDemo {
+  BCMutableTransaction *tx;
+  NSString *transactionHex;
+
+  transactionHex =
+      @"0100000001cf6b23baf0ebb8a09559f761144ab4407b5dce75a9484ed07a6da41f7f021"
+      @"8e9010000008a4730440220372be617d9d276340846265ddc7ba9dabbe78e97fac9709"
+      @"1f7e2cb19ec2929ae02203be15a0a3929b2353ebb81f5d67b20ab3b1e427f124855a23"
+      @"09649858eaa4b340141040cfa3dfb357bdff37c8748c7771e173453da5d7caa32972ab"
+      @"2f5c888fff5bbaeb5fc812b473bf808206930fade81ef4e373e60039886b51022ce689"
+      @"02d96ef70ffffffff0240420f00000000001976a914a5319d469e1ddd9558bd558a50e"
+      @"95f74b3da58c988ac78c4f81e010000001976a91461b469ada61f37c620010912a9d5d"
+      @"56646015f1688ac00000000";
+
+  tx = [[BCMutableTransaction alloc] initWithData:transactionHex.hexToData];
+  NSLog(@"Transaction Info:\n%@", tx);
 }
 
 - (void)walletDemo {

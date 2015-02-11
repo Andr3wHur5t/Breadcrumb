@@ -16,6 +16,10 @@
 
 - (instancetype)initWithData:(NSData *)data;
 
+- (instancetype)initWithData:(NSData *)data
+                    atOffset:(NSUInteger)offset
+                  withLength:(NSUInteger *)length;
+
 - (instancetype)initWithScript:(BCScript *)script andValue:(NSNumber *)value;
 
 + (instancetype)outputWithData:(NSData *)data;

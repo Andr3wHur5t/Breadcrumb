@@ -19,7 +19,16 @@
  */
 - (instancetype)initWithData:(NSData *)data;
 
+- (instancetype)initWithData:(NSData *)data
+                    atOffset:(NSUInteger)offset
+                  withLength:(NSUInteger *)length;
+
 - (instancetype)initWithTransaction:(BCTransaction *)transaction;
+
+- (instancetype)initWithHash:(NSData *)hash
+               previousIndex:(uint32_t)index
+                      script:(BCScript *)script
+                 andSequence:(uint32_t)sequence;
 
 #pragma mark Meta Data
 /*!

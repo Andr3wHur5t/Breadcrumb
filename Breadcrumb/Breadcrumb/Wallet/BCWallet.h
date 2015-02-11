@@ -31,17 +31,6 @@
 - (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
                             andPassword:(NSData *)password;
 
-/*!
- @brief Constructs the wallet using the inputted restoration data.
-
- @param privInfo The wallets private info.
- @param pubInfo  The wallets public info.
- @param password The password data used in the creation of the wallet.
- */
-- (instancetype)initUsingPrivateInfo:(NSDictionary *)privInfo
-                          publicInfo:(NSDictionary *)pubInfo
-                         andPassword:(NSData *)password;
-
 #pragma mark Info Retrieval
 /*!
  @brief Gets the mnemonic phrase used to generate the root wallet key, this

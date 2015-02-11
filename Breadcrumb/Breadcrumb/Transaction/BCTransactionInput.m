@@ -21,28 +21,52 @@
 #pragma mark Construction
 
 - (instancetype)initWithData:(NSData *)data {
-  NSUInteger position, length, scriptLength;
+  return [self initWithData:data atOffset:0 withLength:NULL];
+}
+
+- (instancetype)initWithData:(NSData *)data
+                    atOffset:(NSUInteger)offset
+                  withLength:(NSUInteger *)length {
+  NSUInteger position, _length, scriptLength;
   uint32_t transactionIndex, sequence;
-  NSData *scriptData, *transactionHash;
+  NSData *scriptData, *transactionHash, *_data;
   BCScript *script;
   NSParameterAssert([data isKindOfClass:[NSData class]]);
   if (![data isKindOfClass:[NSData class]]) return NULL;
 
+  // Get the data in the correct range
+  _data = [data subdataWithRange:NSMakeRange(offset, data.length - offset)];
+  if (![_data isKindOfClass:[NSData class]]) return NULL;
+
   // Parse Data
-  position = 0;
-  transactionHash = [data subdataWithRange:NSMakeRange(position, 32)];
+  position = 0;  // Get the transaction Hash
+  transactionHash = [_data subdataWithRange:NSMakeRange(position, 32)];
   position += 32;
-  transactionIndex = [data UInt32AtOffset:position];
+
+  // Get the transaction output index
+  transactionIndex = [_data UInt32AtOffset:position];
   position += sizeof(uint32_t);
-  scriptLength = [data varIntAtOffset:position length:&length];
-  position += length;
-  scriptData = [data subdataWithRange:NSMakeRange(position, scriptLength)];
+
+  // Get the scripts length
+  scriptLength = [_data varIntAtOffset:position length:&_length];
+  position += _length;
+
+  // Get the scripts data
+  scriptData = [_data subdataWithRange:NSMakeRange(position, scriptLength)];
   position += scriptLength;
-  sequence = [data UInt32AtOffset:position];
+
+  // Get the sequence value
+  sequence = [_data UInt32AtOffset:position];
+  position += sizeof(uint32_t);
+
+  // Check the script data
   if (![scriptData isKindOfClass:[NSData class]]) return NULL;
 
   script = [BCScript scriptWithData:scriptData];
   if (![script isKindOfClass:[BCScript class]]) return NULL;
+
+  // Update Length if avalable
+  if (length) *length = position;
 
   // TODO: Specify Sig script
   return [self initWithHash:transactionHash

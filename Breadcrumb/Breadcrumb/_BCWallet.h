@@ -8,12 +8,14 @@
 
 #import "BCWallet.h"
 #import "BCProviderChain.h"
-#import "NSData+Encryption.h"
+#import "BCProtectedData.h"
+#import "BCKeySequence.h"
+
 #import "BCWallet+Transactions.h"
 #import "BCWallet+TransactionSigning.h"
+#import "BCWallet+Restoration.h"
+
 #import "BreadcrumbCore.h"
-
-
 
 // Queue Label
 static const char *kBCWalletQueueLabel = "com.Breadcrumb.wallet";
@@ -23,56 +25,35 @@ static NSString *const kBCRestoration_Seed = @"seed";
 static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 
 @interface BCWallet () {
-  // Because the information in the wallet is protected using a scrypt derived key we need to have a background queue so we dont block the main queue. We also want user operations execute in order
+  // Because the information in the wallet is protected using a scrypt derived
+  // key we need to have a background queue so we dont block the main queue. We
+  // also want user operations execute in order
   dispatch_queue_t __queue;
 }
 
+#pragma mark Protected Data
 /*!
- @brief The cypher text of the mnemonic key.
- */
-@property(strong, nonatomic, readonly) NSData *mnemonicCypherText;
+ @brief The protected data of the mnemonic phrase.
 
+ @discussion This is protected with AES256 using a scrypt key derived from the
+ entered passphrase, its' cypher text is managed by the protected data object.
+ The data retrived from the protected data manager has a secure allocator,
+ reallocator, and deallocator.
+ */
+@property(strong, nonatomic, readonly) BCProtectedData *protectedMnemonic;
+
+#pragma mark Keys
 /*!
- @brief The cypher text of the seed.
+ @brief This holds, and managages all key pairs.
+ 
+ @discussion This holds our master keys, and dreives child key pairs
  */
-@property(strong, nonatomic, readonly) NSData *seedCypherText;
-
-#pragma mark HD
-/*!
- @brief The master public key of the BIP32 hierarchal wallet.
- */
-@property(strong, nonatomic, readonly) NSData *masterPublicKey;
-
-/*!
- @brief The BIP32 sequence utility object.
-
- @discussion I see no reason for this to be in a instance object, I will change
- its' methods into class methods.
- */
-@property(strong, nonatomic, readonly) BRBIP32Sequence *keySequence;
-
-#pragma mark Info
-/*!
- @brief Gets the wallets private information in its password protected format to
- be used in restoration.
-
- @return Dictionary with the wallets private info password protected.
- */
-- (NSDictionary *)privateInfo;
-
-/*!
- @brief Public wallet info to be used for restoration.
-
- @return Public information about the wallet in clear text.
- */
-- (NSDictionary *)publicInfo;
+@property(strong, nonatomic, readonly) BCKeySequence *keys;
 
 #pragma mark Queue
-
 /*!
  @brief The queue which wallet operations are performed.
  */
 @property(nonatomic, readonly) dispatch_queue_t queue;
-
 
 @end

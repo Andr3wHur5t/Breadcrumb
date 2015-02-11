@@ -17,16 +17,21 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 // In this header, you should import all the public headers of your framework
 // using statements like #import <Breadcrumb/PublicHeader.h>
 
-#pragma mark Abstract Interfaces
+#pragma mark Utilities
+#import <Breadcrumb/BCMnemonic.h>
+#import <Breadcrumb/BCProtectedData.h>
+
+#pragma mark Abstracts
 #import <Breadcrumb/BCAWallet.h>
 
 #pragma mark Concrete Interfaces
-#import <Breadcrumb/BCWallet.h>
-#import <Breadcrumb/BCTransaction.h>
 #import <Breadcrumb/BCAmount.h>
 #import <Breadcrumb/BCAddress.h>
 
-#pragma mark Utilities
-#import <Breadcrumb/BCMnemonic.h>
+#pragma mark Transaction Interfaces
+#import <Breadcrumb/BCTransaction.h>
+
+#pragma mark Wallets
+#import <Breadcrumb/BCWallet.h>
 
 #import <Breadcrumb/BreadcrumbCore.h>

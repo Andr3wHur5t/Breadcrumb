@@ -17,23 +17,40 @@
 #pragma mark Construction
 
 - (instancetype)initWithData:(NSData *)data {
+  return [self initWithData:data atOffset:0 withLength:NULL];
+}
+
+- (instancetype)initWithData:(NSData *)data
+                    atOffset:(NSUInteger)offset
+                  withLength:(NSUInteger *)length {
   int64_t value;
-  NSUInteger scriptLength, scriptOffset;
-  NSData *scriptData;
+  NSUInteger scriptLength, valueLength, position = 0;
+  NSData *scriptData, *_data;
   BCScript *script;
   NSParameterAssert([data isKindOfClass:[NSData class]]);
   if (![data isKindOfClass:[NSData class]]) return NULL;
 
-  value = [data UInt64AtOffset:0];
-  scriptLength = [data varIntAtOffset:sizeof(uint64_t) length:&scriptOffset];
+  // Get data from offset
+  _data = [data subdataWithRange:NSMakeRange(offset, data.length - offset)];
+  if (![_data isKindOfClass:[NSData class]]) return NULL;
 
-  scriptData =
-      [data subdataWithRange:NSMakeRange(sizeof(uint64_t) + scriptOffset,
-                                         scriptLength)];
+  // Get the value of the output
+  value = [_data UInt64AtOffset:0];
+  position += sizeof(uint64_t);
+
+  // Get the scripts length
+  scriptLength = [_data varIntAtOffset:position length:&valueLength];
+  position += valueLength;
+
+  // Get the scripts data
+  scriptData = [_data subdataWithRange:NSMakeRange(position, scriptLength)];
+  position += scriptLength;
   if (![scriptData isKindOfClass:[NSData class]]) return NULL;
 
   script = [BCScript scriptWithData:scriptData];
   if (![script isKindOfClass:[BCScript class]]) return NULL;
+  
+  if (length) *length = position;
 
   return [self initWithScript:script andValue:@(value)];
 }

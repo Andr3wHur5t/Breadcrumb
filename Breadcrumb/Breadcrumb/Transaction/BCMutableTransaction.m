@@ -27,6 +27,54 @@
   return self;
 }
 
+- (instancetype)initWithData:(NSData *)data {
+  BCTransactionInput *input;
+  BCTransactionOutput *output;
+  uint64_t inputCount = 0, outputCount = 0;
+  NSUInteger position = 0, length = 0;
+  uint32_t version = 0;
+  NSParameterAssert([data isKindOfClass:[NSData class]]);
+  if (![data isKindOfClass:[NSData class]]) return NULL;
+
+  self = [super init];
+  if (!self) return NULL;
+
+  version = [data UInt32AtOffset:position];  // Get the version
+  position += sizeof(uint32_t);
+
+  // Parse Based off of version
+  switch (version) {
+    default:  // version 1
+      // Get Inputs
+      inputCount = [data varIntAtOffset:position length:&length];
+      position += length;
+      for (NSUInteger i = 0; i < inputCount; ++i) {
+        input = [[BCTransactionInput alloc] initWithData:data
+                                                atOffset:position
+                                              withLength:&length];
+        if (![input isKindOfClass:[BCTransactionInput class]]) return NULL;
+
+        [self addInput:input];
+        position += length;
+      }
+
+      // Get Outputs
+      outputCount = [data varIntAtOffset:position length:&length];
+      position += length;
+      for (NSUInteger i = 0; i < outputCount; ++i) {
+        output = [[BCTransactionOutput alloc] initWithData:data
+                                                  atOffset:position
+                                                withLength:&length];
+        if (![output isKindOfClass:[BCTransactionOutput class]]) return NULL;
+
+        [self addOutput:output];
+        position += length;
+      }
+      break;
+  }
+  return self;
+}
+
 + (instancetype)mutableTransaction {
   return [[[self class] alloc] init];
 }
@@ -61,11 +109,21 @@
 #pragma mark Representations
 
 - (NSString *)toString {
+  NSString *inputsString, *outputsString;
   if (![self inputsAreValid]) return @"Has invalid input.";
   if (![self outputsAreValid]) return @"Has invalid output.";
 
-  return [NSString
-      stringWithFormat:@"Inputs:\n%@\nOutputs:\n%@", self.inputs, self.outputs];
+  inputsString = @"";
+  for (BCTransactionInput *input in self.inputs)
+    inputsString = [inputsString stringByAppendingFormat:@"%@\n\n", input];
+
+  outputsString = @"";
+  for (BCTransactionOutput *output in self.outputs)
+    outputsString = [outputsString stringByAppendingFormat:@"%@\n\n", output];
+
+  return [NSString stringWithFormat:@"Inputs: %@\n%@Outputs: %@\n%@",
+                                    @(self.inputs.count), inputsString,
+                                    @(self.outputs.count), outputsString];
 }
 
 - (NSData *)toData {
@@ -143,7 +201,8 @@
                                             to:(BCAddress *)address
                                        feePerK:(NSNumber *)feePerK
                              withChangeAddress:(BCAddress *)changeAddress {
-  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0, transactionSize = 0;
+  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0,
+           transactionSize = 0;
   BCTransactionOutput *targetOutput, *changeOutput;
   BCTransactionInput *utxoInput;
   BCMutableTransaction *newTransaction;
@@ -198,19 +257,18 @@
     // not enough Funds Error
     return NULL;
   }
-  
+
   // Because transactions in bitcoin require you to spend an entire transaction
   // to keep the leftover we need a change address so that you only spend the
   // desired amount. Anything left over in the transaction is considered the
   // mining fee.
   changeAmount = utxoSumAmount - (targetAmount + feeAmount);
-  
+
   // Check if we are over the limit for standard transactions
-  if ( transactionSize >= 100000 ) {
+  if (transactionSize >= 100000) {
     // Non Standard Transactions, Over size limit.
     return NULL;
   }
-
 
   // Set Change Output
   changeOutput = [BCTransactionOutput standardOutputForAmount:@(changeAmount)
