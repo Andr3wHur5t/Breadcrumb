@@ -19,7 +19,6 @@
 		3767F1491A830C9300AFD6D6 /* NSMutableData+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = 3767F13F1A830C9300AFD6D6 /* NSMutableData+Bitcoin.m */; };
 		3767F14A1A830C9300AFD6D6 /* NSString+Base58.h in Headers */ = {isa = PBXBuildFile; fileRef = 3767F1401A830C9300AFD6D6 /* NSString+Base58.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3767F14B1A830C9300AFD6D6 /* NSString+Base58.m in Sources */ = {isa = PBXBuildFile; fileRef = 3767F1411A830C9300AFD6D6 /* NSString+Base58.m */; };
-		3767F1531A830DC600AFD6D6 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3767F1511A830D4700AFD6D6 /* CoreData.framework */; };
 		3767F1561A830E1100AFD6D6 /* BIP39EnglishWords.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3767F1541A830E1100AFD6D6 /* BIP39EnglishWords.plist */; };
 		3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */; };
 		377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A18EE1A8424A8007AA1CD /* BCMnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -183,7 +182,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3767EC7A1A82E25300AFD6D6 /* libcrypto.a in Frameworks */,
-				3767F1531A830DC600AFD6D6 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
