@@ -65,6 +65,8 @@
 		377A19641A8AF56D007AA1CD /* BCWallet+Restoration.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19621A8AF56D007AA1CD /* BCWallet+Restoration.m */; };
 		377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19651A8B0144007AA1CD /* BCKeySequence.h */; };
 		377A19681A8B0144007AA1CD /* BCKeySequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19661A8B0144007AA1CD /* BCKeySequence.m */; };
+		377A196C1A8C020C007AA1CD /* BCsecp256k1.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A196A1A8C020C007AA1CD /* BCsecp256k1.h */; };
+		377A196D1A8C020C007AA1CD /* BCsecp256k1.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A196B1A8C020C007AA1CD /* BCsecp256k1.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */; };
@@ -155,6 +157,8 @@
 		377A19621A8AF56D007AA1CD /* BCWallet+Restoration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "BCWallet+Restoration.m"; path = "Wallet/BCWallet+Restoration.m"; sourceTree = "<group>"; };
 		377A19651A8B0144007AA1CD /* BCKeySequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCKeySequence.h; path = Keys/BCKeySequence.h; sourceTree = "<group>"; };
 		377A19661A8B0144007AA1CD /* BCKeySequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCKeySequence.m; path = Keys/BCKeySequence.m; sourceTree = "<group>"; };
+		377A196A1A8C020C007AA1CD /* BCsecp256k1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCsecp256k1.h; path = secp256k1/BCsecp256k1.h; sourceTree = "<group>"; };
+		377A196B1A8C020C007AA1CD /* BCsecp256k1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCsecp256k1.m; path = secp256k1/BCsecp256k1.m; sourceTree = "<group>"; };
 		37BFECB91A82D1460081BE4B /* Breadcrumb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Breadcrumb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECBD1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37BFECBE1A82D1460081BE4B /* Breadcrumb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Breadcrumb.h; sourceTree = "<group>"; };
@@ -209,6 +213,7 @@
 		3767EC7B1A82E56C00AFD6D6 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				377A19691A8C01D2007AA1CD /* secp256k1 */,
 				377A195C1A8AE00A007AA1CD /* Protected Data */,
 				377A19531A8ADBA4007AA1CD /* Keys */,
 				377A192E1A8756BE007AA1CD /* Script */,
@@ -446,6 +451,15 @@
 			name = "Protected Data";
 			sourceTree = "<group>";
 		};
+		377A19691A8C01D2007AA1CD /* secp256k1 */ = {
+			isa = PBXGroup;
+			children = (
+				377A196A1A8C020C007AA1CD /* BCsecp256k1.h */,
+				377A196B1A8C020C007AA1CD /* BCsecp256k1.m */,
+			);
+			name = secp256k1;
+			sourceTree = "<group>";
+		};
 		37BFECAF1A82D1460081BE4B = {
 			isa = PBXGroup;
 			children = (
@@ -548,6 +562,7 @@
 				377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */,
 				377A19071A8441CD007AA1CD /* BCAWallet.h in Headers */,
 				3767F1421A830C9300AFD6D6 /* NSData+Bitcoin.h in Headers */,
+				377A196C1A8C020C007AA1CD /* BCsecp256k1.h in Headers */,
 				377A19311A875751007AA1CD /* BCScript.h in Headers */,
 				3767F14A1A830C9300AFD6D6 /* NSString+Base58.h in Headers */,
 				377A19031A844121007AA1CD /* BCAmount.h in Headers */,
@@ -694,6 +709,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				377A196D1A8C020C007AA1CD /* BCsecp256k1.m in Sources */,
 				377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */,
 				37BFECEC1A82D29C0081BE4B /* Reachability.m in Sources */,
 				377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */,

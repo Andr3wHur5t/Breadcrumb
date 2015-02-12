@@ -9,6 +9,7 @@
 #import "BCKeyPair.h"
 #import "BCProtectedData.h"
 #import "NSString+Base58.h"
+#import "BCsecp256k1.h"
 #import "BreadcrumbCore.h"
 
 @interface BCKeyPair ()
@@ -34,18 +35,16 @@
 
 #pragma mark Construction
 
-- (instancetype)initWithPrivate:(NSData *)privateKey
-                         public:(NSData *)publicKey
-                   andMemoryKey:(NSData *)memoryKey {
+- (instancetype)initWithPrivateKey:(NSData *)privateKey
+                      andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
     NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
-    NSParameterAssert([publicKey isKindOfClass:[NSData class]]);
-    if (![privateKey isKindOfClass:[NSData class]] ||
-        ![publicKey isKindOfClass:[NSData class]])
-      return NULL;
+    if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
-    _publicKey = publicKey;
+    _publicKey = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey];
     _privateKey = [privateKey protectedWithKey:memoryKey];
+    privateKey = NULL;
+
     // TODO: Get address from public key.
     //    _address = [[NSString addressWithScriptPubKey:publicKey]
     //    toBitcoinAddress];
@@ -86,10 +85,27 @@
 #pragma mark Signing Operations
 
 - (NSData *)sign:(NSData *)data withMemoryKey:(NSData *)memoryKey {
-  // TODO: Implement https://github.com/bitcoin/secp256k1 for signing, and
-  // signature verification.
-  // ECDSA Sign
-  return data;
+  @autoreleasepool {
+    NSData *signedData, *rawPrivateKey;
+    NSParameterAssert(![data isKindOfClass:[NSData class]] ||
+                      ![memoryKey isKindOfClass:[NSData class]]);
+    if (![data isKindOfClass:[NSData class]] ||
+        ![memoryKey isKindOfClass:[NSData class]] ||
+        ![_privateKey isKindOfClass:[BCProtectedData class]])
+      return NULL;
+
+    // Get the private key to sign with
+    rawPrivateKey = [self.privateKey dataUsingMemoryKey:memoryKey];
+    memoryKey = NULL;
+    if (![rawPrivateKey isKindOfClass:[NSData class]]) return NULL;
+
+    // Sign the data with the private key.
+    signedData =
+        [[BCsecp256k1 sharedInstance] signData:data withKey:rawPrivateKey];
+    rawPrivateKey = NULL;
+
+    return [signedData isKindOfClass:[NSData class]] ? signedData : NULL;
+  }
 }
 
 #pragma mark Derivation Operations
