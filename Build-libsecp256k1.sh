@@ -114,8 +114,8 @@ xcrun -sdk iphoneos lipo -info "${OUTPUT_PATH}/${LIB_NAME}"
 echo "Copying headers..."
 cp -R "${ARMV7_OUTPUT}..${HEADER_PATH}" "${OUTPUT_PATH}/${HEADER_PATH}"
 
-#echo "Cleaning up build dirs."
-#rm -r "${BUILD_OUTPUT}"
+echo "Cleaning up build dirs."
+rm -r "${BUILD_OUTPUT}"
 
 echo "Finished '${OUTPUT_PATH}'"
 exit 0

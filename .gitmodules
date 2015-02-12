@@ -1,6 +1,3 @@
-[submodule "breadwallet"]
-	path = breadwallet
-	url = https://github.com/Andr3wHur5t/breadwallet.git
 [submodule "secp256k1"]
 	path = secp256k1
 	url = https://github.com/bitcoin/secp256k1.git

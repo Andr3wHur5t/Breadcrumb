@@ -18,11 +18,6 @@
  */
 @property(strong, nonatomic, readonly) BCProtectedData *privateKey;
 
-/*!
- @brief I will be removing this soon so don't get too attached.
- */
-@property(strong, nonatomic, readonly) BRBIP32Sequence *sequenceHelper;
-
 @end
 
 @implementation BCKeyPair
@@ -30,8 +25,6 @@
 @synthesize address = _address;
 @synthesize publicKey = _publicKey;
 @synthesize privateKey = _privateKey;
-
-@synthesize sequenceHelper = _sequenceHelper;
 
 #pragma mark Construction
 
@@ -51,13 +44,6 @@
     //    if (![_address isKindOfClass:[NSString class]]) return NULL;
   }
   return self;
-}
-
-#pragma mark Old Sequence Interface
-
-- (BRBIP32Sequence *)sequenceHelper {
-  if (!_sequenceHelper) _sequenceHelper = [[BRBIP32Sequence alloc] init];
-  return _sequenceHelper;
 }
 
 #pragma mark Public Info

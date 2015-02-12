@@ -7,7 +7,4 @@
    <FileRef
       location = "group:Breadcrumb/Breadcrumb.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:breadwallet/BreadWallet.xcodeproj">
-   </FileRef>
 </Workspace>
