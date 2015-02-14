@@ -26,7 +26,6 @@
 #import "BCWallet+TransactionSigning.h"
 #import "_BCWallet.h"
 #import "NSData+Hash.h"
-#import "NSData+ConversionUtilties.h"
 
 @implementation BCWallet (_TransactionSigning)
 
@@ -35,28 +34,33 @@
   @autoreleasepool {  // Ensure immediate deallocation of sensitive data.
     BCTransactionInput *updatedInput;
     NSMutableData *currentSigniture;
-    NSData *currentHash, *currentPubKey;
+    NSData *currentHash, *signedHash;
     BCMutableScript *unlockScript;
+    BCKeyPair *currentKeyPair;
 
-    // This is a complex process, This should be well commented for explanation...
+    // This is a complex process, This should be well commented for
+    // explanation...
     for (NSUInteger i = 0; i < transaction.inputs.count; ++i) {
       // Get The Hash of the current transaction
       currentHash = [[transaction toData] SHA256_2];
       if (![currentHash isKindOfClass:[NSData class]]) return NULL;
 
-      // Sign the hash with the key that owns the input
-      currentSigniture = [[NSMutableData alloc] initWithData:currentHash];
-      if (![currentSigniture isKindOfClass:[NSData class]]) return NULL;
+      // TODO: Find key
+      currentKeyPair = self.keys;
+      if (![currentKeyPair.publicKey isKindOfClass:[NSData class]]) return NULL;
       
-      // TODO: Find key and sign
+      // Sign the transaction
+      signedHash = [currentKeyPair signHash:currentHash withMemoryKey:key];
+      
+      // Sign the hash with the key that owns the input
+      currentSigniture = [[NSMutableData alloc] initWithData:signedHash];
+      if (![currentSigniture isKindOfClass:[NSData class]]) return NULL;
+
 
       // Append it with the SIG_HASH all code which specifies the method we used
       // to sign
       [currentSigniture appendUInt32:SIGHASH_ALL];
-
-      // Get the public key of the key we just signed with.
-      currentPubKey = NULL;
-      //      if (![currentPubKey isKindOfClass:[NSData class]]) return NULL;
+      
 
       // Create the unlock script (Also known as sig script)
       unlockScript = [BCMutableScript script];
@@ -66,7 +70,7 @@
       [unlockScript writeBytes:currentSigniture];
 
       // Append the Public Key of the owning Key Pair
-      
+      [unlockScript writeBytes:currentKeyPair.publicKey];
 
       // Create an updated input transaction
       updatedInput = [transaction.inputs objectAtIndex:i];

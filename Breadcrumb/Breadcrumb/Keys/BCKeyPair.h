@@ -71,6 +71,6 @@
 
  @return The signed data or NULL if invalid.
  */
-- (NSData *)sign:(NSData *)data withMemoryKey:(NSData *)memoryKey;
+- (NSData *)signHash:(NSData *)hash withMemoryKey:(NSData *)memoryKey;
 
 @end

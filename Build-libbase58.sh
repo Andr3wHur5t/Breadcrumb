@@ -3,12 +3,12 @@
 
 # Create Params
 BASE_DIR="${PWD}"
-SOURCE_PATH="${BASE_DIR}/secp256k1"
+SOURCE_PATH="${BASE_DIR}/libbase58"
 CONFIGURE_PATH="${SOURCE_PATH}/configure"
 MIN_SDK="8.0"
-OUTPUT_PATH="${BASE_DIR}/libs/libsecp256k1"
+OUTPUT_PATH="${BASE_DIR}/libs/libbase58"
 HEADER_PATH="/include"
-LIB_NAME="libsecp256k1.a"
+LIB_NAME="libbase58.a"
 
 ## Compiler Config
 CC_PATH="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -116,6 +116,9 @@ cp -R "${ARMV7_OUTPUT}..${HEADER_PATH}" "${OUTPUT_PATH}/${HEADER_PATH}"
 
 echo "Cleaning up build dirs."
 rm -r "${BUILD_OUTPUT}"
+
+#remove compile file.
+rm  "${SOURCE_PATH}/compile"
 
 echo "Finished '${OUTPUT_PATH}'"
 exit 0

@@ -23,8 +23,9 @@
 - (instancetype)initWithAddressString:(NSString *)addressString {
   self = [super init];
   if (self) {
-    _dataRepresentation = addressString.base58ToData;
-    if (![_dataRepresentation isKindOfClass:[NSData class]]) return NULL;
+    // TODO: Add base 58 utility
+    //    _dataRepresentation = addressString.base58ToData;
+//    if (![_dataRepresentation isKindOfClass:[NSData class]]) return NULL;
     _stringRepresentation = addressString;
   }
   return self;

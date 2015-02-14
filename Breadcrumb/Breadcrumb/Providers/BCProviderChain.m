@@ -9,7 +9,6 @@
 #import "BCProviderChain.h"
 #import "BCTransaction.h"
 #import "BCMutableTransaction.h"
-#import "NSData+ConversionUtilties.h"
 #import "BreadcrumbCore.h"
 
 // Chain Error Constants

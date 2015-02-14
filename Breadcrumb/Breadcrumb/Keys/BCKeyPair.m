@@ -9,6 +9,7 @@
 #import "BCKeyPair.h"
 #import "BCProtectedData.h"
 #import "NSString+Base58.h"
+#import "NSData+Hash.h"
 #import "BCsecp256k1.h"
 #import "BreadcrumbCore.h"
 
@@ -36,8 +37,6 @@
 
     _publicKey = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey];
     _privateKey = [privateKey protectedWithKey:memoryKey];
-    privateKey = NULL;
-
     // TODO: Get address from public key.
     //    _address = [[NSString addressWithScriptPubKey:publicKey]
     //    toBitcoinAddress];
@@ -70,12 +69,12 @@
 
 #pragma mark Signing Operations
 
-- (NSData *)sign:(NSData *)data withMemoryKey:(NSData *)memoryKey {
+- (NSData *)signHash:(NSData *)hash withMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
     NSData *signedData, *rawPrivateKey;
-    NSParameterAssert(![data isKindOfClass:[NSData class]] ||
-                      ![memoryKey isKindOfClass:[NSData class]]);
-    if (![data isKindOfClass:[NSData class]] ||
+    NSParameterAssert([hash isKindOfClass:[NSData class]] ||
+                      [memoryKey isKindOfClass:[NSData class]]);
+    if (![hash isKindOfClass:[NSData class]] ||
         ![memoryKey isKindOfClass:[NSData class]] ||
         ![_privateKey isKindOfClass:[BCProtectedData class]])
       return NULL;
@@ -86,12 +85,29 @@
     if (![rawPrivateKey isKindOfClass:[NSData class]]) return NULL;
 
     // Sign the data with the private key.
-    signedData =
-        [[BCsecp256k1 sharedInstance] signData:data withKey:rawPrivateKey];
+    signedData = [[BCsecp256k1 sharedInstance] signitureForHash:hash
+                                                 withPrivateKey:rawPrivateKey];
     rawPrivateKey = NULL;
 
     return [signedData isKindOfClass:[NSData class]] ? signedData : NULL;
   }
+}
+
+- (BOOL)didSign:(NSData *)signedData withOriginal:(NSData *)original {
+  NSData *hash;
+  NSParameterAssert([signedData isKindOfClass:[NSData class]]);
+  NSParameterAssert([original isKindOfClass:[NSData class]]);
+  if (![_publicKey isKindOfClass:[NSData class]] ||
+      ![signedData isKindOfClass:[NSData class]] ||
+      ![original isKindOfClass:[NSData class]])
+    return FALSE;
+
+  hash = [original SHA256_2];
+  if (![hash isKindOfClass:[NSData class]]) return FALSE;
+
+  return [[BCsecp256k1 sharedInstance] signiture:signedData
+                                       orginHash:[original SHA256_2]
+                             isValidForPublicKey:_publicKey];
 }
 
 #pragma mark Derivation Operations

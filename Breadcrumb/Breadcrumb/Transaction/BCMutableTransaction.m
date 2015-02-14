@@ -8,7 +8,6 @@
 
 #import "BCMutableTransaction.h"
 #import "BreadcrumbCore.h"
-#import "NSData+ConversionUtilties.h"
 
 #define BC_BITCOIN_VERSION 1
 

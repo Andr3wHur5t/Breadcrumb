@@ -27,6 +27,7 @@
 
 #import "NSData+Hash.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "RIPEMD160.c"
 
 @implementation NSData (Hash)
 
@@ -56,12 +57,9 @@
 }
 
 - (NSData *)RMD160 {
-  //    NSMutableData *d = [NSMutableData
-  //    dataWithLength:RIPEMD160_DIGEST_LENGTH];
-
-  //    RIPEMD160(self.bytes, self.length, d.mutableBytes);
-  NSAssert(false, @"Needs to be implmented.");
-  return NULL;  // d;
+  NSMutableData *d = [NSMutableData dataWithLength:RIPEMD160_DIGEST_SIZE];
+  ripemd160(self.bytes, self.length, d.mutableBytes);
+  return d;
 }
 
 - (NSData *)hash160 {

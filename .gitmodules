@@ -1,3 +1,6 @@
 [submodule "secp256k1"]
 	path = secp256k1
 	url = https://github.com/bitcoin/secp256k1.git
+[submodule "libbase58"]
+	path = libbase58
+	url = https://github.com/bitcoin/libbase58.git

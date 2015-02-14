@@ -26,13 +26,20 @@
 - (NSData *)publicKeyFromKey:(NSData *)privateKey;
 
 /*!
- @brief Signs the inputted data with the inputted key.
-
- @param data The data to sign
- @param key  The key used to sign the data.
+ @brief Signs the inputted hash with the inputed private key.
+ 
+ @param hash The 32 byte hash to sign,
+ @param key  The 32 byte key to sign the hash with.
+ 
+ @return <#return value description#>
  */
-- (NSData *)signData:(NSData *)data withKey:(NSData *)key;
+- (NSData *)signitureForHash:(NSData *)hash withPrivateKey:(NSData *)key;
 
+- (BOOL)signiture:(NSData *)signiture isValidForPublicKey:(NSData *)publicKey;
+
+- (BOOL)signiture:(NSData *)signiture
+              orginHash:(NSData *)hash
+    isValidForPublicKey:(NSData *)publicKey;
 #pragma mark Shared access
 
 /*!
