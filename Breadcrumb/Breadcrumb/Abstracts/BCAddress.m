@@ -76,7 +76,6 @@
 
 #pragma mark Conversion
 
-// TODO: Pass Network param to properly set version.
 + (BCAddress *)addressFromPublicKey:(NSData *)publicKey {
   NSData *hash;
   NSMutableData *mHash;
@@ -90,7 +89,7 @@
 
   mHash = [[NSMutableData alloc] init];
 
-  // Because we don't currently suport mulit-sig use the old version byte
+  // Because we don't currently support multi-sig use the old version byte
   [mHash appendUInt8:BCAddressType_Old];
   [mHash appendData:hash];
 
