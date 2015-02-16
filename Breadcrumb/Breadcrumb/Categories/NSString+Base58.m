@@ -79,23 +79,11 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
 }
 
 + (NSString *)base58checkWithData:(NSData *)data {
-  [self setBase58SHA256];
-  NSString *output;
-  char base58String[data.length * 2];  // Assuming 2x larger...
-  size_t length;
+  NSMutableData *_data = [NSMutableData secureDataWithData:data];
 
-  if (!b58check_enc(base58String, &length, 0x0, [data bytes], data.length)) {
-    NSLog(@"Failed to encode");
-    return NULL;
-  }
+  [_data appendBytes:_data.SHA256_2.bytes length:4];
 
-  output = [NSString stringWithUTF8String:base58String];
-
-  if (!b58check([data bytes], data.length, output.UTF8String, output.length)) {
-    NSLog(@"Failed Check");
-    return NULL;
-  }
-  return [output isKindOfClass:[NSString class]] ? output : NULL;
+  return [self base58WithData:_data];
 }
 
 - (NSString *)hexToBase58check {
@@ -132,22 +120,23 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
     return NULL;
   }
 
-  data = [[NSData dataWithBytes:bin length:buffSize] subdataWithRange:NSMakeRange(buffSize - length, length)];
+  data = [[NSData dataWithBytes:bin length:buffSize]
+      subdataWithRange:NSMakeRange(buffSize - length, length)];
   return data;
 }
 
-static NSString *const validChars =
-    @"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 - (NSData *)base58checkToData {
-  NSData *data;
-  [[self class] setBase58SHA256];
-
-  data = [self base58ToData];
-  if (!b58check(data.bytes, data.length, self.UTF8String, self.length)) {
-    NSLog(@"Invalid checksum");
+  NSData *data, *d;
+  d = self.base58ToData;
+  if (d.length < 4)
     return NULL;
-  }
+  data =
+      CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
 
+  // verify checksum
+  if (*(uint32_t *)((const uint8_t *)d.bytes + d.length - 4) !=
+      *(uint32_t *)data.SHA256_2.bytes)
+    return NULL;
   return data;
 }
 

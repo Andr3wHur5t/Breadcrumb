@@ -19,9 +19,8 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
 
-  
   //  [self walletDemo];
-    [self rawParseDemo];
+//    [self rawParseDemo];
   return YES;
 }
 
@@ -88,18 +87,20 @@
       @"bf82a840cb562793cc1928bd485cc531888ac50c30000000000001976a9143696e32f2"
       @"e5ee974ce59b16a11387dcf05435d6a88ac00000000";
   
-  NSString *str = [transactionHex.hexToData base58CheckEncoding];
+  NSString *str = [transactionHex.hexToData base58Encoding];
   // Full Check
-  NSAssert([[str base58ToData] isEqualToData:transactionHex.hexToData], @"Full Encoding Check");
+ 
   
   // Base58 encoding
   NSAssert([[@"deadBeeF".hexToData base58Encoding] isEqualToString:@"6h8cQN"], @"Encodes base58");
   NSAssert([[[@"6h8cQN" base58ToData] toHex] isEqual:@"deadbeef"], @"Decodes base58");
+   NSAssert([[[transactionHex.hexToData base58Encoding] base58ToData] isEqualToData:transactionHex.hexToData], @"Full Encoding Check");
+  
   
   // Base58 Check Encoding
   NSAssert([[@"00c4c5d791fcb4654a1ef5e03fe0ad3d9c598f9827".hexToData base58CheckEncoding] isEqualToString:@"1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T"], @"Encodes base58 with checksum");
   NSAssert([[[@"1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T" base58checkToData] toHex] isEqual:@"00c4c5d791fcb4654a1ef5e03fe0ad3d9c598f9827"], @"Decodes base58 with checksum");
-  
+  NSAssert([[[transactionHex.hexToData base58CheckEncoding] base58ToData] isEqualToData:transactionHex.hexToData], @"Full Encoding Check");
 
   
   tx = [[BCMutableTransaction alloc] initWithData:transactionHex.hexToData];
