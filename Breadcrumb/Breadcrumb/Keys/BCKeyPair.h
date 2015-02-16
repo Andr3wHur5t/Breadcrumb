@@ -73,4 +73,6 @@
  */
 - (NSData *)signHash:(NSData *)hash withMemoryKey:(NSData *)memoryKey;
 
+- (BOOL)didSign:(NSData *)signedData withOriginalHash:(NSData *)hash;
+
 @end

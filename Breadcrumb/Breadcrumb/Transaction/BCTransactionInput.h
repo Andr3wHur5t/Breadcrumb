@@ -28,9 +28,23 @@
 - (instancetype)initWithHash:(NSData *)hash
                previousIndex:(uint32_t)index
                       script:(BCScript *)script
+                     address:(BCAddress *)address
                  andSequence:(uint32_t)sequence;
 
 #pragma mark Meta Data
+
+/*!
+ @brief This is the address which must sign the transaction.
+
+ @discussion This is the address which has ownership for the transaction. In the
+ future when we support multi signature this will need to be an array of
+ addresses.
+
+ NOTE: this can be null, because it can not be directly retrived from parsing a
+ raw transaction input.
+ */
+@property(strong, nonatomic, readonly) BCAddress *controllingAddress;
+
 /*!
  @brief The previous outputs hash.
  */

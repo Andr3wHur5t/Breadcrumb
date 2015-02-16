@@ -37,6 +37,7 @@
     NSData *currentHash, *signedHash;
     BCMutableScript *unlockScript;
     BCKeyPair *currentKeyPair;
+    BCAddress *currentAddress;
 
     // This is a complex process, This should be well commented for
     // explanation...
@@ -45,22 +46,24 @@
       currentHash = [[transaction toData] SHA256_2];
       if (![currentHash isKindOfClass:[NSData class]]) return NULL;
 
-      // TODO: Find key
-      currentKeyPair = self.keys;
+      currentAddress =
+          ((BCTransactionInput *)[transaction.inputs objectAtIndex:i])
+              .controllingAddress;
+      if (![currentAddress isKindOfClass:[BCAddress class]]) return NULL;
+
+      currentKeyPair = [self keyForAddress:currentAddress];
       if (![currentKeyPair.publicKey isKindOfClass:[NSData class]]) return NULL;
-      
+
       // Sign the transaction
       signedHash = [currentKeyPair signHash:currentHash withMemoryKey:key];
-      
+
       // Sign the hash with the key that owns the input
       currentSigniture = [[NSMutableData alloc] initWithData:signedHash];
       if (![currentSigniture isKindOfClass:[NSData class]]) return NULL;
 
-
       // Append it with the SIG_HASH all code which specifies the method we used
       // to sign
       [currentSigniture appendUInt32:SIGHASH_ALL];
-      
 
       // Create the unlock script (Also known as sig script)
       unlockScript = [BCMutableScript script];
@@ -82,6 +85,7 @@
            initWithHash:updatedInput.previousOutputHash
           previousIndex:updatedInput.previousOutputIndex
                  script:unlockScript
+                address:updatedInput.controllingAddress
             andSequence:updatedInput.sequence];
       if (![updatedInput isKindOfClass:[BCTransactionInput class]]) return NULL;
 
@@ -89,46 +93,18 @@
       [transaction.inputs setObject:updatedInput atIndexedSubscript:i];
     }
 
-    return transaction;  // transaction;
+    return transaction;
   }
 }
 
-#pragma mark Old
-// sign any inputs in the given transaction that can be signed using private
-// keys from the wallet
-//- (BOOL)signTransaction:(BRTransaction *)transaction withPrompt:(NSString
-//*)authprompt
-//{
-//  @autoreleasepool { // @autoreleasepool ensures sensitive data will be
-//  dealocated immediately
-//    int64_t amount = [self amountSentByTransaction:transaction] - [self
-//    amountReceivedFromTransaction:transaction];
-//    NSData *seed = self.seed(authprompt, (amount > 0) ? amount : 0);
-//    NSMutableArray *pkeys = [NSMutableArray array];
-//    NSMutableOrderedSet *externalIndexes = [NSMutableOrderedSet orderedSet],
-//    *internalIndexes = [NSMutableOrderedSet orderedSet];
-//
-//    if (! seed) return YES; // user canceled authentication
-//
-//    for (NSString *addr in transaction.inputAddresses) {
-//      [internalIndexes addObject:@([self.internalAddresses
-//      indexOfObject:addr])];
-//      [externalIndexes addObject:@([self.externalAddresses
-//      indexOfObject:addr])];
-//    }
-//
-//    [internalIndexes removeObject:@(NSNotFound)];
-//    [externalIndexes removeObject:@(NSNotFound)];
-//    [pkeys addObjectsFromArray:[self.sequence privateKeys:[externalIndexes
-//    array] internal:NO fromSeed:seed]];
-//    [pkeys addObjectsFromArray:[self.sequence privateKeys:[internalIndexes
-//    array] internal:YES fromSeed:seed]];
-//
-//    [transaction signWithPrivateKeys:pkeys];
-//
-//    return [transaction isSigned];
-//  }
-//}
+- (BCKeyPair *)keyForAddress:(BCAddress *)address {
+  NSParameterAssert([address isKindOfClass:[BCAddress class]]);
+  if (![address isKindOfClass:[BCAddress class]]) return NULL;
+
+  // TODO: Find Key
+  NSLog(@"Key For Address '%@'", address);
+  return self.keys;
+}
 
 @end
 

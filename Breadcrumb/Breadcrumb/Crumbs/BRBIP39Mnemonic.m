@@ -64,6 +64,8 @@
   uint32_t n = (uint32_t)words.count, x;
   NSMutableArray *a = CFBridgingRelease(CFArrayCreateMutable(
       SecureAllocator(), data.length * 3 / 4, &kCFTypeArrayCallBacks));
+
+  if (![data isKindOfClass:[NSData class]]) return NULL;
   NSMutableData *d = [NSMutableData secureDataWithData:data];
 
   [d appendData:data.SHA256];  // append SHA256 checksum

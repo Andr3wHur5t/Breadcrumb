@@ -19,8 +19,9 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
 
-  //  [self walletDemo];
-//    [self rawParseDemo];
+  [self rawParseDemo];
+  [self walletDemo];
+
   return YES;
 }
 
@@ -74,6 +75,10 @@
   //  transactionHex =
   //  @"010000000297515bb7f32f28446bfe7b34b232b1e9ad1221f1d4ab4624726412764b126611000000006b483045022100fa43ae8f04367447d9682e6a7c2f747ee234d5e57e9414a3ed4039458bd0e8e702200e7f0d7dad54df586145f45ae0fe66bd2ba2018fc4c515853cc2574a65c1508f01210387212e3733d75ddcce9121c2af5df1f06e71f63fb736df4dc02dc56e9f3c4f02ffffffffbe6ee63b7c778f1c31c4710dbffa599b9ec8a9c0fd0e65f7f08d1077ef2f07e4000000006a47304402205e96ffae4e9d4df893391cff431e271aec931ef2255e758619aa8bd1e15c151b0220324a3626c2b8d39a1fec8a9a8dfd3db3513380458edf94c6a06f33da43e5575a01210387212e3733d75ddcce9121c2af5df1f06e71f63fb736df4dc02dc56e9f3c4f02ffffffff0150c30000000000001976a9143696e32f2e5ee974ce59b16a11387dcf05435d6a88ac00000000";
 
+  //  30440220382abd07bc22b92f289b21745bb8c93734eadaf86cc0ff310658b73ac522a69b022043cd23001e4b78dfe3c9df10ab61e10e47abeb88b86c4bc8f0d2a2db95f405d501000000043531554b88ed1404d6d421a115aa72b1a429505a3b0ce248ebaba63e83df9bf444ef7a73b12798d5f47a40d66eb3c09d63b952783f7718f9d81258ed39a3bc43
+
+  // 4930460221009e0339f72c793a89e664a8a932df073962a3f84eda0bd9e02084a6a9567f75aa022100bd9cbaca2e5ec195751efdfac164b76250b1e21302e51ca86dd7ebd7020cdc0601410450863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b23522cd470243453a299fa9e77237716103abc11a1df38855ed6f2ee187e9c582ba6
+
   transactionHex =
       @"0100000002be6ee63b7c778f1c31c4710dbffa599b9ec8a9c0fd0e65f7f08d1077ef2f0"
       @"7e4000000006a473044022028758879bba44439ab8ad5be025ff9d8acc38206f626d1c"
@@ -86,23 +91,9 @@
       @"1f63fb736df4dc02dc56e9f3c4f02ffffffff0228230000000000001976a914dc8ae9c"
       @"bf82a840cb562793cc1928bd485cc531888ac50c30000000000001976a9143696e32f2"
       @"e5ee974ce59b16a11387dcf05435d6a88ac00000000";
-  
-  NSString *str = [transactionHex.hexToData base58Encoding];
-  // Full Check
- 
-  
-  // Base58 encoding
-  NSAssert([[@"deadBeeF".hexToData base58Encoding] isEqualToString:@"6h8cQN"], @"Encodes base58");
-  NSAssert([[[@"6h8cQN" base58ToData] toHex] isEqual:@"deadbeef"], @"Decodes base58");
-   NSAssert([[[transactionHex.hexToData base58Encoding] base58ToData] isEqualToData:transactionHex.hexToData], @"Full Encoding Check");
-  
-  
-  // Base58 Check Encoding
-  NSAssert([[@"00c4c5d791fcb4654a1ef5e03fe0ad3d9c598f9827".hexToData base58CheckEncoding] isEqualToString:@"1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T"], @"Encodes base58 with checksum");
-  NSAssert([[[@"1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T" base58checkToData] toHex] isEqual:@"00c4c5d791fcb4654a1ef5e03fe0ad3d9c598f9827"], @"Decodes base58 with checksum");
-  NSAssert([[[transactionHex.hexToData base58CheckEncoding] base58ToData] isEqualToData:transactionHex.hexToData], @"Full Encoding Check");
 
-  
+  NSString *str = [transactionHex.hexToData base58Encoding];
+
   tx = [[BCMutableTransaction alloc] initWithData:transactionHex.hexToData];
   NSLog(@"Transaction Info:\n%@", tx);
 }
@@ -120,7 +111,7 @@
   // When you instantiate a wallet it requires a password to decrypt private
   // restoration data, or encrypt new private data such as the wallets' seed
   // phrase.
-  BCWallet *wallet = [[BCWallet alloc] initNewWithPassword:password];
+  BCWallet *wallet = [[BCWallet alloc] initUsingMnemonicPhrase:@"health dial gather defense pizza spray clerk unknown rude inmate behind smoke" andPassword:password];
 
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password

@@ -14,6 +14,7 @@
 @synthesize previousOutputHash = _previousOutputHash;
 @synthesize previousOutputIndex = _previousOutputIndex;
 @synthesize sequence = _sequence;
+@synthesize controllingAddress = _controllingAddress;
 
 @synthesize scriptSig = _scriptSig;
 @synthesize isSigned = _isSigned;
@@ -68,10 +69,10 @@
   // Update Length if avalable
   if (length) *length = position;
 
-  // TODO: Specify Sig script
   return [self initWithHash:transactionHash
               previousIndex:transactionIndex
                      script:script
+                    address:NULL
                 andSequence:sequence];
 }
 
@@ -81,21 +82,15 @@
 
   return [self initWithHash:transaction.hash
               previousIndex:transaction.outputIndex
-                  andScript:transaction.script];
-}
-
-- (instancetype)initWithHash:(NSData *)hash
-               previousIndex:(uint32_t)index
-                   andScript:(BCScript *)script {
-  return [self initWithHash:hash
-              previousIndex:index
-                     script:script
+                     script:transaction.script
+                    address:[transaction.addresses objectAtIndex:0]
                 andSequence:UINT32_MAX];
 }
 
 - (instancetype)initWithHash:(NSData *)hash
                previousIndex:(uint32_t)index
                       script:(BCScript *)script
+                     address:(BCAddress *)address
                  andSequence:(uint32_t)sequence {
   NSParameterAssert([hash isKindOfClass:[NSData class]]);
   if (![hash isKindOfClass:[NSData class]]) return NULL;
@@ -106,6 +101,7 @@
     _scriptSig = script;
     _sequence = sequence;
     _isSigned = FALSE;
+    _controllingAddress = address;
   }
   return self;
 }
@@ -133,7 +129,6 @@
 
   buffer = [[NSMutableData alloc] init];
 
-  // TODO: Change to Sig Script
   scriptData = [self.scriptSig toData];
   if (![scriptData isKindOfClass:[NSData class]]) return NULL;
 

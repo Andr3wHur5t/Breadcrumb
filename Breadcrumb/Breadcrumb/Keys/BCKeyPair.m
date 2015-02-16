@@ -35,12 +35,13 @@
     NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
+    // TODO: Validate generated key in unit tests
     _publicKey = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey];
     _privateKey = [privateKey protectedWithKey:memoryKey];
-    // TODO: Get address from public key.
-    //    _address = [[NSString addressWithScriptPubKey:publicKey]
-    //    toBitcoinAddress];
-    //    if (![_address isKindOfClass:[NSString class]]) return NULL;
+    
+    // Get address
+    _address = [BCAddress addressFromPublicKey:_publicKey];
+    if (![_address isKindOfClass:[BCAddress class]]) return NULL;
   }
   return self;
 }
@@ -93,20 +94,15 @@
   }
 }
 
-- (BOOL)didSign:(NSData *)signedData withOriginal:(NSData *)original {
-  NSData *hash;
+- (BOOL)didSign:(NSData *)signedData withOriginalHash:(NSData *)hash {
   NSParameterAssert([signedData isKindOfClass:[NSData class]]);
-  NSParameterAssert([original isKindOfClass:[NSData class]]);
+  NSParameterAssert([hash isKindOfClass:[NSData class]]);
   if (![_publicKey isKindOfClass:[NSData class]] ||
       ![signedData isKindOfClass:[NSData class]] ||
-      ![original isKindOfClass:[NSData class]])
+      ![hash isKindOfClass:[NSData class]])
     return FALSE;
-
-  hash = [original SHA256_2];
-  if (![hash isKindOfClass:[NSData class]]) return FALSE;
-
   return [[BCsecp256k1 sharedInstance] signiture:signedData
-                                       orginHash:[original SHA256_2]
+                                       orginHash:hash
                              isValidForPublicKey:_publicKey];
 }
 
