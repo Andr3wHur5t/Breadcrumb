@@ -117,7 +117,7 @@
 - (NSString *)toString {
   return [NSString stringWithFormat:@"Output Hash: '%@'\nOutput Index: %@\nSig "
                                     @"Script: '%@'\nSigned: %@\nSequence: %x",
-                                    self.previousOutputHash,
+                                    self.previousOutputHash.toHex,
                                     @(self.previousOutputIndex), self.scriptSig,
                                     self.isSigned ? @"True" : @"False",
                                     self.sequence];

@@ -184,6 +184,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		370E68A01A931C8700862518 /* Big Number */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Big Number";
+			sourceTree = "<group>";
+		};
 		3711194E1A8320DF002D7E6B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -487,6 +494,7 @@
 		37BFECE31A82D2650081BE4B /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				370E68A01A931C8700862518 /* Big Number */,
 				370E688B1A8D97AB00862518 /* RIPEMD160.c */,
 				37D51B9D1A8CCA5C00A843B7 /* ccMemory.h */,
 				37D51B9E1A8CCA5C00A843B7 /* Reachability.h */,

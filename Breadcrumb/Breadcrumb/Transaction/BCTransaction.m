@@ -78,7 +78,7 @@
                                     @"Confirmations: %@\nHash: %@\nOutput "
                                     @"Index:%@\nScript: '%@'\nisSigned: %@\n",
                                     addresses, self.value, self.spent,
-                                    self.confirmations, self.hash,
+                                    self.confirmations, self.hash.toHex,
                                     @(self.outputIndex), self.script,
                                     self.isSigned ? @"true" : @"false"];
 }

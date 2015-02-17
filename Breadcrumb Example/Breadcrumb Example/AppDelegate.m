@@ -18,9 +18,32 @@
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
-
-  [self rawParseDemo];
+//
+//  [self rawParseDemo];
   [self walletDemo];
+
+  NSData *dat =
+      @"01000000030bf0de38c26195919179f42d475beb7a6b15258c38b57236afdd60a07eddd"
+      @"2cc000000008e4b3045022100f46b6efb201ae9fb01cb24b7999cb8f014b6158ea9da9"
+      @"6825a2eb33ad38bfd5a0220186d8bd7cc37b93b035925e57c79e7426668bb055222307"
+      @"45d721c1fd9d1542b01000000410455588b112746c08ec166a6d9c4d2edb07201c7a0a"
+      @"07a6201441d24f34748a01030055fd1b0ee3788b190ef13f8a4d39d1029058ba64288f"
+      @"c95a6e706922c1ce8ffffffff5ad2913b948c883b007b1bca39322c42d60ef465b9dc3"
+      @"9bc0a53ffe8fe3faafd000000008d4a304402207169195e25a44f9336da4e8f19371b7"
+      @"cae19ded75c59b884fe91188e2889c748022072ea56e1c808e7d029d4676156ae3e7a4"
+      @"ef80ca1266e77bc0aff9714e1b80d9301000000410455588b112746c08ec166a6d9c4d"
+      @"2edb07201c7a0a07a6201441d24f34748a01030055fd1b0ee3788b190ef13f8a4d39d1"
+      @"029058ba64288fc95a6e706922c1ce8ffffffffb84a66c46e24fe71f9d8ab29b06df93"
+      @"2d77bec2cc0691799fae398a8dc9069bf010000008d4a3044022033d6c744c4df96545"
+      @"82a588f8ae4fbfd7a2fc10f90d6b8c92641462dcbfdd556022022414ad7a749f9fb36d"
+      @"7cb184f238d3f88657af3c21c8a9750a472dad62c47f101000000410455588b112746c"
+      @"08ec166a6d9c4d2edb07201c7a0a07a6201441d24f34748a01030055fd1b0ee3788b19"
+      @"0ef13f8a4d39d1029058ba64288fc95a6e706922c1ce8ffffffff02c80000000000000"
+      @"01a76a91505b472a266d0bd89c13706a4132ccfb16f7c3b9fcb88ac08e904000000000"
+      @"01a76a91500c629680b8d13ca7a4b7d196360186d05658da6db88ac00000000"
+           .hexToData;
+
+  NSLog(@"Created Trans:%@", [[BCMutableTransaction alloc] initWithData:dat]);
 
   return YES;
 }
@@ -111,7 +134,10 @@
   // When you instantiate a wallet it requires a password to decrypt private
   // restoration data, or encrypt new private data such as the wallets' seed
   // phrase.
-  BCWallet *wallet = [[BCWallet alloc] initUsingMnemonicPhrase:@"health dial gather defense pizza spray clerk unknown rude inmate behind smoke" andPassword:password];
+  BCWallet *wallet = [[BCWallet alloc]
+      initUsingMnemonicPhrase:@"health dial gather defense pizza spray clerk "
+                              @"unknown rude inmate behind smoke"
+                  andPassword:password];
 
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password

@@ -19,22 +19,31 @@
  memory.
  */
 - (instancetype)initWithPrivateKey:(NSData *)privateKey
+                         chainCode:(NSData *)chainCode
                       andMemoryKey:(NSData *)memoryKey;
 
 #pragma mark Public Info
 /*!
- @brief The bitcoin address of the keypair.
+ @brief The bitcoin address of the key pair.
  */
 @property(strong, nonatomic, readonly) BCAddress *address;
 
 /*!
- @brief The public key of the keypair.
+ @brief The public key of the key pair.
  */
 @property(strong, nonatomic, readonly) NSData *publicKey;
 
+/*!
+ @brief This is an initialization vector for child keys.
+
+ @discussion This can be used for hardened public key generation, you should
+ limit outside exposure to this data as much as possible.
+ */
+@property(strong, nonatomic, readonly) NSData *chainCode;
+
 #pragma mark Private Info
 /*!
- @brief Decrypts, and retrives the private key from memory.
+ @brief Decrypts, and retrieves the private key from memory.
 
  @param memoryKey The key used to encrypt the private key in memory.
 
@@ -46,23 +55,15 @@
 /*!
  @brief Gets the internal key pair for the specified index of the key sequence.
 
+ @discussion The internal address is used for change addresses.
+
  @param index The index of the internal key pair to retrieve.
 
  @return The internal key pair for the specified index, or NULL if invalid.
  */
-- (BCKeyPair *)internalKeyPairAt:(NSUInteger)index;
+- (instancetype)keyPairAt:(NSUInteger)index withMemoryKey:(NSData *)memoryKey;
 
-/*!
- @brief Gets the external key pair for the specified index of the key sequence.
-
- @param index The index of the external key pair to retrieve.
-
- @return The external key pair for the specified index, or NULL if invalid.
- */
-- (BCKeyPair *)externalKeyPairAt:(NSUInteger)index;
-
-#pragma mark Siging Operations
-
+#pragma mark Singing Operations
 /*!
  @brief Signs the inputed data with the key pairs private key.
 
@@ -73,6 +74,14 @@
  */
 - (NSData *)signHash:(NSData *)hash withMemoryKey:(NSData *)memoryKey;
 
+/*!
+ @brief Verifies that the signed data was signed by the key pairs public key.
+
+ @param signedData The signed data to check.
+ @param hash       The data before it was signed.
+
+ @return True if the data has been signed by the key pairs public key.
+ */
 - (BOOL)didSign:(NSData *)signedData withOriginalHash:(NSData *)hash;
 
 @end

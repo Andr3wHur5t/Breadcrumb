@@ -30,16 +30,19 @@
 #pragma mark Construction
 
 - (instancetype)initWithPrivateKey:(NSData *)privateKey
+                         chainCode:(NSData *)chainCode
                       andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
     NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
-    // TODO: Validate generated key in unit tests
     _publicKey = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey];
     _privateKey = [privateKey protectedWithKey:memoryKey];
-    
-    // Get address
+    privateKey = NULL;
+    memoryKey = NULL;
+
+    _chainCode = chainCode;
+
     _address = [BCAddress addressFromPublicKey:_publicKey];
     if (![_address isKindOfClass:[BCAddress class]]) return NULL;
   }
@@ -86,7 +89,7 @@
     if (![rawPrivateKey isKindOfClass:[NSData class]]) return NULL;
 
     // Sign the data with the private key.
-    signedData = [[BCsecp256k1 sharedInstance] signitureForHash:hash
+    signedData = [[BCsecp256k1 sharedInstance] signatureForHash:hash
                                                  withPrivateKey:rawPrivateKey];
     rawPrivateKey = NULL;
 
@@ -101,11 +104,73 @@
       ![signedData isKindOfClass:[NSData class]] ||
       ![hash isKindOfClass:[NSData class]])
     return FALSE;
-  return [[BCsecp256k1 sharedInstance] signiture:signedData
-                                       orginHash:hash
+  return [[BCsecp256k1 sharedInstance] signature:signedData
+                                      originHash:hash
                              isValidForPublicKey:_publicKey];
 }
 
 #pragma mark Derivation Operations
+
+- (instancetype)childKeyPairAt:(uint32_t)index
+                 withMemoryKey:(NSData *)memoryKey {
+  @autoreleasepool {
+    NSMutableData *data;
+    NSData *privateKey, *hmacData, *childPrivate, *childChainCode;
+    NSParameterAssert([memoryKey isKindOfClass:[NSData class]]);
+    if (![self.chainCode isKindOfClass:[NSData class]] ||
+        ![memoryKey isKindOfClass:[NSData class]])
+      return NULL;
+
+    // Get Private Key
+    privateKey = [self privateKeyUsingMemoryKey:memoryKey];
+    memoryKey = NULL;
+    if (![privateKey isKindOfClass:[NSData class]]) return NULL;
+
+    data = [[NSMutableData alloc] init];
+    // The index defines if the key is hardened or not.
+    if (index >= 0x80000000) {
+      // Build Hardened
+      // Disallows master pub -> child pub
+      [data appendUInt8:0x00];
+      [data appendData:privateKey];
+    } else {
+      // Build Normal
+      // Allows master pub -> child pub
+      [data appendData:self.publicKey];
+    }
+    privateKey = NULL;
+
+    // Append The index for Both
+    [data appendUInt32:OSSwapHostToBigInt32(index)];
+    
+    // secp256k1 Curve order
+//    @"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141".hexToData;
+
+    // Sha512 HMAC using our chain code.
+    hmacData = [data SHA512HmacWithKey:self.chainCode];
+    data = NULL;
+    if (![hmacData isKindOfClass:[NSData class]] || hmacData.length != 64) {
+      return NULL;
+    }
+
+    // Split the hmac into its parts
+    childPrivate = [hmacData subdataWithRange:NSMakeRange(0, 32)];
+    if (![childPrivate isKindOfClass:[NSData class]]) {
+      hmacData = NULL;
+      return NULL;
+    }
+
+    childChainCode = [hmacData subdataWithRange:NSMakeRange(32, 32)];
+    if (![childChainCode isKindOfClass:[NSData class]]) {
+      hmacData = NULL;
+      return NULL;
+    }
+
+    // Create the key pair object, it will create the public key automaticly.
+    return [[[self class] alloc] initWithPrivateKey:childPrivate
+                                          chainCode:childChainCode
+                                       andMemoryKey:memoryKey];
+  }
+}
 
 @end

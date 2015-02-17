@@ -27,18 +27,22 @@
 
 /*!
  @brief Signs the inputted hash with the inputed private key.
- 
+
  @param hash The 32 byte hash to sign,
  @param key  The 32 byte key to sign the hash with.
- 
- @return <#return value description#>
  */
-- (NSData *)signitureForHash:(NSData *)hash withPrivateKey:(NSData *)key;
+- (NSData *)signatureForHash:(NSData *)hash withPrivateKey:(NSData *)key;
 
-- (BOOL)signiture:(NSData *)signiture isValidForPublicKey:(NSData *)publicKey;
+/*!
+ @brief Checks if the signature is valid given the signed data, the origin data,
+ and the public key.
 
-- (BOOL)signiture:(NSData *)signiture
-              orginHash:(NSData *)hash
+ @param signature The signed data.
+ @param hash      The origin data before it was signed.
+ @param publicKey The public key of the key pair that signed the data.
+ */
+- (BOOL)signature:(NSData *)signature
+             originHash:(NSData *)hash
     isValidForPublicKey:(NSData *)publicKey;
 #pragma mark Shared access
 
@@ -47,8 +51,8 @@
  can take (10-100ms)
 
  @discussion First access of this instance allocates memory for secp256k1
- operations, appon deallocation of this instance memory for the c library will
- be also deallcated.
+ operations, upon deallocation of this instance memory for the c library will
+ be also deallocated.
  */
 + (instancetype)sharedInstance;
 

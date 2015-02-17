@@ -44,9 +44,10 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
 
 #pragma mark Keys
 /*!
- @brief This holds, and managages all key pairs.
- 
- @discussion This holds our master keys, and dreives child key pairs
+ @brief This manages HD keypairs, and their children.
+
+ @discussion This maintains the lifecycle of th master key pair, and its
+ children.
  */
 @property(strong, nonatomic, readonly) BCKeySequence *keys;
 

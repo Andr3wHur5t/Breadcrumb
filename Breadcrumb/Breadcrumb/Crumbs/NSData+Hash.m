@@ -27,6 +27,7 @@
 
 #import "NSData+Hash.h"
 #import <CommonCrypto/CommonDigest.h>
+#import <CommonCrypto/CommonHMAC.h>
 #import "RIPEMD160.c"
 
 @implementation NSData (Hash)
@@ -54,6 +55,26 @@
   CC_SHA256(d.bytes, (CC_LONG)d.length, d.mutableBytes);
 
   return d;
+}
+
+- (NSData *)SHA512 {
+  NSMutableData *d = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
+
+  CC_SHA512(self.bytes, (CC_LONG)self.length, d.mutableBytes);
+
+  return d;
+}
+
+- (NSData *)SHA512HmacWithKey:(NSData *)key {
+  NSMutableData *d;
+  NSParameterAssert([key isKindOfClass:[NSData class]]);
+  if (![key isKindOfClass:[NSData class]]) return NULL;
+
+  d = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
+  CCHmac(kCCHmacAlgSHA512, key.bytes, key.length, self.bytes,
+         (CC_LONG)self.length, d.mutableBytes);
+
+  return [d isKindOfClass:[NSData class]] ? d : NULL;
 }
 
 - (NSData *)RMD160 {

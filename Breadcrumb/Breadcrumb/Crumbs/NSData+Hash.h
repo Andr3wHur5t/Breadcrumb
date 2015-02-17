@@ -32,6 +32,8 @@
 - (NSData *)SHA1;
 - (NSData *)SHA256;
 - (NSData *)SHA256_2;
+- (NSData *)SHA512;
+- (NSData *)SHA512HmacWithKey:(NSData *)key;
 - (NSData *)RMD160;
 - (NSData *)hash160;
 - (NSData *)reverse;

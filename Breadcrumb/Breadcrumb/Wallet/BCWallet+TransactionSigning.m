@@ -103,7 +103,7 @@
 
   // TODO: Find Key
   NSLog(@"Key For Address '%@'", address);
-  return self.keys;
+  return self.keys.masterKeyPair;
 }
 
 @end
@@ -122,7 +122,7 @@
 }
 
 + (NSData *)_saltData {
-  // TODO: Get salt on a per device basis
+  // TODO: Generate a nonce and put it in the key chain
   return @"0X0X0X0XEFFF".hexToData;
 }
 @end
