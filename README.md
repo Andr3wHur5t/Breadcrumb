@@ -13,7 +13,7 @@ Making a wallet is so easy you can start sending, and receiving Bitcoin in less 
 
 ## How to get started
 
-Include `Breadcrumb.framework`, `CommonCrypto.framework`, and `CoreData.framework` into your Xcode project.
+Include `Breadcrumb.framework`, and `CommonCrypto.framework` into your Xcode project.
 
 Add `#import <Breadcrumb/Breadcrumb.h>` to one of your applications' source files.
 
