@@ -843,10 +843,8 @@
 					"$(inherited)",
 					"${BUILD_DIR}",
 					"$(SDKROOT)/usr/lib/system",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libsecp256k1",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libbase58",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libsecp256k1",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Breadcrumb-dswgrgjawfdrefeqsliclgbgmpsd/Build/Products/Debug-iphoneos",
+					"\"$(SRCROOT)/../libs/\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -875,10 +873,8 @@
 					"$(inherited)",
 					"${BUILD_DIR}",
 					"$(SDKROOT)/usr/lib/system",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libsecp256k1",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libbase58",
-					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libsecp256k1",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Breadcrumb-dswgrgjawfdrefeqsliclgbgmpsd/Build/Products/Debug-iphoneos",
+					"\"$(SRCROOT)/../libs/\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
