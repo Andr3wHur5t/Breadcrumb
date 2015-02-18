@@ -51,7 +51,7 @@
               .controllingAddress;
       if (![currentAddress isKindOfClass:[BCAddress class]]) return NULL;
 
-      currentKeyPair = [self keyForAddress:currentAddress];
+      currentKeyPair = [self keyForAddress:currentAddress withMemoryKey:key];
       if (![currentKeyPair.publicKey isKindOfClass:[NSData class]]) return NULL;
 
       // Sign the transaction
@@ -97,10 +97,11 @@
   }
 }
 
-- (BCKeyPair *)keyForAddress:(BCAddress *)address {
+- (BCKeyPair *)keyForAddress:(BCAddress *)address withMemoryKey:(NSData *)memoryKey {
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
   if (![address isKindOfClass:[BCAddress class]]) return NULL;
 
+  [self.keys.masterKeyPair childKeyPairAt:0 withMemoryKey:memoryKey];
   // TODO: Find Key
   NSLog(@"Key For Address '%@'", address);
   return self.keys.masterKeyPair;

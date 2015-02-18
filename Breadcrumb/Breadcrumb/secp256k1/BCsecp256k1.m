@@ -40,7 +40,7 @@
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
     if (secp256k1_ec_pubkey_create(pubKey, &pubKeyLength, [privateKey bytes],
-                                   0) == 0) {
+                                   1) == 0) {
       NSLog(@"Failed to create public key!");  // TODO: Report as errors
       return NULL;
     } else {

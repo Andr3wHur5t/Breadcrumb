@@ -173,6 +173,34 @@
   }
 }
 
+#pragma mark Key Sequence
+
+- (void)keySequenceWithPassword:(NSData *)password
+                  usingCallback:(void (^)(BCKeySequence *, NSData *))callback {
+  @autoreleasepool {
+    __block NSData *sPassword = password;
+    __block void (^sCallback)(BCKeySequence *, NSData *) = callback;
+    // Dispatch async because scrypt from the password takes about 5 sec which
+    // is too long to run on the main thread.
+    dispatch_async(self.queue, ^{
+        __block NSData *memoryKey;
+
+        // Derive the memory key from the password
+        memoryKey = [[self class] _keyFromPassword:sPassword];
+        sPassword = NULL;
+
+        // Dispatch on main so they don't need to think about what queue they
+        // are on.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @autoreleasepool {
+              sCallback(self.keys, memoryKey);
+              memoryKey = NULL;
+            }
+        });
+    });
+  }
+}
+
 #pragma mark Wallet Info
 
 - (BCAProvider *)provider {

@@ -74,6 +74,17 @@
   return [[self toString] isEqualToString:[((BCAddress *)object)toString]];
 }
 
+- (BOOL)isEqualExcludingVersion:(BCAddress *)address {
+  NSData *addr1, *addr2;
+  addr1 = [self toData];
+  addr1 = [addr1 subdataWithRange:NSMakeRange(1, addr1.length - 1)];
+
+  addr2 = [address toData];
+  addr2 = [addr2 subdataWithRange:NSMakeRange(1, addr2.length - 1)];
+
+  return [addr1 isEqualToData:addr2];
+}
+
 #pragma mark Conversion
 
 + (BCAddress *)addressFromPublicKey:(NSData *)publicKey {

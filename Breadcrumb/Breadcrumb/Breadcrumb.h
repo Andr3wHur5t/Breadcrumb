@@ -20,6 +20,8 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 #pragma mark Utilities
 #import <Breadcrumb/BCMnemonic.h>
 #import <Breadcrumb/BCProtectedData.h>
+#import <Breadcrumb/BCKeyPair.h>
+#import <Breadcrumb/BCKeySequence.h>
 
 #pragma mark Abstracts
 #import <Breadcrumb/BCAWallet.h>

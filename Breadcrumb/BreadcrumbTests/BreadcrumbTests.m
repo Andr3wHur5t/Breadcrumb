@@ -46,7 +46,7 @@
 #pragma mark Base58
 
 - (void)testBase58 {
-  // Base58 encoding
+  // Base58 encoding (Note Failure to encode...)
   XCTAssert([[@"deadBeeF".hexToData base58Encoding] isEqualToString:@"6h8cQN"],
             @"Encodes base58");
   XCTAssert([[[@"6h8cQN" base58ToData] toHex] isEqual:@"deadbeef"],

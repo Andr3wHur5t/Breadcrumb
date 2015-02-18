@@ -46,6 +46,10 @@
 - (void)mnemonicPhraseWithPassword:(NSData *)password
                      usingCallback:(void (^)(NSString *))callback;
 
+- (void)keySequenceWithPassword:(NSData *)password
+                  usingCallback:(void (^)(BCKeySequence *sequence,
+                                          NSData *memoryKey))callback;
+
 #pragma mark Addresses
 
 #pragma mark Delegate Classes

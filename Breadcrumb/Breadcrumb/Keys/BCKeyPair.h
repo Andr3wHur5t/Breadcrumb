@@ -61,7 +61,7 @@
 
  @return The internal key pair for the specified index, or NULL if invalid.
  */
-- (instancetype)keyPairAt:(NSUInteger)index withMemoryKey:(NSData *)memoryKey;
+- (instancetype)childKeyPairAt:(uint32_t)index withMemoryKey:(NSData *)memoryKe;
 
 #pragma mark Singing Operations
 /*!

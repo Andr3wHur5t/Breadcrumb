@@ -14,6 +14,10 @@
 		370E68941A8EB31E00862518 /* NSString+Base58.m in Sources */ = {isa = PBXBuildFile; fileRef = 370E68921A8EB31E00862518 /* NSString+Base58.m */; };
 		3752B1C41A83709B0029C91C /* BreadcrumbCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 3752B1C31A83709B0029C91C /* BreadcrumbCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */; };
+		3773FB0C1A9450FC00EDB119 /* BCKeySequenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3773FB0B1A9450FC00EDB119 /* BCKeySequenceTests.m */; };
+		3773FB0E1A9456F700EDB119 /* BCAddressTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3773FB0D1A9456F700EDB119 /* BCAddressTests.m */; };
+		3773FB101A94580600EDB119 /* BCTransactionSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 3773FB0F1A94580600EDB119 /* BCTransactionSigning.m */; };
+		3773FB121A94581E00EDB119 /* BCWalletGeneration.m in Sources */ = {isa = PBXBuildFile; fileRef = 3773FB111A94581E00EDB119 /* BCWalletGeneration.m */; };
 		377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A18EE1A8424A8007AA1CD /* BCMnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A18EF1A8424A8007AA1CD /* BCMnemonic.m */; };
 		377A19031A844121007AA1CD /* BCAmount.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19011A844121007AA1CD /* BCAmount.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -48,19 +52,21 @@
 		377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A194C1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h */; };
 		377A194F1A89AE2E007AA1CD /* BCWallet+TransactionSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A194D1A89AE2E007AA1CD /* BCWallet+TransactionSigning.m */; };
 		377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19511A89BC52007AA1CD /* _BCWallet.h */; };
-		377A195A1A8ADD29007AA1CD /* BCKeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19581A8ADD29007AA1CD /* BCKeyPair.h */; };
+		377A195A1A8ADD29007AA1CD /* BCKeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19581A8ADD29007AA1CD /* BCKeyPair.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A195B1A8ADD29007AA1CD /* BCKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19591A8ADD29007AA1CD /* BCKeyPair.m */; };
 		377A195F1A8AE03A007AA1CD /* BCProtectedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A195D1A8AE03A007AA1CD /* BCProtectedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19601A8AE03A007AA1CD /* BCProtectedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A195E1A8AE03A007AA1CD /* BCProtectedData.m */; };
 		377A19631A8AF56D007AA1CD /* BCWallet+Restoration.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19611A8AF56D007AA1CD /* BCWallet+Restoration.h */; };
 		377A19641A8AF56D007AA1CD /* BCWallet+Restoration.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19621A8AF56D007AA1CD /* BCWallet+Restoration.m */; };
-		377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19651A8B0144007AA1CD /* BCKeySequence.h */; };
+		377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19651A8B0144007AA1CD /* BCKeySequence.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19681A8B0144007AA1CD /* BCKeySequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19661A8B0144007AA1CD /* BCKeySequence.m */; };
 		377A196C1A8C020C007AA1CD /* BCsecp256k1.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A196A1A8C020C007AA1CD /* BCsecp256k1.h */; };
 		377A196D1A8C020C007AA1CD /* BCsecp256k1.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A196B1A8C020C007AA1CD /* BCsecp256k1.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */; };
+		37C67F491A933495005FF82D /* libTomMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C67F481A933495005FF82D /* libTomMath.a */; };
+		37C67F4B1A9334BE005FF82D /* tommath.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C67F4A1A9334BE005FF82D /* tommath.h */; };
 		37D51B851A8CC9FB00A843B7 /* BRBIP39Mnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37D51B861A8CC9FB00A843B7 /* BRBIP39Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */; };
 		37D51B931A8CCA2F00A843B7 /* NSData+Bitcoin.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -97,6 +103,10 @@
 		3767EC791A82E25300AFD6D6 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3767F14F1A830D4100AFD6D6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Breadcrumb-Prefix.pch"; sourceTree = "<group>"; };
+		3773FB0B1A9450FC00EDB119 /* BCKeySequenceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCKeySequenceTests.m; sourceTree = "<group>"; };
+		3773FB0D1A9456F700EDB119 /* BCAddressTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCAddressTests.m; sourceTree = "<group>"; };
+		3773FB0F1A94580600EDB119 /* BCTransactionSigning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCTransactionSigning.m; sourceTree = "<group>"; };
+		3773FB111A94581E00EDB119 /* BCWalletGeneration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCWalletGeneration.m; sourceTree = "<group>"; };
 		377A18EE1A8424A8007AA1CD /* BCMnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCMnemonic.h; path = Mnemonic/BCMnemonic.h; sourceTree = "<group>"; };
 		377A18EF1A8424A8007AA1CD /* BCMnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCMnemonic.m; path = Mnemonic/BCMnemonic.m; sourceTree = "<group>"; };
 		377A19011A844121007AA1CD /* BCAmount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAmount.h; path = Amount/BCAmount.h; sourceTree = "<group>"; };
@@ -147,6 +157,8 @@
 		37BFECC41A82D1460081BE4B /* BreadcrumbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreadcrumbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECCA1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BreadcrumbTests.m; sourceTree = "<group>"; };
+		37C67F481A933495005FF82D /* libTomMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTomMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		37C67F4A1A9334BE005FF82D /* tommath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tommath.h; path = ../../libTomMath/libTomMath/tommath.h; sourceTree = "<group>"; };
 		37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BRBIP39Mnemonic.h; path = Crumbs/BRBIP39Mnemonic.h; sourceTree = "<group>"; };
 		37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BRBIP39Mnemonic.m; path = Crumbs/BRBIP39Mnemonic.m; sourceTree = "<group>"; };
 		37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Bitcoin.h"; path = "Crumbs/NSData+Bitcoin.h"; sourceTree = "<group>"; };
@@ -168,6 +180,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37C67F491A933495005FF82D /* libTomMath.a in Frameworks */,
 				370E68901A8EB28700862518 /* libsecp256k1.a in Frameworks */,
 				370E688F1A8EB28700862518 /* libbase58.a in Frameworks */,
 			);
@@ -184,13 +197,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		370E68A01A931C8700862518 /* Big Number */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Big Number";
-			sourceTree = "<group>";
-		};
 		3711194E1A8320DF002D7E6B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -205,7 +211,6 @@
 		3767EC7B1A82E56C00AFD6D6 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
-				377A19691A8C01D2007AA1CD /* secp256k1 */,
 				377A195C1A8AE00A007AA1CD /* Protected Data */,
 				377A19531A8ADBA4007AA1CD /* Keys */,
 				377A192E1A8756BE007AA1CD /* Script */,
@@ -214,6 +219,7 @@
 				377A190D1A844D56007AA1CD /* Wallet */,
 				377A18FF1A843FFA007AA1CD /* Amount */,
 				377A18ED1A842467007AA1CD /* Mnemonic */,
+				377A19691A8C01D2007AA1CD /* secp256k1 */,
 			);
 			name = Interfaces;
 			sourceTree = "<group>";
@@ -477,8 +483,12 @@
 		37BFECC81A82D1460081BE4B /* BreadcrumbTests */ = {
 			isa = PBXGroup;
 			children = (
-				37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */,
 				37BFECC91A82D1460081BE4B /* Supporting Files */,
+				37BFECCB1A82D1460081BE4B /* BreadcrumbTests.m */,
+				3773FB0B1A9450FC00EDB119 /* BCKeySequenceTests.m */,
+				3773FB0D1A9456F700EDB119 /* BCAddressTests.m */,
+				3773FB0F1A94580600EDB119 /* BCTransactionSigning.m */,
+				3773FB111A94581E00EDB119 /* BCWalletGeneration.m */,
 			);
 			path = BreadcrumbTests;
 			sourceTree = "<group>";
@@ -494,7 +504,8 @@
 		37BFECE31A82D2650081BE4B /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
-				370E68A01A931C8700862518 /* Big Number */,
+				37C67F4A1A9334BE005FF82D /* tommath.h */,
+				37C67F481A933495005FF82D /* libTomMath.a */,
 				370E688B1A8D97AB00862518 /* RIPEMD160.c */,
 				37D51B9D1A8CCA5C00A843B7 /* ccMemory.h */,
 				37D51B9E1A8CCA5C00A843B7 /* Reachability.h */,
@@ -548,6 +559,7 @@
 				377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */,
 				377A19101A844D76007AA1CD /* BCWallet.h in Headers */,
 				37D51B951A8CCA2F00A843B7 /* NSData+Hash.h in Headers */,
+				37C67F4B1A9334BE005FF82D /* tommath.h in Headers */,
 				377A19631A8AF56D007AA1CD /* BCWallet+Restoration.h in Headers */,
 				37D51B971A8CCA2F00A843B7 /* NSMutableData+Bitcoin.h in Headers */,
 				377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */,
@@ -706,7 +718,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3773FB121A94581E00EDB119 /* BCWalletGeneration.m in Sources */,
 				37BFECCC1A82D1460081BE4B /* BreadcrumbTests.m in Sources */,
+				3773FB0C1A9450FC00EDB119 /* BCKeySequenceTests.m in Sources */,
+				3773FB0E1A9456F700EDB119 /* BCAddressTests.m in Sources */,
+				3773FB101A94580600EDB119 /* BCTransactionSigning.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -818,6 +834,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../libs/\"/**",
+					"\"$(SRCROOT)/../libTomMath/\"",
 				);
 				INFOPLIST_FILE = Breadcrumb/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -829,6 +846,7 @@
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libsecp256k1",
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libbase58",
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libsecp256k1",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Breadcrumb-dswgrgjawfdrefeqsliclgbgmpsd/Build/Products/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -848,6 +866,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"\"$(SRCROOT)/../libs/\"/**",
+					"\"$(SRCROOT)/../libTomMath/\"",
 				);
 				INFOPLIST_FILE = Breadcrumb/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -859,6 +878,7 @@
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libsecp256k1",
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libbase58",
 					"/Users/andrewhurst/21e6-Projects/Breadcrumb/libs/libsecp256k1",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Breadcrumb-dswgrgjawfdrefeqsliclgbgmpsd/Build/Products/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

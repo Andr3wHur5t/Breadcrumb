@@ -62,6 +62,10 @@ typedef enum : uint8_t {
  */
 + (BCAddress *)addressFromPublicKey:(NSData *)publicKey;
 
+#pragma mark Checks
+
+- (BOOL)isEqualExcludingVersion:(BCAddress *)address;
+
 @end
 
 @interface NSString (BCAddress)

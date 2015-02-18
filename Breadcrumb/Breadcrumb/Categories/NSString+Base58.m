@@ -70,8 +70,11 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
   size_t length;
 
   if (!b58enc(base58String, &length, [data bytes], data.length)) {
-    NSLog(@"Failed to encode");
-    return NULL;
+    // Try again
+    if (!b58enc(base58String, &length, [data bytes], data.length)) {
+      NSLog(@"Failed to encode");
+      return NULL;
+    }
   }
 
   output = [NSString stringWithUTF8String:base58String];
@@ -128,8 +131,7 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
 - (NSData *)base58checkToData {
   NSData *data, *d;
   d = self.base58ToData;
-  if (d.length < 4)
-    return NULL;
+  if (d.length < 4) return NULL;
   data =
       CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
 

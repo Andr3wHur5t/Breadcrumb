@@ -12,6 +12,7 @@
 #import "NSData+Hash.h"
 #import "BCsecp256k1.h"
 #import "BreadcrumbCore.h"
+#import "tommath.h"
 
 @interface BCKeyPair ()
 /*!
@@ -114,8 +115,8 @@
 - (instancetype)childKeyPairAt:(uint32_t)index
                  withMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
+    NSData *privateKey, *hmacData, *segment, *childPrivate, *childChainCode;
     NSMutableData *data;
-    NSData *privateKey, *hmacData, *childPrivate, *childChainCode;
     NSParameterAssert([memoryKey isKindOfClass:[NSData class]]);
     if (![self.chainCode isKindOfClass:[NSData class]] ||
         ![memoryKey isKindOfClass:[NSData class]])
@@ -123,7 +124,6 @@
 
     // Get Private Key
     privateKey = [self privateKeyUsingMemoryKey:memoryKey];
-    memoryKey = NULL;
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
     data = [[NSMutableData alloc] init];
@@ -136,30 +136,36 @@
     } else {
       // Build Normal
       // Allows master pub -> child pub
+      // REQ: POINT(q)
       [data appendData:self.publicKey];
     }
-    privateKey = NULL;
 
     // Append The index for Both
     [data appendUInt32:OSSwapHostToBigInt32(index)];
-    
-    // secp256k1 Curve order
-//    @"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141".hexToData;
 
     // Sha512 HMAC using our chain code.
     hmacData = [data SHA512HmacWithKey:self.chainCode];
     data = NULL;
     if (![hmacData isKindOfClass:[NSData class]] || hmacData.length != 64) {
+      privateKey = NULL;
       return NULL;
     }
 
     // Split the hmac into its parts
-    childPrivate = [hmacData subdataWithRange:NSMakeRange(0, 32)];
-    if (![childPrivate isKindOfClass:[NSData class]]) {
+    // This is the parse256 operation
+    segment = [hmacData subdataWithRange:NSMakeRange(0, 32)];
+    if (![segment isKindOfClass:[NSData class]]) {
+      privateKey = NULL;
       hmacData = NULL;
       return NULL;
     }
 
+    // Calculate the private key from the segment.
+    childPrivate =
+        [[self class] childPrivateFromParent:privateKey andLeftSegment:segment];
+    privateKey = NULL;
+
+    // Get the chain code from the other side
     childChainCode = [hmacData subdataWithRange:NSMakeRange(32, 32)];
     if (![childChainCode isKindOfClass:[NSData class]]) {
       hmacData = NULL;
@@ -171,6 +177,50 @@
                                           chainCode:childChainCode
                                        andMemoryKey:memoryKey];
   }
+}
+
+// Trying to make the code simpler, more organized, and more readable
++ (NSData *)childPrivateFromParent:(NSData *)parent
+                    andLeftSegment:(NSData *)leftSegment {
+  mp_int nParentKey, nLeftSegment, nResult, nCurveOrder;
+  unsigned char bytes[512];
+  NSUInteger length;
+  NSData *data;
+
+  // Init Values
+  mp_init(&nParentKey);
+  mp_init(&nResult);
+  mp_init(&nLeftSegment);
+  nCurveOrder = [[self class] curveOrder];
+
+  // Convert our data into big numbers
+  mp_read_unsigned_bin(&nParentKey, parent.bytes, (int)parent.length);
+  mp_read_unsigned_bin(&nLeftSegment, leftSegment.bytes,
+                       (int)leftSegment.length);
+
+  // ki = IL + kpar (mod n)
+  // In This case parse is converting the left segment to big endian, then
+  // adding to the parent key.
+  // Which is then goes through % of the curve order of sepc256k1 (statically
+  // defined bellow).
+  mp_addmod(&nLeftSegment, &nParentKey, &nCurveOrder, &nResult);
+  mp_to_unsigned_bin_n(&nResult, bytes, &length);
+
+  data = [NSData dataWithBytes:bytes length:length];
+  return [data isKindOfClass:[NSData class]] ? data : NULL;
+}
+
++ (mp_int)curveOrder {
+  static dispatch_once_t onceToken;
+  static mp_int curveOrder;
+  dispatch_once(&onceToken, ^{
+      mp_init(&curveOrder);
+      mp_read_radix(
+          &curveOrder,
+          "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
+          16);
+  });
+  return curveOrder;
 }
 
 @end

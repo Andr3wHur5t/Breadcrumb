@@ -38,43 +38,17 @@
 @property(strong, nonatomic, readonly) BCKeyPair *masterKeyPair;
 
 #pragma mark Child Retrieval
-/*!
- @brief Gets the internal key pair at the specified path.
 
- @discussion This responds the same as
- - (BCKeyPair *)internalKeyPairWithComponents:(NSArray *)components;
+- (BCKeyPair *)keyPair44ForCoin:(uint32_t)coin
+                        account:(uint32_t)accountId
+                       external:(BOOL)external
+                          index:(uint32_t)index
+                  withMemoryKey:(NSData *)memoryKey;
 
- @param path The path of the key pair in the hd wallet. Example: 44/0/0/1
- */
-- (BCKeyPair *)internalKeyPairAtPath:(NSString *)path;
-
-/*!
- @brief Gets the external key pair at the specified path.
-
- @discussion This responds the same as
- - (BCKeyPair *)internalKeyPairWithComponents:(NSArray *)components;
-
- @param path The path of the key pair in the hd wallet. Example: 44/0/0/1
- */
-- (BCKeyPair *)externalKeyPairAtPath:(NSString *)path;
-
-/*!
- @brief Gets the key pair at the specified component path.
-
- @discussion Gets the internal key pair to be used for change addresses.
-
- @param components An array of components. Example: @[@44,@0,@0,@1]
- */
-- (BCKeyPair *)internalKeyPairWithComponents:(NSArray *)components;
-
-/*!
- @brief Gets the key pair at the specified component path.
-
- @discussion Gets an external key pair to be used for receiving.
-
- @param components An array of components. Example: @[@44,@0,@0,@1]
- */
-- (BCKeyPair *)externalKeyPairWithComponents:(NSArray *)components;
+- (BCKeyPair *)keyPair32ForAccount:(uint32_t)accountId
+                          external:(BOOL)external
+                             index:(uint32_t)index
+                     withMemoryKey:(NSData *)memoryKey;
 
 #pragma mark Utilities
 /*!
