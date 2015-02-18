@@ -1,6 +1,7 @@
 # Breadcrumb
 
 [![Build Status](https://travis-ci.org/Andr3wHur5t/Breadcrumb.svg)](https://travis-ci.org/Andr3wHur5t/Breadcrumb)
+[![CocoaPods](https://img.shields.io/cocoapods/l/AFNetworking.svg)](https://github.com/Andr3wHur5t/Breadcrumb/blob/master/LICENSE)
 
 **Breadcrumb** takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
 
