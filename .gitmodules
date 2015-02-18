@@ -4,3 +4,6 @@
 [submodule "libbase58"]
 	path = libbase58
 	url = https://github.com/bitcoin/libbase58.git
+[submodule "libTomMath/libtommath"]
+	path = libTomMath/libtommath
+	url = https://github.com/libtom/libtommath.git
