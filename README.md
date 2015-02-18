@@ -1,6 +1,10 @@
 # Breadcrumb
 
-**Breadcrumb** takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
+**Breadcrumb**
+
+[![Build Status](https://travis-ci.org/Andr3wHur5t/Breadcrumb.svg)](https://travis-ci.org/Andr3wHur5t/Breadcrumb)
+
+Takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
 
 With minimalistic interfaces you can quickly get started working with Bitcoin, and the Blockchain.
 
