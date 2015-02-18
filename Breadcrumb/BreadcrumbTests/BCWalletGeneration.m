@@ -16,6 +16,8 @@
 
 @implementation BCWalletGeneration
 
-
+// correct horse battery staple
+// Private Key: C4BBCB1FBEC99D65BF59D85C8CB62EE2DB963F0FE106F483D9AFA73BD4E39A8A
+// Address: 1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T
 
 @end
