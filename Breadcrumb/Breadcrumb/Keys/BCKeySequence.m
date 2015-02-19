@@ -208,7 +208,8 @@
                             account:(uint32_t)accountId
                            external:(BOOL)external
                               index:(uint32_t)index {
-  // m/purpose'/coin_type'/account'/change/address_index
+  // m/purpose(44)'/coin_type'/account'/change/address_index
+  // m/0x8000002C/0x80000000/0x80000000/0/0
   return @[
     @(BIP44_PURPOSE),
     @(coin),
@@ -222,6 +223,7 @@
                                  external:(BOOL)external
                                     index:(uint32_t)index {
   // m/account'/change/address_index
+  // m/0x80000000/0/0
   return @[ @(BIP32_PRIME | accountId), @(external ? 0 : 1), @(index) ];
 }
 

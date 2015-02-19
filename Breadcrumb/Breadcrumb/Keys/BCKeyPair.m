@@ -15,6 +15,10 @@
 #import "BreadcrumbCore.h"
 #import "tommath.h"
 
+#define WIF_BTC_MAINNET 0x80
+#define WIF_BTC_TESTNET 0xef
+#define WIF_HAS_COMPRESSED_PUB 0x01
+
 @interface BCKeyPair ()
 /*!
  @brief The protected private key.
@@ -32,23 +36,84 @@
 #pragma mark Construction
 
 - (instancetype)initWithPrivateKey:(NSData *)privateKey
+                     compressedPub:(BOOL)compressed
+                      andMemoryKey:(NSData *)memoryKey {
+  @autoreleasepool {
+    NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
+    if (![privateKey isKindOfClass:[NSData class]]) return NULL;
+    self = [super init];
+    if (self) {
+      _isCompressed = compressed;
+      _publicKey =
+          [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey
+                                              compressed:_isCompressed];
+      _privateKey = [privateKey protectedWithKey:memoryKey];
+      privateKey = NULL;
+      memoryKey = NULL;
+
+      _address = [BCAddress addressFromPublicKey:_publicKey];
+      if (![_address isKindOfClass:[BCAddress class]]) return NULL;
+    }
+    return self;
+  }
+}
+
+- (instancetype)initWithPrivateKey:(NSData *)privateKey
                          chainCode:(NSData *)chainCode
                       andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
     NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
-    _publicKey = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey];
-    _privateKey = [privateKey protectedWithKey:memoryKey];
+    self = [self initWithPrivateKey:privateKey
+                      compressedPub:true  // ASSUMING TRUE, FIX!
+                       andMemoryKey:memoryKey];
     privateKey = NULL;
     memoryKey = NULL;
-
-    _chainCode = chainCode;
-
-    _address = [BCAddress addressFromPublicKey:_publicKey];
-    if (![_address isKindOfClass:[BCAddress class]]) return NULL;
+    if (self) _chainCode = chainCode;
+    return self;
   }
-  return self;
+}
+
+- (instancetype)initWithWIF:(NSString *)wifString
+               andMemoryKey:(NSData *)memoryKey {
+  @autoreleasepool {
+    BOOL isCompressed;
+    NSData *privateKey;
+    NSMutableData *decodedWif;
+    NSParameterAssert([wifString isKindOfClass:[NSString class]]);
+    if (![wifString isKindOfClass:[NSString class]]) {
+      memoryKey = NULL;
+      wifString = NULL;
+      return NULL;
+    }
+
+    // Convert the wif string to a private key.
+    decodedWif = [NSMutableData secureDataWithData:wifString.base58checkToData];
+    wifString = NULL;
+    if (![decodedWif isKindOfClass:[NSData class]]) {
+      decodedWif = NULL;
+      memoryKey = NULL;
+      return NULL;
+    }
+
+    // Check If it is a compressed Key
+    isCompressed = [decodedWif UInt8AtOffset:decodedWif.length - 1] ==
+                   WIF_HAS_COMPRESSED_PUB;
+
+    // We Need to Drop the last byte because they added a compressed code.
+    if (isCompressed) decodedWif.length = decodedWif.length - 1;
+
+    // Get Private Key From left over
+    privateKey = [NSMutableData
+        secureDataWithData:[decodedWif
+                               subdataWithRange:NSMakeRange(
+                                                    1, decodedWif.length - 1)]];
+    if (![privateKey isKindOfClass:[NSData class]]) return NULL;
+    return [self initWithPrivateKey:privateKey
+                      compressedPub:isCompressed
+                       andMemoryKey:memoryKey];
+  }
 }
 
 #pragma mark Public Info
@@ -261,8 +326,13 @@
       [result
           appendString:[kBCKeySequenceHardenedFlagChars substringToIndex:1]];
   }
-  
+
   return [NSString stringWithString:result];
+}
+
++ (BOOL)typeCodeStatesCompressed:(char)typeCode {
+  return typeCode == 'K' || typeCode == 'L' || typeCode == 'c' ||
+         typeCode == '9';
 }
 
 @end

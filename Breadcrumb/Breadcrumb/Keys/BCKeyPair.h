@@ -22,6 +22,8 @@
                          chainCode:(NSData *)chainCode
                       andMemoryKey:(NSData *)memoryKey;
 
+- (instancetype)initWithWIF:(NSString *)wifString
+               andMemoryKey:(NSData *)memoryKey;
 #pragma mark Public Info
 /*!
  @brief The bitcoin address of the key pair.
@@ -42,6 +44,8 @@
  limit outside exposure to this data as much as possible.
  */
 @property(strong, nonatomic, readonly) NSData *chainCode;
+
+@property(assign, nonatomic, readonly) BOOL isCompressed;
 
 #pragma mark Private Info
 /*!

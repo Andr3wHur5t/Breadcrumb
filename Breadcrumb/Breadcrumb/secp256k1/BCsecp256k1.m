@@ -8,6 +8,7 @@
 
 #import "BCsecp256k1.h"
 #import "secp256k1.h"
+#import "BreadcrumbCore.h"
 
 @implementation BCsecp256k1
 #pragma mark Construction
@@ -33,14 +34,14 @@
 
 #pragma mark Operations
 
-- (NSData *)publicKeyFromKey:(NSData *)privateKey {
+- (NSData *)publicKeyFromKey:(NSData *)privateKey compressed:(BOOL)compressed {
   @autoreleasepool {
     unsigned char pubKey[65];
     int pubKeyLength;
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
 
     if (secp256k1_ec_pubkey_create(pubKey, &pubKeyLength, [privateKey bytes],
-                                   1) == 0) {
+                                   compressed) == 0) {
       NSLog(@"Failed to create public key!");  // TODO: Report as errors
       return NULL;
     } else {
@@ -60,7 +61,7 @@
     }
 
     if (secp256k1_ecdsa_sign([hash bytes], signature, &sigLength, [key bytes],
-                             NULL, NULL) == 0) {
+                             NULL, [[[self class] psudoRandomDataWithLength:256] bytes]) == 0) {
       NSLog(@"Failed to sign!");  // TODO: Report as errors
       return NULL;
     } else {
@@ -84,15 +85,15 @@
         return TRUE;
         break;
       case 0:
-        NSLog(@"Incorrect Sig");  // TODO: Report as errors
+        //        NSLog(@"Incorrect Sig");  // TODO: Report as errors
         return FALSE;
         break;
       case -1:
-        NSLog(@"Invalid Sig");  // TODO: Report as errors
+        //        NSLog(@"Invalid Sig");  // TODO: Report as errors
         return FALSE;
         break;
       case -2:
-        NSLog(@"Invalid pub key");  // TODO: Report as errors
+        //        NSLog(@"Invalid pub key");  // TODO: Report as errors
         return FALSE;
         break;
 
@@ -110,5 +111,17 @@
   static BCsecp256k1 *instance;
   dispatch_once(&onceToken, ^{ instance = [[[self class] alloc] _init]; });
   return instance;
+}
+
+#pragma mark Utilties
++ (NSData *)psudoRandomDataWithLength:(NSUInteger)length {
+  @autoreleasepool {
+    NSMutableData *entropy;
+    
+    entropy = [NSMutableData secureDataWithLength:length];
+    SecRandomCopyBytes(kSecRandomDefault, entropy.length, entropy.mutableBytes);
+    
+    return entropy;
+  }
 }
 @end

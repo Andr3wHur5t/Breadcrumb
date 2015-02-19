@@ -15,8 +15,7 @@
 // on the main queue using the callback.
 //
 // Synchronous interfaces are available in _BCWallet.h these interfaces should
-// be
-// dispatched on the wallets queue.
+// be dispatched on the wallets queue.
 
 #import <Breadcrumb/Breadcrumb.h>
 

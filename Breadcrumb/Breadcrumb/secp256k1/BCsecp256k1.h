@@ -23,7 +23,7 @@
 
  @param privateKey The private key to generate the public key from.
  */
-- (NSData *)publicKeyFromKey:(NSData *)privateKey;
+- (NSData *)publicKeyFromKey:(NSData *)privateKey compressed:(BOOL)compressed;
 
 /*!
  @brief Signs the inputted hash with the inputed private key.
@@ -44,6 +44,8 @@
 - (BOOL)signature:(NSData *)signature
              originHash:(NSData *)hash
     isValidForPublicKey:(NSData *)publicKey;
+
+
 #pragma mark Shared access
 
 /*!
@@ -56,4 +58,6 @@
  */
 + (instancetype)sharedInstance;
 
+#pragma mark Utilties
++ (NSData *)psudoRandomDataWithLength:(NSUInteger)length;
 @end
