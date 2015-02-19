@@ -67,6 +67,7 @@
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
 		37C67F491A933495005FF82D /* libTomMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C67F481A933495005FF82D /* libTomMath.a */; };
 		37C67F4B1A9334BE005FF82D /* tommath.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C67F4A1A9334BE005FF82D /* tommath.h */; };
+		37C77DC41A969968008D56FE /* BCMnemonicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DC31A969968008D56FE /* BCMnemonicTests.m */; };
 		37D51B851A8CC9FB00A843B7 /* BRBIP39Mnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37D51B861A8CC9FB00A843B7 /* BRBIP39Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */; };
 		37D51B931A8CCA2F00A843B7 /* NSData+Bitcoin.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -160,6 +161,7 @@
 		37BFECCA1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37C67F481A933495005FF82D /* libTomMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTomMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		37C67F4A1A9334BE005FF82D /* tommath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tommath.h; path = ../../libTomMath/libTomMath/tommath.h; sourceTree = "<group>"; };
+		37C77DC31A969968008D56FE /* BCMnemonicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCMnemonicTests.m; sourceTree = "<group>"; };
 		37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BRBIP39Mnemonic.h; path = Crumbs/BRBIP39Mnemonic.h; sourceTree = "<group>"; };
 		37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BRBIP39Mnemonic.m; path = Crumbs/BRBIP39Mnemonic.m; sourceTree = "<group>"; };
 		37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Bitcoin.h"; path = "Crumbs/NSData+Bitcoin.h"; sourceTree = "<group>"; };
@@ -484,6 +486,7 @@
 				3773FB151A95215900EDB119 /* BCEncodingTests.m */,
 				3773FB171A95266800EDB119 /* BCWalletGenerationTests.m */,
 				37F10D5F1A9579DC005FD095 /* BCKeyPairTests.m */,
+				37C77DC31A969968008D56FE /* BCMnemonicTests.m */,
 			);
 			path = BreadcrumbTests;
 			sourceTree = "<group>";
@@ -717,6 +720,7 @@
 				3773FB0E1A9456F700EDB119 /* BCAddressTests.m in Sources */,
 				3773FB141A95208400EDB119 /* BCHashTests.m in Sources */,
 				37F10D601A9579DC005FD095 /* BCKeyPairTests.m in Sources */,
+				37C77DC41A969968008D56FE /* BCMnemonicTests.m in Sources */,
 				3773FB161A95215900EDB119 /* BCEncodingTests.m in Sources */,
 				3773FB181A95266800EDB119 /* BCWalletGenerationTests.m in Sources */,
 			);

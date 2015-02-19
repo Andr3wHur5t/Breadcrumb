@@ -27,12 +27,12 @@
       return NULL;
     }
 
-    phrase = [self mnemonicFromSeedData:entropy];
+    phrase = [self mnemonicFromEntropy:entropy];
     return [phrase isKindOfClass:[NSString class]] ? phrase : NULL;
   }
 }
 
-+ (NSString *)mnemonicFromSeedData:(NSData *)data {
++ (NSString *)mnemonicFromEntropy:(NSData *)data {
   // Auto release pool ensures data is deallocated immediately
   @autoreleasepool {
     NSParameterAssert([data isKindOfClass:[NSData class]]);
@@ -80,6 +80,16 @@
 
     encodedValue = [[BRBIP39Mnemonic sharedInstance] encodePhrase:phraseData];
     return [encodedValue isKindOfClass:[NSString class]] ? encodedValue : NULL;
+  }
+}
+
+#pragma mark Conversion
+
++ (NSData *)keyFromPhrase:(NSString *)phrase
+           withPassphrase:(NSString *)passphrase {
+  @autoreleasepool {
+    return [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:phrase
+                                                  withPassphrase:passphrase];
   }
 }
 

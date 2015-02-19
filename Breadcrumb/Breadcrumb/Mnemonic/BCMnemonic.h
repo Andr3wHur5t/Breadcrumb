@@ -15,7 +15,6 @@
  */
 @interface BCMnemonic : NSObject
 #pragma mark Generation
-
 /*!
  @brief Generates a BIP39 compliant mnemonic using data from a
  cryptographic random number generator.
@@ -34,7 +33,7 @@
 
  @return The resulting mnemonic.
  */
-+ (NSString *)mnemonicFromSeedData:(NSData *)data;
++ (NSString *)mnemonicFromEntropy:(NSData *)data;
 
 #pragma mark Processing
 /*!
@@ -64,5 +63,10 @@
  @return The resulting mnemonic phrase, or NULL if the process failed.
  */
 + (NSString *)encodeData:(NSData *)phraseData;
+
+#pragma mark Conversion
+
++ (NSData *)keyFromPhrase:(NSString *)phrase
+           withPassphrase:(NSString *)passphrase;
 
 @end
