@@ -51,6 +51,7 @@
       privateKey = NULL;
       memoryKey = NULL;
 
+      if ( ![_publicKey isKindOfClass:[NSData class]] ) return NULL;
       _address = [BCAddress addressFromPublicKey:_publicKey];
       if (![_address isKindOfClass:[BCAddress class]]) return NULL;
     }

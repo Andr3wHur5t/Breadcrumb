@@ -65,6 +65,14 @@
                BlueprintName = "BreadcrumbTests"
                ReferencedContainer = "container:Breadcrumb.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "BCKeySequenceTests/testHDVector1">
+               </Test>
+               <Test
+                  Identifier = "BCKeySequenceTests/testHDVector2">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

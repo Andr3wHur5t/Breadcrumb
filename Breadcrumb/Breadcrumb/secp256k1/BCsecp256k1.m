@@ -39,6 +39,7 @@
     unsigned char pubKey[65];
     int pubKeyLength;
     if (![privateKey isKindOfClass:[NSData class]]) return NULL;
+    if (![privateKey bytes] || privateKey.length != 32) return NULL;
 
     if (secp256k1_ec_pubkey_create(pubKey, &pubKeyLength, [privateKey bytes],
                                    compressed) == 0) {
@@ -54,14 +55,16 @@
   @autoreleasepool {
     unsigned char signature[75];
     int sigLength = 75;
+    if (![key isKindOfClass:[NSData class]]) return NULL;
 
     if (secp256k1_ec_seckey_verify([key bytes]) == 0) {
       NSLog(@"Key Not Valid");  // TODO: Report as errors
       return NULL;
     }
 
-    if (secp256k1_ecdsa_sign([hash bytes], signature, &sigLength, [key bytes],
-                             NULL, [[[self class] psudoRandomDataWithLength:256] bytes]) == 0) {
+    if (secp256k1_ecdsa_sign(
+            [hash bytes], signature, &sigLength, [key bytes], NULL,
+            [[[self class] psudoRandomDataWithLength:256] bytes]) == 0) {
       NSLog(@"Failed to sign!");  // TODO: Report as errors
       return NULL;
     } else {
@@ -117,10 +120,10 @@
 + (NSData *)psudoRandomDataWithLength:(NSUInteger)length {
   @autoreleasepool {
     NSMutableData *entropy;
-    
+
     entropy = [NSMutableData secureDataWithLength:length];
     SecRandomCopyBytes(kSecRandomDefault, entropy.length, entropy.mutableBytes);
-    
+
     return entropy;
   }
 }

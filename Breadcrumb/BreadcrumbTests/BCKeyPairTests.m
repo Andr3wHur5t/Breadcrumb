@@ -58,7 +58,8 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
 
   memKey = [NSMutableData dataWithLength:32];
   keyPair1 = [[BCKeyPair alloc] initWithWIF:kStrSecret1 andMemoryKey:memKey];
-
+  XCTAssert([keyPair1 isKindOfClass:[BCKeyPair class]], @"Failed");
+  
   // Check If Compressed
   XCTAssert(!keyPair1.isCompressed, @"Failed");
 
@@ -68,6 +69,7 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
   // Verify pub Key
 
   keyPair2 = [[BCKeyPair alloc] initWithWIF:strSecret2 andMemoryKey:memKey];
+    XCTAssert([keyPair2 isKindOfClass:[BCKeyPair class]], @"Failed");
 
   XCTAssert(!keyPair2.isCompressed, @"Failed");
 
@@ -77,6 +79,7 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
   // Verify pub Key
 
   keyPair1C = [[BCKeyPair alloc] initWithWIF:strSecret1C andMemoryKey:memKey];
+      XCTAssert([keyPair1C isKindOfClass:[BCKeyPair class]], @"Failed");
 
   // Check If Compressed
   XCTAssert(keyPair1C.isCompressed, @"Failed");
@@ -87,6 +90,7 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
   // Verify pub Key
 
   keyPair2C = [[BCKeyPair alloc] initWithWIF:strSecret2C andMemoryKey:memKey];
+        XCTAssert([keyPair2C isKindOfClass:[BCKeyPair class]], @"Failed");
 
   // Check If Compressed
   XCTAssert(keyPair2C.isCompressed, @"Failed");
