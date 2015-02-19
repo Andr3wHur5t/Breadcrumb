@@ -1,6 +1,7 @@
 # Breadcrumb
 
 [![Build Status](https://travis-ci.org/Andr3wHur5t/Breadcrumb.svg)](https://travis-ci.org/Andr3wHur5t/Breadcrumb)
+[![CocoaPods](https://img.shields.io/cocoapods/l/AFNetworking.svg)](https://github.com/Andr3wHur5t/Breadcrumb/blob/master/LICENSE)
 
 **Breadcrumb** takes away the complexity that you normally encounter when working with other **Bitcoin**, or **Blockchain** libraries. 
 
@@ -12,7 +13,7 @@ Making a wallet is so easy you can start sending, and receiving Bitcoin in less 
 
 ## How to get started
 
-Include `Breadcrumb.framework`, `CommonCrypto.framework`, and `CoreData.framework` into your Xcode project.
+Include `Breadcrumb.framework`, and `CommonCrypto.framework` into your Xcode project.
 
 Add `#import <Breadcrumb/Breadcrumb.h>` to one of your applications' source files.
 
