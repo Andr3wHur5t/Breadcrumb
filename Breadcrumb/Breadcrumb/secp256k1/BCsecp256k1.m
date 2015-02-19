@@ -64,7 +64,7 @@
 
     if (secp256k1_ecdsa_sign(
             [hash bytes], signature, &sigLength, [key bytes], NULL,
-            [[[self class] psudoRandomDataWithLength:256] bytes]) == 0) {
+            [[[self class] pseudoRandomDataWithLength:256] bytes]) == 0) {
       NSLog(@"Failed to sign!");  // TODO: Report as errors
       return NULL;
     } else {
@@ -117,7 +117,7 @@
 }
 
 #pragma mark Utilties
-+ (NSData *)psudoRandomDataWithLength:(NSUInteger)length {
++ (NSData *)pseudoRandomDataWithLength:(NSUInteger)length {
   @autoreleasepool {
     NSMutableData *entropy;
 

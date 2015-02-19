@@ -147,10 +147,10 @@
                                                            bytes[*i + 1 + q]]];
   }
 
-  // Jump pass the bytes we just proccessed
+  // Jump pass the bytes we just processed
   *i += lengthToRead;
 
-  // Retun the hex of the values
+  // Return the hex of the values
   return processedValue;
 }
 

@@ -85,7 +85,7 @@ static const BCScriptOpCode OP_SIZE = 0x82;
 static const BCScriptOpCode OP_EQUAL = 0x87;
 static const BCScriptOpCode OP_EQUALVERIFY = 0x88;
 
-// Arithmitic
+// Arithmetic
 static const BCScriptOpCode OP_1ADD = 0x8b;
 static const BCScriptOpCode OP_1SUB = 0x8c;
 static const BCScriptOpCode OP_NEGATE = 0x8f;
@@ -118,7 +118,7 @@ static const BCScriptOpCode OP_CHECKSIGVERIFY = 0xad;
 static const BCScriptOpCode OP_CHECKMULTISIG = 0xae;
 static const BCScriptOpCode OP_CHECKMULTISIGVERIFY = 0xaf;
 
-// Psudo-words
+// Pseudo-Words
 static const BCScriptOpCode OP_PUBKEYHASH = 0xfd;
 static const BCScriptOpCode OP_PUBKEY = 0xfe;
 static const BCScriptOpCode OP_INVALIDOPCODE = 0xff;

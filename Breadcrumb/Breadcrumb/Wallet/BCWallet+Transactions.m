@@ -66,7 +66,7 @@ static NSString *const kBCWalletError_FailedToSign =
   sAddress = address;
   sCallback = callback;
 
-  // Get UTXOs optimized for the specified ammount from our provider so we can
+  // Get UTXOs optimized for the specified amount from our provider so we can
   // build the transaction.
   [self.provider
       UTXOforAmount:amount
@@ -79,7 +79,7 @@ static NSString *const kBCWalletError_FailedToSign =
              sCallback(NULL, error);
 
            } else if ([UTXOs isKindOfClass:[NSArray class]]) {
-             // Build the reansaction with the inputted UTXOs
+             // Build the transaction with the inputted UTXOs
              transaction = [BCMutableTransaction
                  buildTransactionWith:UTXOs
                             forAmount:sAmount

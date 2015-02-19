@@ -38,13 +38,13 @@
           withOutputLength:(NSUInteger)length;
 
 /*!
- @brief Scrypts the inputed password with the inputted algorithim parameters.
+ @brief Scrypts the inputed password with the inputted algorithm parameters.
 
  @param password The password to to derive from.
  @param salt     The salt to use.
  @param n        The work factor of the algorithm.
- @param r        The block size of the algotritm.
- @param p        The paralization factor of the algorithm.
+ @param r        The block size of the algorithm.
+ @param p        The paralyzation factor of the algorithm.
  @param length   The byte length of the output.
  */
 + (NSData *)scryptPassword:(NSData *)password

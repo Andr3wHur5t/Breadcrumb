@@ -74,7 +74,7 @@ static NSString *const kBCKeySequenceHardenedFlagChars = @"'h";
                        andMemoryKey:(NSData *)memoryKey;
 
 /*!
- @brief Gets the keypair at the specified bip32 path
+ @brief Gets the key pair at the specified bip32 path
 
  @param path      The bip32 path to get the key pair for.
  @param memoryKey The memory key to protect the key pairs private key.

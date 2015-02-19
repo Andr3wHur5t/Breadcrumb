@@ -28,13 +28,13 @@
 /*!
  @brief This generates a key using the wallet salt, and the given password.
 
- @discussion This method scrypts the inputted password with the salt from the
+ @discussion This method scrypt the inputted password with the salt from the
  wallets salt class method.
 
  This is a long running operation, and should not be executed on the main
  thread.
 
- @param password The password data to generat the key with.
+ @param password The password data to generate the key with.
 
  @return The 32 byte key, or NULL if the operation failed..
  */

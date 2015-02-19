@@ -66,7 +66,7 @@
   script = [BCScript scriptWithData:scriptData];
   if (![script isKindOfClass:[BCScript class]]) return NULL;
 
-  // Update Length if avalable
+  // Update Length if available
   if (length) *length = position;
 
   return [self initWithHash:transactionHash

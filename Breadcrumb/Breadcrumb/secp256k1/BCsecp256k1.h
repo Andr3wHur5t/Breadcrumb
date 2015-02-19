@@ -58,6 +58,6 @@
  */
 + (instancetype)sharedInstance;
 
-#pragma mark Utilties
-+ (NSData *)psudoRandomDataWithLength:(NSUInteger)length;
+#pragma mark Utilities
++ (NSData *)pseudoRandomDataWithLength:(NSUInteger)length;
 @end

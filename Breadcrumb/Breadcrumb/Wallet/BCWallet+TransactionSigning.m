@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
 // Because it is hard to find good documentation on this I'm going to put
-// this here for future refrence.
+// this here for future reference.
 //
 // How To Sign A Transaction:
 // 1) Build an unsigned transaction
@@ -15,10 +15,10 @@
 // OP_CHECKSIG'
 // 2) For Each Input In the transaction build a hash
 // 3) Sign The Hash with the Key which "owns" the transaction
-// 4) Append the signiture with SIG_HASHALL code
-// 5) Append the signiture that you just appended with SIG_HASH all with the
+// 4) Append the signature with SIG_HASHALL code
+// 5) Append the signature that you just appended with SIG_HASH all with the
 // public key of the key which "owns" the transaction.
-// 6) Create A script which pushes the signiture you just Appended.
+// 6) Create A script which pushes the signature you just Appended.
 // 7) Replace the script of the first most input that is unsigned with the newly
 // generated script.
 // 8) Do this again for each input...
@@ -33,7 +33,7 @@
                                    withKey:(NSData *)key {
   @autoreleasepool {  // Ensure immediate deallocation of sensitive data.
     BCTransactionInput *updatedInput;
-    NSMutableData *currentSigniture;
+    NSMutableData *currentSignature;
     NSData *currentHash, *signedHash;
     BCMutableScript *unlockScript;
     BCKeyPair *currentKeyPair;
@@ -58,19 +58,19 @@
       signedHash = [currentKeyPair signHash:currentHash withMemoryKey:key];
 
       // Sign the hash with the key that owns the input
-      currentSigniture = [[NSMutableData alloc] initWithData:signedHash];
-      if (![currentSigniture isKindOfClass:[NSData class]]) return NULL;
+      currentSignature = [[NSMutableData alloc] initWithData:signedHash];
+      if (![currentSignature isKindOfClass:[NSData class]]) return NULL;
 
       // Append it with the SIG_HASH all code which specifies the method we used
       // to sign
-      [currentSigniture appendUInt32:SIGHASH_ALL];
+      [currentSignature appendUInt32:SIGHASH_ALL];
 
       // Create the unlock script (Also known as sig script)
       unlockScript = [BCMutableScript script];
       if (![unlockScript isKindOfClass:[BCScript class]]) return NULL;
 
-      // Append the signiture
-      [unlockScript writeBytes:currentSigniture];
+      // Append the signature
+      [unlockScript writeBytes:currentSignature];
 
       // Append the Public Key of the owning Key Pair
       [unlockScript writeBytes:currentKeyPair.publicKey];
@@ -79,7 +79,7 @@
       updatedInput = [transaction.inputs objectAtIndex:i];
       if (![updatedInput isKindOfClass:[BCTransactionInput class]]) return NULL;
 
-      // Create A clone of the transaction input, but set the script signiture
+      // Create A clone of the transaction input, but set the script signature
       // to the script we just created.
       updatedInput = [[BCTransactionInput alloc]
            initWithHash:updatedInput.previousOutputHash

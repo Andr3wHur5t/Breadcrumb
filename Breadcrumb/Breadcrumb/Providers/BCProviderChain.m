@@ -53,7 +53,7 @@ static NSString *const kChainUTXOsURL =
 - (void)publishTransaction:(BCMutableTransaction *)transaction
             withCompletion:(void (^)(NSError *))completion {
   // Publish to the Bitcoin Network.
-  NSLog(@"Publish Trasaction:\n'%@'", [[transaction toData] toHex]);
+  NSLog(@"Publish Transaction:\n'%@'", [[transaction toData] toHex]);
   completion(NULL);
 }
 

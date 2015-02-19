@@ -45,7 +45,7 @@ typedef enum : uint8_t {
  @brief The type of address.
 
  @discussion This is stated by the first byte of the decoded address, New
- addresses use new technologies like multi-singiture.
+ addresses use new technologies like multi-signature.
  */
 @property(assign, nonatomic, readonly) BCAddressType type;
 
@@ -55,7 +55,7 @@ typedef enum : uint8_t {
  @brief Converts a public key into a base 58checked address using the old
  version byte.
 
- @discussion Converts a public key into an addres by getting the has of the
+ @discussion Converts a public key into an address by getting the has of the
  address (SHA256 + RIPMD160) then base 58 check encoding it.
 
  @param publicKey The public key to convert into a address.

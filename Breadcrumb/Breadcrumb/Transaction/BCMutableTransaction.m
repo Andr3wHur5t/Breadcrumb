@@ -159,7 +159,7 @@
 }
 
 - (BOOL)outputsAreValid {
-  // Check all ouptuts are the correct class
+  // Check all outputs are the correct class
   for (NSUInteger i = 0; i < self.outputs.count; ++i)
     if (![[self.outputs objectAtIndex:i]
             isKindOfClass:[BCTransactionOutput class]])

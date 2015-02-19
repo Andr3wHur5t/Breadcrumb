@@ -58,7 +58,7 @@
 - (BCKeyPair *)keyPairForComponents:(NSArray *)components
                        andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
-    BCKeyPair *currentkeyPair;
+    BCKeyPair *currentKeyPair;
     NSParameterAssert([components isKindOfClass:[NSArray class]]);
     NSParameterAssert([memoryKey isKindOfClass:[NSData class]]);
     if (![components isKindOfClass:[NSArray class]] ||
@@ -75,24 +75,24 @@
     }
 
     // Set first key pair to root.
-    currentkeyPair = self.masterKeyPair;
+    currentKeyPair = self.masterKeyPair;
 
     // Get key pair by enumerating indexes of components
     for (NSNumber *componentIndex in components) {
       // Validate Last Key Pair
-      if (![currentkeyPair isKindOfClass:[BCKeyPair class]]) {
+      if (![currentKeyPair isKindOfClass:[BCKeyPair class]]) {
         memoryKey = NULL;
         return NULL;
       }
 
       // Get its child key pair.
-      currentkeyPair =
-          [currentkeyPair childKeyPairAt:(uint32_t)[componentIndex intValue]
+      currentKeyPair =
+          [currentKeyPair childKeyPairAt:(uint32_t)[componentIndex intValue]
                            withMemoryKey:memoryKey];
     }
 
     memoryKey = NULL;
-    return [currentkeyPair isKindOfClass:[BCKeyPair class]] ? currentkeyPair
+    return [currentKeyPair isKindOfClass:[BCKeyPair class]] ? currentKeyPair
                                                             : NULL;
   }
 }
@@ -143,17 +143,18 @@
   }
 }
 
-- (BCKeyPair *)keyPairForPath:(NSString *)path andMemoryKey:(NSData *)memoryKey {
+- (BCKeyPair *)keyPairForPath:(NSString *)path
+                 andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
     NSArray *components;
     BCKeyPair *keyPair;
-    
+
     components = [[self class] componentsFromPath:path];
     if (![components isKindOfClass:[NSArray class]]) {
       memoryKey = NULL;
       return NULL;
     }
-    
+
     keyPair = [self keyPairForComponents:components andMemoryKey:memoryKey];
     memoryKey = NULL;
     return keyPair;

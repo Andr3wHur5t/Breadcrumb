@@ -40,7 +40,7 @@
  future when we support multi signature this will need to be an array of
  addresses.
 
- NOTE: this can be null, because it can not be directly retrived from parsing a
+ NOTE: this can be null, because it can not be directly retrieved from parsing a
  raw transaction input.
  */
 @property(strong, nonatomic, readonly) BCAddress *controllingAddress;
