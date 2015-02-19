@@ -15,8 +15,69 @@
 
 @implementation BCKeySequenceTests
 
-#pragma mark BIP 32 Test Vectors
-// Refrence to Vectors https://en.bitcoin.it/wiki/BIP_0032_TestVectors
+#pragma mark Sequence Parsing & Generation Vectors
+
+- (void)testSequenceParsingVector0 {
+  NSArray *seq;
+  seq = @[ @(BIP32_PRIME), @(0) ];
+  XCTAssert([[BCKeySequence componentsFromPath:@"m/0'/0"] isEqualToArray:seq],
+            @"Failed");
+  XCTAssert([[BCKeySequence componentsFromPath:@"m/0h/0"] isEqualToArray:seq],
+            @"Failed");
+  XCTAssert([[BCKeySequence componentsFromPath:@"m/0H/0"] isEqualToArray:seq],
+            @"Failed");
+  XCTAssert([[BCKeySequence componentsFromPath:@"m/0 '/0"] isEqualToArray:seq],
+            @"Failed");
+  XCTAssert([[BCKeySequence componentsFromPath:@"M/0 '/0"] isEqualToArray:seq],
+            @"Failed");
+
+  seq = @[ @0, @0, @3433456356, @(BIP32_PRIME | 34654765), @(2345) ];
+  XCTAssert(
+      [[BCKeySequence componentsFromPath:@"m/0/0/3433456356/34654765'/2345"]
+          isEqualToArray:seq],
+      @"Failed");
+
+  seq = @[ @0, @0, @356, @(BIP32_PRIME | 344765), @(2345) ];
+  XCTAssert([[BCKeySequence componentsFromPath:@"m /0 /0 /356/344765' /2345 "]
+                isEqualToArray:seq],
+            @"Failed");
+  XCTAssert(
+      ![[BCKeySequence componentsFromPath:@"mfdgggdf /0 /0 /356/344765' /2345 "]
+          isKindOfClass:[NSArray class]],
+      @"Failed");
+  XCTAssert(![[BCKeySequence componentsFromPath:@"mfdgggdgdfshjgsflh "]
+                isKindOfClass:[NSArray class]],
+            @"Failed");
+}
+
+- (void)testSequenceGenerationVector0 {
+  NSArray *seq;
+  seq = @[ @(BIP32_PRIME), @(0) ];
+  XCTAssert([[BCKeyPair serializeSequence:seq] isEqualToString:@"m/0'/0"] ||
+                [[BCKeyPair serializeSequence:seq].lowercaseString
+                    isEqualToString:@"m/0h/0"],
+            @"Failed");
+
+  seq = @[ @0, @0, @343345, @(BIP32_PRIME | 34654765), @(2345) ];
+  XCTAssert([[BCKeyPair serializeSequence:seq]
+                isEqualToString:@"m/0/0/343345/34654765'/2345"] ||
+                [[BCKeyPair serializeSequence:seq].lowercaseString
+                    isEqualToString:@"m/0/0/343345/34654765h/2345"],
+            @"Failed");
+
+  seq = @[ @0, @0, @356, @(BIP32_PRIME | 344765), @(2345) ];
+  XCTAssert([[BCKeyPair serializeSequence:seq]
+                isEqualToString:@"m/0/0/356/344765'/2345"] ||
+                [[BCKeyPair serializeSequence:seq].lowercaseString
+                    isEqualToString:@"m/0/0/356/344765h/2345"],
+            @"Failed");
+}
+
+- (void)testKeyPairFromSequenceStringVector0 {
+}
+
+#pragma mark BIP 32 Vectors
+// Reference to Vectors https://en.bitcoin.it/wiki/BIP_0032_TestVectors
 
 - (void)testHDVector1 {
   NSData *rootSeed, *pass;
@@ -59,8 +120,8 @@
                     [@"15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma" toBitcoinAddress]],
             @"Failed");
 
-  // Extract the hardened h0 keypair used in bip32 wallets
-  h0 = [kp.masterKeyPair childKeyPairAt:0x80000000 withMemoryKey:pass];
+  // Extract the hardened h0 key pair used in bip32 wallets
+  h0 = [kp.masterKeyPair childKeyPairAt:BIP32_PRIME withMemoryKey:pass];
 
   // Validate the h0 private key is valid
   XCTAssert(
@@ -87,7 +148,7 @@
                       [@"19Q2WoS5hSS6T8GjhK8KZLMgmWaq4neXrh" toBitcoinAddress]],
       @"Failed");
 
-  // Check a nonhardened key
+  // Check a non-hardened key
   externalChain = [h0 childKeyPairAt:1 withMemoryKey:pass];
 
   // Check Private Key
@@ -356,32 +417,34 @@
                 isEqualExcludingVersion:
                     [@"15XVotxCAV7sRx1PSCkQNsGw3W9jT9A94R" toBitcoinAddress]],
             @"Failed");
-  
+
   // m/0/2147483647'/1/2147483646'/2
-  
+
   m_0_2147483647H_1_2147483646_2 =
-  [m_0_2147483647H_1_2147483646 childKeyPairAt:2
-                      withMemoryKey:pass];
-  
+      [m_0_2147483647H_1_2147483646 childKeyPairAt:2 withMemoryKey:pass];
+
   // Check That the master chain code is correct
   XCTAssert([m_0_2147483647H_1_2147483646_2.chainCode
-             isEqualToData:@"9452b549be8cea3ecb7a84bec10dcfd94afe4d129ebfd3b3cb58eedf394ed271".hexToData],
+                isEqualToData:@"9452b549be8cea3ecb7a84bec10dcfd94afe4d129ebfd3b"
+                              @"3cb58eedf394ed271".hexToData],
             @"Failed.");
-  
+
   // Check that the private key is correct.
   XCTAssert([[m_0_2147483647H_1_2147483646_2 privateKeyUsingMemoryKey:pass]
-             isEqualToData:@"bb7d39bdb83ecf58f2fd82b6d918341cbef428661ef01ab97c28a4842125ac23".hexToData],
+                isEqualToData:@"bb7d39bdb83ecf58f2fd82b6d918341cbef428661ef01ab"
+                              @"97c28a4842125ac23".hexToData],
             @"Failed.");
-  
+
   // Check That the master public key is correct
   XCTAssert([m_0_2147483647H_1_2147483646_2.publicKey
-             isEqualToData:@"024d902e1a2fc7a8755ab5b694c575fce742c48d9ff192e63df5193e4c7afe1f9c".hexToData],
+                isEqualToData:@"024d902e1a2fc7a8755ab5b694c575fce742c48d9ff192e"
+                              @"63df5193e4c7afe1f9c".hexToData],
             @"Failed.");
-  
+
   // Check Address
   XCTAssert([m_0_2147483647H_1_2147483646_2.address
-             isEqualExcludingVersion:
-             [@"14UKfRV9ZPUp6ZC9PLhqbRtxdihW9em3xt" toBitcoinAddress]],
+                isEqualExcludingVersion:
+                    [@"14UKfRV9ZPUp6ZC9PLhqbRtxdihW9em3xt" toBitcoinAddress]],
             @"Failed");
 }
 

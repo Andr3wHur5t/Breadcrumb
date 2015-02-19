@@ -84,4 +84,14 @@
  */
 - (BOOL)didSign:(NSData *)signedData withOriginalHash:(NSData *)hash;
 
+#pragma mark Utilities
+
+/*!
+ @brief Serialized the inputted array as a key sequence with the assumed master
+ prepended.
+
+ @param sequence The sequence to serialized into a string.
+ */
++ (NSString *)serializeSequence:(NSArray *)sequence;
+
 @end

@@ -1,5 +1,5 @@
 //
-//  BCTransactionSigning.m
+//  BCTransactionSigningTests.m
 //  Breadcrumb
 //
 //  Created by Andrew Hurst on 2/17/15.
@@ -9,10 +9,10 @@
 #import "Breadcrumb.h"
 #import <XCTest/XCTest.h>
 
-@interface BCTransactionSigning : XCTestCase
+@interface BCTransactionSigningTests : XCTestCase
 
 @end
 
-@implementation BCTransactionSigning
+@implementation BCTransactionSigningTests
 
 @end

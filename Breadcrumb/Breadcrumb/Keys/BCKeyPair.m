@@ -7,6 +7,7 @@
 //
 
 #import "BCKeyPair.h"
+#import "BCKeySequence.h"
 #import "BCProtectedData.h"
 #import "NSString+Base58.h"
 #import "NSData+Hash.h"
@@ -128,7 +129,7 @@
 
     data = [[NSMutableData alloc] init];
     // The index defines if the key is hardened or not.
-    if (index >= 0x80000000) {
+    if (index >= BIP32_PRIME) {
       // Build Hardened
       // Disallows master pub -> child pub
       [data appendUInt8:0x00];
@@ -203,6 +204,7 @@
   // adding to the parent key.
   // Which is then goes through % of the curve order of sepc256k1 (statically
   // defined bellow).
+  // NOTE: this is also the point() operation defined in BIP32
   mp_addmod(&nLeftSegment, &nParentKey, &nCurveOrder, &nResult);
   mp_to_unsigned_bin_n(&nResult, bytes, &length);
 
@@ -215,12 +217,51 @@
   static mp_int curveOrder;
   dispatch_once(&onceToken, ^{
       mp_init(&curveOrder);
+      // sepc256k1 curve order as defined https://en.bitcoin.it/wiki/Secp256k1
       mp_read_radix(
           &curveOrder,
           "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
           16);
   });
   return curveOrder;
+}
+
+#pragma mark Utilties
+
++ (NSString *)serializeSequence:(NSArray *)sequence {
+  NSMutableString *result;
+  NSNumberFormatter *formatter;
+  BOOL isHardened;
+  NSParameterAssert([sequence isKindOfClass:[NSArray class]]);
+  if (![sequence isKindOfClass:[NSArray class]]) return NULL;
+
+  // Ensure all objects are numbers
+  for (id object in sequence)
+    if (![object isKindOfClass:[NSNumber class]]) return NULL;
+
+  // Get key pair by enumerating indexes of components
+  formatter = [[NSNumberFormatter alloc] init];
+  result = [[NSMutableString alloc] initWithString:kBCKeySequenceMasterChar];
+  for (NSNumber *componentIndex in sequence) {
+    [result appendString:kBCKeySequenceDelimiterChar];
+
+    isHardened = (uint32_t)[componentIndex intValue] >= BIP32_PRIME;
+
+    // Append the value
+    [result
+        appendString:[formatter
+                         stringFromNumber:isHardened
+                                              ? @([componentIndex intValue] -
+                                                  BIP32_PRIME)
+                                              : componentIndex]];
+
+    // Append the hardened flag if needed
+    if (isHardened)
+      [result
+          appendString:[kBCKeySequenceHardenedFlagChars substringToIndex:1]];
+  }
+  
+  return [NSString stringWithString:result];
 }
 
 @end
