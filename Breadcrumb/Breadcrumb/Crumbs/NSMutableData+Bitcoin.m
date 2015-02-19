@@ -26,6 +26,7 @@
 //  THE SOFTWARE.
 
 #import "NSMutableData+Bitcoin.h"
+#import "BreadcrumbCore.h"
 #import "NSData+Bitcoin.h"
 #import "NSString+Base58.h"
 #import "NSData+Hash.h"
