@@ -1,2 +1,6 @@
 language: objective-c
-script: xctool -workspace Breadcrumb.xcworkspace -scheme Breadcrumb test
+before_install:
+- gem install xcpretty --no-rdoc --no-ri --no-document --quiet
+script:
+- set -o pipefail && xcodebuild -workspace Breadcrumb.xcworkspace -sdk iphonesimulator -scheme Breadcrumb -configuration Debug test | xcpretty -c
+

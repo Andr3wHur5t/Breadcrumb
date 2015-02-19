@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7579F7D819231A5D00CA56F4"
-               BuildableName = "libcrypto.a"
-               BlueprintName = "crypto"
-               ReferencedContainer = "container:../breadwallet/BreadWallet.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "75001D3D1A1EE89500585F55"
-               BuildableName = "submodules"
-               BlueprintName = "submodules"
-               ReferencedContainer = "container:../breadwallet/BreadWallet.xcodeproj">
+               BlueprintIdentifier = "37C67DFC1A93309C005FF82D"
+               BuildableName = "libTomMath.a"
+               BlueprintName = "libTomMath"
+               ReferencedContainer = "container:../libTomMath/libTomMath.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
