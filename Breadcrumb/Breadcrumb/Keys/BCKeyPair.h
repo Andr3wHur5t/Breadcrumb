@@ -26,11 +26,13 @@
 /*!
  @brief The bitcoin address of the key pair.
  */
+// TODO: Make this a week reference to the public keys address.
 @property(strong, nonatomic, readonly) BCAddress *address;
 
 /*!
  @brief The public key of the key pair.
  */
+// TODO: Make the public key into an object so we can gets description easier.
 @property(strong, nonatomic, readonly) NSData *publicKey;
 
 /*!

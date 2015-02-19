@@ -213,6 +213,7 @@
 }
 
 + (mp_int)curveOrder {
+  // TODO: Move to ECDSA helper
   static dispatch_once_t onceToken;
   static mp_int curveOrder;
   dispatch_once(&onceToken, ^{

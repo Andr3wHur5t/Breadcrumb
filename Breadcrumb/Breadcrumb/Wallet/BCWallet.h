@@ -5,6 +5,18 @@
 //  Created by Andrew Hurst on 2/5/15.
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
+// IDEA: Risk mitigation by separating funds into different accounts in HD while
+// cacheing account roots, and only access/generate when necessary.
+//
+// This interface is designed to reduce interaction with security mechanisms, so
+// that developers unfamiliar security principles can still use the wallet with
+// some sense of security. Because these operations tend to be long running >1ms
+// all of these interfaces will dispatch to the wallets queue, and call back
+// on the main queue using the callback.
+//
+// Synchronous interfaces are available in _BCWallet.h these interfaces should
+// be
+// dispatched on the wallets queue.
 
 #import <Breadcrumb/Breadcrumb.h>
 
@@ -46,6 +58,13 @@
 - (void)mnemonicPhraseWithPassword:(NSData *)password
                      usingCallback:(void (^)(NSString *))callback;
 
+/*!
+ @brief This gets the key sequence, and gives you the memory key to access the
+ sub keys private keys.
+
+ @param password The password used to secure the wallet.
+ @param callback The callback which
+ */
 - (void)keySequenceWithPassword:(NSData *)password
                   usingCallback:(void (^)(BCKeySequence *sequence,
                                           NSData *memoryKey))callback;
