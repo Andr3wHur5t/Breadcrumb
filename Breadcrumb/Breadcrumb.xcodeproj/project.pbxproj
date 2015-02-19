@@ -844,9 +844,9 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(inherited)\"",
-					"\"${BUILD_DIR}\"",
-					"\"$(SDKROOT)/usr/lib/system\"",
+					"$(inherited)",
+					"\"${CONFIGURATION_BUILD_DIR}\"",
+					"$(SDKROOT)/usr/lib/system",
 					"\"$(SRCROOT)/../libs/\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -873,9 +873,9 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(inherited)\"",
-					"\"${BUILD_DIR}\"",
-					"\"$(SDKROOT)/usr/lib/system\"",
+					"$(inherited)",
+					"\"${CONFIGURATION_BUILD_DIR}\"",
+					"$(SDKROOT)/usr/lib/system",
 					"\"$(SRCROOT)/../libs/\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
