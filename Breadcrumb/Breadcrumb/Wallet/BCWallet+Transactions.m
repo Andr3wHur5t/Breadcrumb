@@ -33,23 +33,35 @@ static NSString *const kBCWalletError_FailedToSign =
     __block BCAddress *sAddress = address;
     void (^sCallback)(NSError *) = callback;
 
-    dispatch_async(self.queue, ^{
-        // Get the key
-        NSData *key = [[self class] _keyFromPassword:password];
-        if (![key isKindOfClass:[NSData class]]) {
-          sCallback([[self class] failedToSignTransactionError]);
+    [self getBalance:^(uint64_t balance, NSError *error) {
+        if ([error isKindOfClass:[NSError class]]) {
+          sCallback(error);
           return;
         }
+        if (balance <= [amount integerValue]) {
+          // Not Enough Funds
+          sCallback([[self class] InsufficientFundsForTransactionError]);
+          return;
+        }
+        dispatch_async(self.queue, ^{
 
-        // Create Unsigned transaction, and Sign
-        [self
-            _unsignedTransactionForAmount:sAmount
-                                       to:sAddress
-                             withCallback:[self  // Set the callback to sign the
-                                                 // transaction
-                                              _signTransactionBlockForCallback:
-                                                  sCallback andKey:key]];
-    });
+            // Get the key
+            NSData *key = [[self class] _keyFromPassword:password];
+            if (![key isKindOfClass:[NSData class]]) {
+              sCallback([[self class] failedToSignTransactionError]);
+              return;
+            }
+
+            // Create Unsigned transaction, and Sign
+            [self _unsignedTransactionForAmount:sAmount
+                                             to:sAddress
+                                   withCallback:
+                                       [self  // Set the callback to sign the
+                                              // transaction
+                                           _signTransactionBlockForCallback:
+                                               sCallback andKey:key]];
+        });
+    }];
   }
 }
 
@@ -70,7 +82,8 @@ static NSString *const kBCWalletError_FailedToSign =
   // build the transaction.
   [self.provider
       UTXOforAmount:amount
-       andAddresses:@[ @"1K4nPxBMy6sv7jssTvDLJWk1ADHBZEoUVb" ]
+       andAddresses:self.addressManager  // Pass the address manager so they can
+                                         // get the right addresses
        withCallback:^(NSArray *UTXOs, NSError *error) {
            BCMutableTransaction *transaction;
 
@@ -85,7 +98,7 @@ static NSString *const kBCWalletError_FailedToSign =
                             forAmount:sAmount
                                    to:sAddress
                               feePerK:@10000  // Get Fee from wallet settings
-                    withChangeAddress:self.currentAddress];
+                    withChangeAddress:self.addressManager.firstUnusedInternal];
 
              // Check if we failed
              if (![transaction isKindOfClass:[BCMutableTransaction class]]) {
@@ -138,6 +151,7 @@ static NSString *const kBCWalletError_FailedToSign =
 
           // Publish the transaction to the provider.
           [self.provider publishTransaction:signedTransaction
+                                    forCoin:self.addressManager.coin
                              withCompletion:sCallback];
 
         } else {
@@ -149,6 +163,14 @@ static NSString *const kBCWalletError_FailedToSign =
 }
 
 #pragma mark Errors
+
++ (NSError *)InsufficientFundsForTransactionError {
+  return [NSError errorWithDomain:kBCWalletError_Domain
+                             code:3
+                         userInfo:@{
+                           NSLocalizedDescriptionKey : @"Insufficient Funds."
+                         }];
+}
 
 + (NSError *)failedToCreateUnsignedTransactionError {
   return [NSError errorWithDomain:kBCWalletError_Domain

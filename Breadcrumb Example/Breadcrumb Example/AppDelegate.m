@@ -15,12 +15,13 @@
 
 @implementation AppDelegate
 
+// TODO: Clean up
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
   //
   //  [self rawParseDemo];
-  //  [self walletDemo];
+  [self walletDemo];
   //
   //  NSData *dat =
   //      @"01000000030bf0de38c26195919179f42d475beb7a6b15258c38b57236afdd60a07eddd"
@@ -55,8 +56,7 @@
   //  childKeyPairAt:0 withMemoryKey:pass] childKeyPairAt:0 withMemoryKey:pass]
   //  childKeyPairAt:0 withMemoryKey:pass].address);
 
-  [self testAddressVector0];
-  [self testWalletKeyGenVector0];
+  //  [self testWalletKeyGenVector0];
   return YES;
 }
 
@@ -94,8 +94,8 @@
 }
 
 - (void)rawParseDemo {
-  BCMutableTransaction *tx;
-  NSString *transactionHex;
+  //  BCMutableTransaction *tx;
+  //  NSString *transactionHex;
 
   //  transactionHex =
   //      @"0100000001cf6b23baf0ebb8a09559f761144ab4407b5dce75a9484ed07a6da41f7f021"
@@ -113,24 +113,24 @@
   //  30440220382abd07bc22b92f289b21745bb8c93734eadaf86cc0ff310658b73ac522a69b022043cd23001e4b78dfe3c9df10ab61e10e47abeb88b86c4bc8f0d2a2db95f405d501000000043531554b88ed1404d6d421a115aa72b1a429505a3b0ce248ebaba63e83df9bf444ef7a73b12798d5f47a40d66eb3c09d63b952783f7718f9d81258ed39a3bc43
 
   // 4930460221009e0339f72c793a89e664a8a932df073962a3f84eda0bd9e02084a6a9567f75aa022100bd9cbaca2e5ec195751efdfac164b76250b1e21302e51ca86dd7ebd7020cdc0601410450863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b23522cd470243453a299fa9e77237716103abc11a1df38855ed6f2ee187e9c582ba6
+  //
+  //  transactionHex =
+  //      @"0100000002be6ee63b7c778f1c31c4710dbffa599b9ec8a9c0fd0e65f7f08d1077ef2f0"
+  //      @"7e4000000006a473044022028758879bba44439ab8ad5be025ff9d8acc38206f626d1c"
+  //      @"a4a1dbf0af343265302205bb7db56d5426bd11810ed06bf50ae2a018bc7cc8639d6dfc"
+  //      @"5e7fdc9f052c13f01210387212e3733d75ddcce9121c2af5df1f06e71f63fb736df4dc"
+  //      @"02dc56e9f3c4f02ffffffff97515bb7f32f28446bfe7b34b232b1e9ad1221f1d4ab462"
+  //      @"4726412764b126611000000006a47304402200c3dd4af3a7e273aab864d797d18b1b05"
+  //      @"a5f1980a19fd27e8a5de8d3c3ec8cdf02203718499f163104d162d67d1a095bbc9c443"
+  //      @"db9d8ca03207a461aefe4e16f394301210387212e3733d75ddcce9121c2af5df1f06e7"
+  //      @"1f63fb736df4dc02dc56e9f3c4f02ffffffff0228230000000000001976a914dc8ae9c"
+  //      @"bf82a840cb562793cc1928bd485cc531888ac50c30000000000001976a9143696e32f2"
+  //      @"e5ee974ce59b16a11387dcf05435d6a88ac00000000";
+  //
+  //  NSString *str = [transactionHex.hexToData base58Encoding];
 
-  transactionHex =
-      @"0100000002be6ee63b7c778f1c31c4710dbffa599b9ec8a9c0fd0e65f7f08d1077ef2f0"
-      @"7e4000000006a473044022028758879bba44439ab8ad5be025ff9d8acc38206f626d1c"
-      @"a4a1dbf0af343265302205bb7db56d5426bd11810ed06bf50ae2a018bc7cc8639d6dfc"
-      @"5e7fdc9f052c13f01210387212e3733d75ddcce9121c2af5df1f06e71f63fb736df4dc"
-      @"02dc56e9f3c4f02ffffffff97515bb7f32f28446bfe7b34b232b1e9ad1221f1d4ab462"
-      @"4726412764b126611000000006a47304402200c3dd4af3a7e273aab864d797d18b1b05"
-      @"a5f1980a19fd27e8a5de8d3c3ec8cdf02203718499f163104d162d67d1a095bbc9c443"
-      @"db9d8ca03207a461aefe4e16f394301210387212e3733d75ddcce9121c2af5df1f06e7"
-      @"1f63fb736df4dc02dc56e9f3c4f02ffffffff0228230000000000001976a914dc8ae9c"
-      @"bf82a840cb562793cc1928bd485cc531888ac50c30000000000001976a9143696e32f2"
-      @"e5ee974ce59b16a11387dcf05435d6a88ac00000000";
-
-  NSString *str = [transactionHex.hexToData base58Encoding];
-
-  tx = [[BCMutableTransaction alloc] initWithData:transactionHex.hexToData];
-  NSLog(@"Transaction Info:\n%@", tx);
+  //  tx = [[BCMutableTransaction alloc] initWithData:transactionHex.hexToData];
+  //  NSLog(@"Transaction Info:\n%@", tx);
 }
 
 - (void)walletDemo {
@@ -146,10 +146,10 @@
   // When you instantiate a wallet it requires a password to decrypt private
   // restoration data, or encrypt new private data such as the wallets' seed
   // phrase.
-  BCWallet *wallet = [[BCWallet alloc]
-      initUsingMnemonicPhrase:@"invest three bring patrol scrub fork police "
-      @"topple frequent shop dance grow"
-                  andPassword:password];
+  NSString *phrase = @"palace canal coast awake mother captain mountain bronze "
+      @"cabbage unfair patrol robot";
+  BCWallet *wallet =
+      [[BCWallet alloc] initUsingMnemonicPhrase:phrase andPassword:password];
 
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password
@@ -158,13 +158,27 @@
                            // Show the user their mnemonic phrase.
                            [self showAlertWithTitle:@"Your Phrase"
                                          andMessage:mnemonic];
+                           NSLog(@"Phrase '%@'", mnemonic);
                        }];
+
+  // Get your current address
+  [wallet getCurrentAddress:^(BCAddress *currentAddress) {
+      [self showAlertWithTitle:@"Your Address"
+                    andMessage:[currentAddress toString]];
+      NSLog(@"Address: '%@'", currentAddress);
+  }];
+
+  // Get balance
+  [wallet getBalance:^(uint64_t balance, NSError *error) {
+      NSLog(@"balance: %@", @(balance));
+  }];
 
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  address = [@"3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" toBitcoinAddress];
-  amount = [@200 toSatoshi];
+  address = [@"1fcgJ8z4kcEG4aPwGTjXZp3z6sDTUvoU8" toBitcoinAddress];
+  // TODO: Change amount to uint64_t
+  amount = [@(1e3) toSatoshi];
   [wallet send:amount
                  to:address
       usingPassword:password
@@ -197,7 +211,7 @@
       initUsingMnemonicPhrase:@"slab ski horn medal document cat minute "
       @"uniform worth coyote sight dragon"
                   andPassword:password];
-  
+
   NSAssert(wallet, @"Failed");
   [wallet
       keySequenceWithPassword:password

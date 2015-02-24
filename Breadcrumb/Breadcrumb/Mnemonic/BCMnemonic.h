@@ -5,6 +5,7 @@
 //  Created by Andrew Hurst on 2/5/15.
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
+//  This really should be an object, I will change this later.
 
 #import <Foundation/Foundation.h>
 
@@ -66,6 +67,14 @@
 
 #pragma mark Conversion
 
+/*!
+ @brief Derives a seed key from the inputted phrase, and passphrase.
+
+ @param phrase     The BIP39 compliant phrase.
+ @param passphrase The passphrase for the sequence (SALT).
+
+ @return The seed key to use.
+ */
 + (NSData *)keyFromPhrase:(NSString *)phrase
            withPassphrase:(NSString *)passphrase;
 

@@ -5,9 +5,6 @@
 //  Created by Andrew Hurst on 2/5/15.
 //  Copyright (c) 2015 Breadcrumb. All rights reserved.
 //
-// IDEA: Risk mitigation by separating funds into different accounts in HD while
-// cacheing account roots, and only access/generate when necessary.
-//
 // This interface is designed to reduce interaction with security mechanisms, so
 // that developers unfamiliar security principles can still use the wallet with
 // some sense of security. Because these operations tend to be long running >1ms
@@ -68,7 +65,16 @@
                   usingCallback:(void (^)(BCKeySequence *sequence,
                                           NSData *memoryKey))callback;
 
+/*!
+ @brief Synchronizes the wallets state with the network/server.
+ */
+- (void)synchronize;
+
 #pragma mark Addresses
+
+- (void)getCurrentAddress:(void (^)(BCAddress *))callback;
+
+- (void)getBalance:(void (^)(uint64_t, NSError *))callback;
 
 #pragma mark Delegate Classes
 /*!
@@ -76,6 +82,8 @@
 
  @discussion You should be able to simply override this with your own class, and
  use that as your new provider.
+
+ Im going to remove this and allow the user to pass the provider as a param.
  */
 + (Class)defaultProvider;
 

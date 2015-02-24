@@ -7,8 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+@class BCCoin;
 
-typedef enum : uint8_t {
+/*!
+ @brief This defines a set of known address types.
+ */
+typedef enum : uint8_t {  // TODO: Update Names.
                  BCAddressType_Old = 0x00,
                  BCAddressType_New = 0x05
                } BCAddressType;
@@ -42,6 +46,11 @@ typedef enum : uint8_t {
 - (NSData *)toData;
 
 /*!
+ @brief Converts the address to data excluding its type byte.
+ */
+- (NSData *)toDataWithoutType;
+
+/*!
  @brief The type of address.
 
  @discussion This is stated by the first byte of the decoded address, New
@@ -50,7 +59,6 @@ typedef enum : uint8_t {
 @property(assign, nonatomic, readonly) BCAddressType type;
 
 #pragma mark Conversion
-
 /*!
  @brief Converts a public key into a base 58checked address using the old
  version byte.
@@ -60,16 +68,26 @@ typedef enum : uint8_t {
 
  @param publicKey The public key to convert into a address.
  */
-+ (BCAddress *)addressFromPublicKey:(NSData *)publicKey;
++ (BCAddress *)addressFromPublicKey:(NSData *)publicKey
+                          usingCoin:(BCCoin *)coin;
 
 #pragma mark Checks
+/*!
+ @brief Checks if addresses are equivalent besides for their type.
 
+ @param address The address to compare.
+
+ @return True if addresses data excluding the version byte is the same,
+ otherwise false.
+ */
 - (BOOL)isEqualExcludingVersion:(BCAddress *)address;
 
 @end
 
 @interface NSString (BCAddress)
-
+/*!
+ @brief Attempts to convert a base58 encoded address into a native form.
+ */
 - (BCAddress *)toBitcoinAddress;
 
 @end

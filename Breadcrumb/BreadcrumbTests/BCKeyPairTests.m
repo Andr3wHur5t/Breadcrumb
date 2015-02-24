@@ -59,44 +59,43 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
   memKey = [NSMutableData dataWithLength:32];
   keyPair1 = [[BCKeyPair alloc] initWithWIF:kStrSecret1 andMemoryKey:memKey];
   XCTAssert([keyPair1 isKindOfClass:[BCKeyPair class]], @"Failed");
-  
+
   // Check If Compressed
   XCTAssert(!keyPair1.isCompressed, @"Failed");
 
   // Check Address
-  XCTAssert([keyPair1.address isEqual:[addr1 toBitcoinAddress]], @"Failed");
+  XCTAssert([[keyPair1.publicKey addressForCoin:[BCCoin MainNetBitcoin]] isEqualExcludingVersion:[addr1 toBitcoinAddress]], @"Failed");
 
   // Verify pub Key
 
   keyPair2 = [[BCKeyPair alloc] initWithWIF:strSecret2 andMemoryKey:memKey];
-    XCTAssert([keyPair2 isKindOfClass:[BCKeyPair class]], @"Failed");
+  XCTAssert([keyPair2 isKindOfClass:[BCKeyPair class]], @"Failed");
 
   XCTAssert(!keyPair2.isCompressed, @"Failed");
 
   // Check Address
-  XCTAssert([keyPair2.address isEqual:[addr2 toBitcoinAddress]], @"Failed");
+  XCTAssert([[keyPair2.publicKey addressForCoin:[BCCoin MainNetBitcoin]] isEqualExcludingVersion:[addr2 toBitcoinAddress]], @"Failed");
 
   // Verify pub Key
-
   keyPair1C = [[BCKeyPair alloc] initWithWIF:strSecret1C andMemoryKey:memKey];
-      XCTAssert([keyPair1C isKindOfClass:[BCKeyPair class]], @"Failed");
+  XCTAssert([keyPair1C isKindOfClass:[BCKeyPair class]], @"Failed");
 
   // Check If Compressed
   XCTAssert(keyPair1C.isCompressed, @"Failed");
 
   // Check Address
-  XCTAssert([keyPair1C.address isEqual:[addr1C toBitcoinAddress]], @"Failed");
+  XCTAssert([[keyPair1C.publicKey addressForCoin:[BCCoin MainNetBitcoin]] isEqualExcludingVersion:[addr1C toBitcoinAddress]], @"Failed");
 
   // Verify pub Key
 
   keyPair2C = [[BCKeyPair alloc] initWithWIF:strSecret2C andMemoryKey:memKey];
-        XCTAssert([keyPair2C isKindOfClass:[BCKeyPair class]], @"Failed");
+  XCTAssert([keyPair2C isKindOfClass:[BCKeyPair class]], @"Failed");
 
   // Check If Compressed
   XCTAssert(keyPair2C.isCompressed, @"Failed");
 
   // Check Address
-  XCTAssert([keyPair2C.address isEqual:[addr2C toBitcoinAddress]], @"Failed");
+  XCTAssert([[keyPair2C.publicKey addressForCoin:[BCCoin MainNetBitcoin]] isEqualExcludingVersion:[addr2C toBitcoinAddress]], @"Failed");
 
   // Verify pub Key
   for (int n = 0; n < 24; ++n) {
@@ -156,7 +155,7 @@ NSString *const strAddressBad = @"1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF";
     XCTAssert([keyPair2C didSign:sign2C withOriginalHash:hashedMessage],
               @"Failed");
   }
-  
+
   // NOTE: No determinisitc sign tests, it may be a good idea to add them...
 }
 

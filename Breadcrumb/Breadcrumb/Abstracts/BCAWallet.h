@@ -22,16 +22,6 @@
  */
 @property(strong, nonatomic, readonly) BCAProvider *provider;
 
-/*!
- @brief The current known balance of the wallet.
- */
-@property(weak, nonatomic, readonly) NSNumber *balance;
-
-/*!
- @brief The current address of the wallet.
- */
-@property(weak, nonatomic, readonly) BCAddress *currentAddress;
-
 #pragma mark Transactions
 /*!
  @brief Sends the inputted amount to the address, and invokes the callback with

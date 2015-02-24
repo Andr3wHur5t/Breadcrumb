@@ -116,10 +116,11 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([kp.masterKeyPair.address
-                  isEqualExcludingVersion:
-                      [@"15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma" toBitcoinAddress]],
-              @"Failed");
+    XCTAssert(
+        [[kp.masterKeyPair.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
+            isEqualExcludingVersion:
+                [@"15mKKb2eos1hWa6tisdPwwDC1a5J1y9nma" toBitcoinAddress]],
+        @"Failed");
 
     // Extract the hardened h0 key pair used in bip32 wallets
     h0 = [kp.masterKeyPair childKeyPairAt:BIP32_PRIME withMemoryKey:pass];
@@ -145,7 +146,7 @@
               @"Failed");
 
     // Check Address
-    XCTAssert([h0.address
+    XCTAssert([[h0.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"19Q2WoS5hSS6T8GjhK8KZLMgmWaq4neXrh" toBitcoinAddress]],
               @"Failed");
@@ -176,7 +177,7 @@
         @"Failed");
 
     // Check Address
-    XCTAssert([externalChain.address
+    XCTAssert([[externalChain.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"1JQheacLPdM5ySCkrZkV66G2ApAXe1mqLj" toBitcoinAddress]],
               @"Failed");
@@ -205,7 +206,7 @@
               @"Failed");
 
     // Check Address
-    XCTAssert([exh2.address
+    XCTAssert([[exh2.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"1NjxqbA9aZWnh17q1UW3rB4EPu79wDXj7x" toBitcoinAddress]],
               @"Failed");
@@ -235,14 +236,14 @@
         @"Failed");
 
     // Check Address
-    XCTAssert([exh2_2.address
+    XCTAssert([[exh2_2.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"1LjmJcdPnDHhNTUgrWyhLGnRDKxQjoxAgt" toBitcoinAddress]],
               @"Failed");
 
     // m/0'/1/2'/2/1000000000
     exh2_2_1e9 = [exh2_2 childKeyPairAt:1000000000 withMemoryKey:pass];
-        XCTAssert([exh2_2_1e9 isKindOfClass:[BCKeyPair class]], @"Failed");
+    XCTAssert([exh2_2_1e9 isKindOfClass:[BCKeyPair class]], @"Failed");
 
     // Check Private Key
     XCTAssert(
@@ -266,7 +267,7 @@
         @"Failed");
 
     // Check Address
-    XCTAssert([exh2_2_1e9.address
+    XCTAssert([[exh2_2_1e9.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"1LZiqrop2HGR4qrH1ULZPyBpU6AUP49Uam" toBitcoinAddress]],
               @"Failed");
@@ -318,10 +319,11 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([kp.masterKeyPair.address
-                  isEqualExcludingVersion:
-                      [@"1JEoxevbLLG8cVqeoGKQiAwoWbNYSUyYjg" toBitcoinAddress]],
-              @"Failed");
+    XCTAssert(
+        [[kp.masterKeyPair.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
+            isEqualExcludingVersion:
+                [@"1JEoxevbLLG8cVqeoGKQiAwoWbNYSUyYjg" toBitcoinAddress]],
+        @"Failed");
 
     // m/0
     m_0 = [kp.masterKeyPair childKeyPairAt:0 withMemoryKey:pass];
@@ -347,7 +349,7 @@
               @"Failed.");
 
     // Check Address
-    XCTAssert([m_0.address
+    XCTAssert([[m_0.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"19EuDJdgfRkwCmRzbzVBHZWQG9QNWhftbZ" toBitcoinAddress]],
               @"Failed");
@@ -379,10 +381,11 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([m_0_2147483647H.address
-                  isEqualExcludingVersion:
-                      [@"1Lke9bXGhn5VPrBuXgN12uGUphrttUErmk" toBitcoinAddress]],
-              @"Failed");
+    XCTAssert(
+        [[m_0_2147483647H.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
+            isEqualExcludingVersion:
+                [@"1Lke9bXGhn5VPrBuXgN12uGUphrttUErmk" toBitcoinAddress]],
+        @"Failed");
 
     // m/0/2147483647'/1
     m_0_2147483647H_1 = [m_0_2147483647H childKeyPairAt:1 withMemoryKey:pass];
@@ -410,10 +413,11 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([m_0_2147483647H_1.address
-                  isEqualExcludingVersion:
-                      [@"1BxrAr2pHpeBheusmd6fHDP2tSLAUa3qsW" toBitcoinAddress]],
-              @"Failed");
+    XCTAssert(
+        [[m_0_2147483647H_1.publicKey addressForCoin:[BCCoin MainNetBitcoin]]
+            isEqualExcludingVersion:
+                [@"1BxrAr2pHpeBheusmd6fHDP2tSLAUa3qsW" toBitcoinAddress]],
+        @"Failed");
 
     // m/0/2147483647'/1/2147483646'
     m_0_2147483647H_1_2147483646 =
@@ -444,7 +448,8 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([m_0_2147483647H_1_2147483646.address
+    XCTAssert([[m_0_2147483647H_1_2147483646.publicKey
+                  addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"15XVotxCAV7sRx1PSCkQNsGw3W9jT9A94R" toBitcoinAddress]],
               @"Failed");
@@ -478,7 +483,8 @@
         @"Failed.");
 
     // Check Address
-    XCTAssert([m_0_2147483647H_1_2147483646_2.address
+    XCTAssert([[m_0_2147483647H_1_2147483646_2.publicKey
+                  addressForCoin:[BCCoin MainNetBitcoin]]
                   isEqualExcludingVersion:
                       [@"14UKfRV9ZPUp6ZC9PLhqbRtxdihW9em3xt" toBitcoinAddress]],
               @"Failed");

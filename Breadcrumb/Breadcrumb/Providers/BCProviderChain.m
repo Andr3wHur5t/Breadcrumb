@@ -26,40 +26,128 @@ static NSString *const kBCChainProvider_Value = @"value";
 static NSString *const kBCChainProvider_Spent = @"spent";
 static NSString *const kBCChainProvider_Confirmations = @"confirmations";
 
+static NSString *const kBCChainProvider_SignedHex = @"signed_hex";
+
 // Chain API
 // TODO: Get API Key From Plist?
 static NSString *const kChainAPIKey = @"DEMO-4a5e1e4";
 
-#define kChainBasePath @"https://api.chain.com/v2"
+#define kChainBasePath @"https://api.chain.com/v2/%@"
 static NSString *const kChainUTXOsURL =
-    kChainBasePath @"/bitcoin/addresses/%@/unspents?api-key-id=%@";
+    kChainBasePath @"/addresses/%@/unspents?api-key-id=%@";
+static NSString *const kChainPublishURL =
+    kChainBasePath @"/transactions/send?api-key-id=%@";
 
+static NSString *const kChainBalanceURL =
+    kChainBasePath @"/addresses/%@?api-key-id=%@";
+
+// TODO: Clean this file up..
 @implementation BCProviderChain
 
 #pragma mark Balance Interface
 
+- (void)getBalanceForAddressManager:(BCAddressManager *)addressManager
+                       withCallback:(void (^)(uint64_t, NSError *))callback {
+  NSMutableArray *addressList = [[NSMutableArray alloc] init];
+  [addressList addObjectsFromArray:addressManager.bip32External.addresses];
+  [addressList addObjectsFromArray:addressManager.bip32Internal.addresses];
+  [addressList addObjectsFromArray:addressManager.bip44Internal.addresses];
+  [addressList addObjectsFromArray:addressManager.bip44External.addresses];
+
+  [[self class] getBalance:addressList
+                      coin:addressManager.coin
+                  callback:callback];
+}
+
+#pragma mark Sync Interface
+
+- (void)syncAddressManager:(BCAddressManager *)addressManager {
+  if (![addressManager isKindOfClass:[BCAddressManager class]]) return;
+
+  [self setMaster:addressManager.bip32External toLast:0];
+  [self setMaster:addressManager.bip32Internal toLast:0];
+  [self setMaster:addressManager.bip44Internal toLast:0];
+  [self setMaster:addressManager.bip44External toLast:0];
+}
+
+- (void)setMaster:(BCAMMasterKey *)master toLast:(uint16_t)last {
+  master.lastUsedIndex = last;
+  [master expandAddressToIndex:last + 20];
+}
+
 #pragma mark UTXO Interface
 
 - (void)UTXOforAmount:(NSNumber *)amount
-         andAddresses:(NSArray *)addresses
+         andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback {
-  [[self class] UTXOsForAddresses:addresses withCallback:callback];
+  NSMutableArray *addressList = [[NSMutableArray alloc] init];
+
+  [addressList addObjectsFromArray:addresses.bip32External.addresses];
+  [addressList addObjectsFromArray:addresses.bip32Internal.addresses];
+  [addressList addObjectsFromArray:addresses.bip44Internal.addresses];
+  [addressList addObjectsFromArray:addresses.bip44External.addresses];
+
+  [[self class] UTXOsForAddresses:addressList
+                             coin:addresses.coin
+                     withCallback:callback];
 }
 
-// We Need A UTXO cache which is synced with the server/network
-// Need to get optimized UTXOs for transaction amounts
-
 #pragma mark Publish Interface
+
 - (void)publishTransaction:(BCMutableTransaction *)transaction
+                   forCoin:(BCCoin *)coin
             withCompletion:(void (^)(NSError *))completion {
-  // Publish to the Bitcoin Network.
-  NSLog(@"Publish Transaction:\n'%@'", [[transaction toData] toHex]);
-  completion(NULL);
+  NSDictionary *payload;
+  NSMutableURLRequest *request;
+  NSError *serializationError;
+  __block void (^sCallback)(NSError *);
+
+  NSLog(@"TX: '%@'", [[transaction toData] toHex]);
+
+  return;
+
+  payload = @{kBCChainProvider_SignedHex : [[transaction toData] toHex]};
+
+  request = [[NSMutableURLRequest alloc]
+      initWithURL:[NSURL URLWithString:
+                             [NSString stringWithFormat:kChainPublishURL,
+                                                        [[self class]
+                                                            stringForCoin:coin],
+                                                        kChainAPIKey]]];
+  request.HTTPMethod = @"POST";
+  request.allHTTPHeaderFields = @{ @"content-type" : @"application/json" };
+  request.HTTPBody =
+      [NSJSONSerialization dataWithJSONObject:payload
+                                      options:0
+                                        error:&serializationError];
+  if ([serializationError isKindOfClass:[NSError class]]) {
+    completion(serializationError);
+    return;
+  }
+
+  // TODO: Dispatch on main
+  sCallback = completion;
+
+  [NSURLConnection
+      sendAsynchronousRequest:request
+                        queue:[NSOperationQueue mainQueue]
+            completionHandler:
+                [[self class]
+                    connectionProcessingWithResult:^(NSHTTPURLResponse *
+                                                         response,
+                                                     id data, NSError *error) {
+                        if ([error isKindOfClass:[NSError class]]) {
+                          sCallback(error);
+                        } else {
+                          sCallback(NULL);
+                        }
+                    }]];
 }
 
 #pragma mark Chain API interface
 
 + (void)UTXOsForAddresses:(NSArray *)addresses
+                     coin:(BCCoin *)coin
              withCallback:(void (^)(NSArray *, NSError *))callback {
   NSString *requestString, *addressesSting;
   NSURLRequest *request;
@@ -67,6 +155,7 @@ static NSString *const kChainUTXOsURL =
   NSParameterAssert(callback);
   NSParameterAssert([addresses isKindOfClass:[NSArray class]] &&
                     addresses.count > 0);
+
   if (![addresses isKindOfClass:[NSArray class]] || addresses.count == 0 ||
       !callback)
     return;
@@ -79,8 +168,9 @@ static NSString *const kChainUTXOsURL =
   }
 
   // Create Request String
-  requestString =
-      [NSString stringWithFormat:kChainUTXOsURL, addressesSting, kChainAPIKey];
+  requestString = [NSString stringWithFormat:kChainUTXOsURL,
+                                             [[self class] stringForCoin:coin],
+                                             addressesSting, kChainAPIKey];
   if (![requestString isKindOfClass:[NSString class]]) {
     // Failed to create request string
     return;
@@ -110,6 +200,78 @@ static NSString *const kChainUTXOsURL =
                         } else {
                           // Unexpected response
                           sCallback(NULL, NULL);
+                        }
+
+                    }]];
+}
+
++ (void)getBalance:(NSArray *)addresses
+              coin:(BCCoin *)coin
+          callback:(void (^)(uint64_t, NSError *))callback {
+  NSString *requestString, *addressesSting;
+  NSURLRequest *request;
+  __block void (^sCallback)(uint64_t, NSError *);
+  NSParameterAssert(callback);
+  NSParameterAssert([addresses isKindOfClass:[NSArray class]] &&
+                    addresses.count > 0);
+
+  if (![addresses isKindOfClass:[NSArray class]] || addresses.count == 0 ||
+      !callback)
+    return;
+
+  // Create Address list
+  addressesSting = [self addressListForAddresses:addresses];
+  if (![addressesSting isKindOfClass:[NSString class]]) {
+    // Failed to construct address string.
+    return;
+  }
+
+  // Create Request String
+  requestString = [NSString stringWithFormat:kChainBalanceURL,
+                                             [[self class] stringForCoin:coin],
+                                             addressesSting, kChainAPIKey];
+  if (![requestString isKindOfClass:[NSString class]]) {
+    // Failed to create request string
+    return;
+  }
+
+  sCallback = callback;
+  // Make the call to chain
+  request = [NSURLRequest requestWithURL:[NSURL URLWithString:requestString]];
+  if (![request isKindOfClass:[NSURLRequest class]]) {
+    // Failed to create request.
+    return;
+  }
+
+  [NSURLConnection
+      sendAsynchronousRequest:request
+                        queue:[NSOperationQueue mainQueue]
+            completionHandler:
+                [[self class]
+                    connectionProcessingWithResult:^(NSHTTPURLResponse *
+                                                         response,
+                                                     id data, NSError *error) {
+                        if ([error isKindOfClass:[NSError class]]) {
+                          sCallback(0, error);
+                        } else if ([data isKindOfClass:[NSArray class]]) {
+                          uint64_t balance = 0;
+                          NSDictionary *total;
+                          NSNumber *itemBalance;
+                          for (NSDictionary *item in data) {
+                            total = [item objectForKey:@"total"];
+                            if (![total isKindOfClass:[NSDictionary class]])
+                              return;
+                            itemBalance = [total objectForKey:@"balance"];
+                            if (![itemBalance isKindOfClass:[NSNumber class]])
+                              return;
+
+                            balance += [itemBalance integerValue];
+                          }
+
+                          sCallback(balance, NULL);
+                        } else {
+                          // Unexpected response
+                          sCallback(0, NULL);
                         }
 
                     }]];
@@ -195,13 +357,13 @@ static NSString *const kChainUTXOsURL =
     return NULL;
 
   // Composite the addresses
-  for (NSString *address in addresses)
-    if ([address.toBitcoinAddress isKindOfClass:[BCAddress class]]) {
+  for (BCAddress *address in addresses)
+    if ([address isKindOfClass:[BCAddress class]]) {
       if ([addressesSting isKindOfClass:[NSString class]])
         addressesSting =
             [NSString stringWithFormat:@"%@,%@", addressesSting, address];
       else
-        addressesSting = address;
+        addressesSting = [address toString];
     }
 
   return [addressesSting isKindOfClass:[NSString class]] ? addressesSting
@@ -237,6 +399,15 @@ static NSString *const kChainUTXOsURL =
   return [NSError errorWithDomain:kBCChainProvider_ErrorDomain
                              code:0
                          userInfo:@{NSLocalizedDescriptionKey : composite}];
+}
+
++ (NSString *)stringForCoin:(BCCoin *)coin {
+  if ([coin isKindOfClass:[BCMainNetBitcoin class]])
+    return @"bitcoin";
+  else if ([coin isKindOfClass:[BCTestNet3Bitcoin class]])
+    return @"testnet3";
+  else
+    return @"testnet3";
 }
 
 @end

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "BCMutableTransaction.h"
 #import "BCTransaction.h"
-#import "BCAddress.h"
+#import "BCAddressManager.h"
 #import "BCAmount.h"
 
 @interface BCAProvider : NSObject
@@ -25,7 +25,7 @@
  @param callback    The callback to call once the operation completes
  */
 - (void)UTXOforAmount:(NSNumber *)amount
-         andAddresses:(NSArray *)addresses
+         andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback;
 
 /*!
@@ -41,6 +41,12 @@
  published, or the operation failed.
  */
 - (void)publishTransaction:(BCMutableTransaction *)transaction
+                   forCoin:(BCCoin *)coin
             withCompletion:(void (^)(NSError *))completion;
+
+- (void)syncAddressManager:(BCAddressManager *)addressManager;
+
+- (void)getBalanceForAddressManager:(BCAddressManager *)addressManager
+                       withCallback:(void (^)(uint64_t, NSError *))callback;
 
 @end

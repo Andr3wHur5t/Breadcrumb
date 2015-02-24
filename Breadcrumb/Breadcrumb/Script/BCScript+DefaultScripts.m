@@ -21,14 +21,19 @@
   // Write the script
   [script writeOpCode:OP_DUP];
   [script writeOpCode:OP_HASH160];
-  [script writeBytes:[address toData]];
+
+  // The type is redundant, drop it here.
+  [script writeBytes:[address toDataWithoutType]];
+
   [script writeOpCode:OP_EQUALVERIFY];
   [script writeOpCode:OP_CHECKSIG];
 
   // Return the script, Note we don't need to convert to an immutable instance
   // because mutable methods are technically available on BCScript but
   // inaccessible unless you manually call it via -()performSelector:(SEL);
-  return [script isKindOfClass:[BCScript class]] ? [BCScript scriptWithData:[script toData]] : NULL;
+  return [script isKindOfClass:[BCScript class]]
+             ? [BCScript scriptWithData:[script toData]]
+             : NULL;
 }
 
 @end

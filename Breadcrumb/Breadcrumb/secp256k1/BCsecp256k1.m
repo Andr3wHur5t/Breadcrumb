@@ -53,22 +53,31 @@
 
 - (NSData *)signatureForHash:(NSData *)hash withPrivateKey:(NSData *)key {
   @autoreleasepool {
-    unsigned char signature[75];
-    int sigLength = 75;
-    if (![key isKindOfClass:[NSData class]]) return NULL;
+    unsigned char signature[72];
+    int sigLength = 72;
+    NSData *signiture;
+    if (![key isKindOfClass:[NSData class]]) {
+      key = NULL;
+      return NULL;
+    }
 
     if (secp256k1_ec_seckey_verify([key bytes]) == 0) {
       NSLog(@"Key Not Valid");  // TODO: Report as errors
+      key = NULL;
       return NULL;
     }
 
     if (secp256k1_ecdsa_sign(
-            [hash bytes], signature, &sigLength, [key bytes], NULL,
-            [[[self class] pseudoRandomDataWithLength:256] bytes]) == 0) {
+            [hash bytes], signature, &sigLength, [key bytes], secp256k1_nonce_function_rfc6979,
+            NULL) == 0) {
       NSLog(@"Failed to sign!");  // TODO: Report as errors
+      key = NULL;
       return NULL;
     } else {
-      return [[NSData alloc] initWithBytes:signature length:sigLength];
+      key = NULL;
+      signiture = [[NSData alloc] initWithBytes:signature length:sigLength];
+
+      return [signiture isKindOfClass:[NSData class]] ? signiture : NULL;
     }
   }
 }
@@ -127,4 +136,20 @@
     return entropy;
   }
 }
+
++ (mp_int)curveOrder {
+  // TODO: Move to ECDSA helper
+  static dispatch_once_t onceToken;
+  static mp_int curveOrder;
+  dispatch_once(&onceToken, ^{
+      mp_init(&curveOrder);
+      // sepc256k1 curve order as defined https://en.bitcoin.it/wiki/Secp256k1
+      mp_read_radix(
+          &curveOrder,
+          "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
+          16);
+  });
+  return curveOrder;
+}
+
 @end

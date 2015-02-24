@@ -30,6 +30,7 @@
 
 @synthesize protectedMnemonic = _protectedMnemonic;
 @synthesize keys = _keys;
+@synthesize addressManager = _addressManager;
 
 #pragma mark Construction
 
@@ -73,30 +74,46 @@
           return;
         }
 
+        // Secure our phrase data
+        [self _setMnemonic:sPhrase withMemoryKey:memoryKey];
+
         // Generate the private key from the phrase
-        privateKey =
-            [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:sPhrase
-                                                   withPassphrase:nil];
+        privateKey = [BCMnemonic keyFromPhrase:sPhrase withPassphrase:NULL];
         sPhrase = NULL;
         if (![privateKey isKindOfClass:[NSData class]]) {
           NSLog(@"Failed to generate wallet private key!");
+          memoryKey = NULL;
           return;
         }
 
         // Create our key sequence, secure our private key with our memory key.
         _keys = [[BCKeySequence alloc] initWithRootSeed:privateKey
                                            andMemoryKey:memoryKey];
+        privateKey = NULL;
         if (![_keys isKindOfClass:[BCKeySequence class]]) {
           NSLog(@"Failed to generate wallet key sequence!");
+          memoryKey = NULL;
           return;
         }
 
-        // Secure our phrase data
-        [self _setMnemonic:phrase withMemoryKey:memoryKey];
-
-        privateKey = NULL;
+        // TODO: Configure with the inputted coin, and preferred path.
+        _addressManager = [[BCAddressManager alloc]
+            initWithKeySequence:self.keys
+                       coinType:[BCCoin TestNet3Bitcoin]
+                  preferredPath:BCKeySequenceType_BIP44
+                   andMemoryKey:memoryKey];
         memoryKey = NULL;
+        if (![_addressManager isKindOfClass:[BCAddressManager class]]) {
+          NSLog(@"Failed to construct address manager!");
+          return;
+        }
     });
+
+    // First Item to execute post construction is sync.
+    [self synchronize];
+
+    // We will return self before configuration, this means we need to dispatch
+    // all operations on the wallets queue to ensure they happen in sync.
     return self;
   }
 }
@@ -203,6 +220,18 @@
 
 #pragma mark Wallet Info
 
+- (void)synchronize {
+  dispatch_async(self.queue,
+                 ^{ [self.provider syncAddressManager:self.addressManager]; });
+}
+
+- (void)getBalance:(void (^)(uint64_t, NSError *))callback {
+  dispatch_async(self.queue, ^{
+      [self.provider getBalanceForAddressManager:self.addressManager
+                                    withCallback:callback];
+  });
+}
+
 - (BCAProvider *)provider {
   // Allow them to set the provider with by changing the returned class
   // TODO: Allow passing startup params
@@ -210,9 +239,12 @@
   return _provider;
 }
 
-- (BCAddress *)currentAddress {
-  // Need to get address from UTXO. Or Get current Index
-  return [@"1K4nPxBMy6sv7jssTvDLJWk1ADHBZEoUVb" toBitcoinAddress];
+- (void)getCurrentAddress:(void (^)(BCAddress *))callback {
+  __block void (^sCallback)(BCAddress *) = callback;
+  dispatch_async(self.queue, ^{
+      dispatch_async(dispatch_get_main_queue(),
+                     ^{ sCallback(self.addressManager.firstUnusedExternal); });
+  });
 }
 
 #pragma mark Queue

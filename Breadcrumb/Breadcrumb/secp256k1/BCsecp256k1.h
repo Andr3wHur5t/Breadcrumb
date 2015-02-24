@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "tommath.h"
 
 /*!
  @brief This is a helper class for secp256k1 functions.
@@ -60,4 +61,5 @@
 
 #pragma mark Utilities
 + (NSData *)pseudoRandomDataWithLength:(NSUInteger)length;
++ (mp_int)curveOrder;
 @end

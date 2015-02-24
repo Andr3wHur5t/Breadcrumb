@@ -11,12 +11,13 @@
 @implementation BCAProvider
 
 - (void)UTXOforAmount:(NSNumber *)amount
-         andAddresses:(NSArray *)addresses
+         andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback {
   NSAssert(FALSE, @"Called method on abstract class.");
 }
 
-- (void)publishTransaction:(id)transaction
+- (void)publishTransaction:(BCMutableTransaction *)transaction
+                   forCoin:(BCCoin *)coin
             withCompletion:(void (^)(NSError *))completion {
   NSAssert(FALSE, @"Called method on abstract class.");
 }

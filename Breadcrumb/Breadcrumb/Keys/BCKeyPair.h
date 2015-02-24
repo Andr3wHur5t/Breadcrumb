@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "BCAddress.h"
+#import "BCPublicKey.h"
 
 @interface BCKeyPair : NSObject
 #pragma mark Construction
@@ -26,16 +26,9 @@
                andMemoryKey:(NSData *)memoryKey;
 #pragma mark Public Info
 /*!
- @brief The bitcoin address of the key pair.
- */
-// TODO: Make this a week reference to the public keys address.
-@property(strong, nonatomic, readonly) BCAddress *address;
-
-/*!
  @brief The public key of the key pair.
  */
-// TODO: Make the public key into an object so we can gets description easier.
-@property(strong, nonatomic, readonly) NSData *publicKey;
+@property(strong, nonatomic, readonly) BCPublicKey *publicKey;
 
 /*!
  @brief This is an initialization vector for child keys.

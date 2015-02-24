@@ -15,6 +15,8 @@
 #import "BCWallet+TransactionSigning.h"
 #import "BCWallet+Restoration.h"
 
+#import "BCAddressManager.h"
+
 #import "BreadcrumbCore.h"
 
 // Queue Label
@@ -42,7 +44,7 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
  */
 @property(strong, nonatomic, readonly) BCProtectedData *protectedMnemonic;
 
-#pragma mark Keys
+#pragma mark Keys & Addresses
 /*!
  @brief This manages HD key pairs, and their children.
 
@@ -50,6 +52,14 @@ static NSString *const kBCRestoration_Mnemonic = @"mnemonic";
  children.
  */
 @property(strong, nonatomic, readonly) BCKeySequence *keys;
+
+/*!
+ @brief This manages addresses, and key paths.
+
+ @discussion This currently supports hybrid imports, and calls the provider
+ object.
+ */
+@property(strong, nonatomic, readonly) BCAddressManager *addressManager;
 
 #pragma mark Queue
 /*!

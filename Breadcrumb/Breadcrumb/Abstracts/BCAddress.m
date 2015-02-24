@@ -7,6 +7,7 @@
 //
 
 #import "BCAddress.h"
+#import "BCCoin.h"
 #import "BreadcrumbCore.h"
 
 @interface BCAddress () {
@@ -57,6 +58,11 @@
   return _dataRepresentation;
 }
 
+- (NSData *)toDataWithoutType {
+  return [_dataRepresentation
+      subdataWithRange:NSMakeRange(1, _dataRepresentation.length - 1)];
+}
+
 #pragma mark Debugging
 
 - (NSString *)debugDescription {
@@ -87,7 +93,8 @@
 
 #pragma mark Conversion
 
-+ (BCAddress *)addressFromPublicKey:(NSData *)publicKey {
++ (BCAddress *)addressFromPublicKey:(NSData *)publicKey
+                          usingCoin:(BCCoin *)coin {
   NSData *hash;
   NSMutableData *mHash;
   NSString *addressString;
@@ -101,7 +108,7 @@
   mHash = [[NSMutableData alloc] init];
 
   // Because we don't currently support multi-sig use the old version byte
-  [mHash appendUInt8:BCAddressType_Old];
+  [mHash appendUInt8:[coin addressTypeForFlags:0]];
   [mHash appendData:hash];
 
   addressString = [mHash base58CheckEncoding];

@@ -10,6 +10,8 @@
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 
+#import "BCPublicKey.h"
+
 @interface BCScript ()
 
 /*!

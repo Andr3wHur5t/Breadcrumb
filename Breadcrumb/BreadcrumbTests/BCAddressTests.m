@@ -53,7 +53,7 @@
   XCTAssert(
       [[BCAddress addressFromPublicKey:@"03f5dfdb9768d46bff4c93952ed7cd9e7"
                                        @"2c944afb00de14335be0e73baf20516b"
-                                       @"a".hexToData]
+                                       @"a".hexToData usingCoin:[BCCoin TestNet3Bitcoin]]
           isEqualExcludingVersion:
               [@"mw2LAcLNSWETLQXEQ7xs237RtkPUDrQTXR" toBitcoinAddress]],
       @"Failed");

@@ -132,7 +132,7 @@
   scriptData = [self.scriptSig toData];
   if (![scriptData isKindOfClass:[NSData class]]) return NULL;
 
-  [buffer appendData:self.previousOutputHash];
+  [buffer appendData:[self.previousOutputHash reverse]];
   [buffer appendUInt32:self.previousOutputIndex];
   [buffer appendVarInt:scriptData.length];
   [buffer appendData:scriptData];

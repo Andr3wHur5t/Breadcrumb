@@ -34,6 +34,31 @@ static NSString *const kBCKeySequenceNumericalChars = @"1234567890";
 static NSString *const kBCKeySequenceHardenedFlagChars = @"'h";
 
 /*!
+ @brief Defines how a key hierarchy is structured.
+ */
+typedef enum
+    : NSUInteger {
+        /*!
+         @brief The BIP32 standard. Example: m/0'/0/0
+
+         @discussion you should try to migrate away from this, and use a newer
+         standard.
+
+         Description: m/account'/isExternal/index
+         */
+        BCKeySequenceType_BIP32 = 0,
+        /*!
+         @brief The BIP44 path standard. Example: m/44'/0'/0'/0/0
+
+         @discussion This is an extension of BIP32 with better definition on how
+         paths should work, you should use this instead of BIP32.
+
+         Description: m/44'/coin'/account'/isExternal/index
+         */
+        BCKeySequenceType_BIP44 = 1,
+      } BCKeySequenceType;
+
+/*!
  @brief  This keeps track of the wallets seed, and master public, and private
  key pairs.
  */
@@ -81,72 +106,7 @@ static NSString *const kBCKeySequenceHardenedFlagChars = @"'h";
  */
 - (BCKeyPair *)keyPairForPath:(NSString *)path andMemoryKey:(NSData *)memoryKey;
 
-/*!
- @brief Gets the key pair for the BIP44 key.
-
- @param coin      The Coin id of the key.
- @param accountId The account id of the key.
- @param external  States if the key will be used for external, or
- internal(change address) use.
- @param index     The index of the key.
- @param memoryKey The key that should be used to protect the private key of the
- key pair.
- */
-- (BCKeyPair *)keyPair44ForCoin:(uint32_t)coin
-                        account:(uint32_t)accountId
-                       external:(BOOL)external
-                          index:(uint32_t)index
-                  withMemoryKey:(NSData *)memoryKey;
-
-/*!
- @brief Gets the key pair for the BIP 32 standard path key.
-
- @param accountId The account id for the BIP 32 standard key.
- @param external  States if the key will be used for external, or
- internal(change address) use.
- @param index     The index of the key.
- @param memoryKey The key that should be used to protect the private key of the
- key pair.
- */
-- (BCKeyPair *)keyPair32ForAccount:(uint32_t)accountId
-                          external:(BOOL)external
-                             index:(uint32_t)index
-                     withMemoryKey:(NSData *)memoryKey;
-
 #pragma mark Utilities
-/*!
- @brief Generates a component set which conforms to BIP44 using the inputted
- values.
-
- @param coin      The Coin id of the key.
- @param accountId The account id of the key.
- @param external  States if the key will be used for external, or
- internal(change address) use.
- @param index     The index of the key.
-
- @return The array of components needed to derive the specified key from a
- master key pair.
- */
-+ (NSArray *)bip44ComponentsForCoin:(uint32_t)coin
-                            account:(uint32_t)accountId
-                           external:(BOOL)external
-                              index:(uint32_t)index;
-
-/*!
- @brief Gets the key pair for the BIP 32 standard path for the inputted values.
-
- @param accountId The account id for the BIP 32 standard key.
- @param external  States if the key will be used for external, or
- internal(change address) use.
- @param index     The index of the key.
-
- @return The array of components needed to derive the specified key from a
- master key pair.
- */
-+ (NSArray *)bip32StdComponentsForAccount:(uint32_t)accountId
-                                 external:(BOOL)external
-                                    index:(uint32_t)index;
-
 /*!
  @brief Extracts the components from inputted key path, as defined in BIP 32.
 

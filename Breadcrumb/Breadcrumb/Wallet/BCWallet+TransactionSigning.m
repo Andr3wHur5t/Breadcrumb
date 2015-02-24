@@ -39,8 +39,6 @@
     BCKeyPair *currentKeyPair;
     BCAddress *currentAddress;
 
-    // This is a complex process, This should be well commented for
-    // explanation...
     for (NSUInteger i = 0; i < transaction.inputs.count; ++i) {
       // Get The Hash of the current transaction
       currentHash = [[transaction toData] SHA256_2];
@@ -51,8 +49,11 @@
               .controllingAddress;
       if (![currentAddress isKindOfClass:[BCAddress class]]) return NULL;
 
-      currentKeyPair = [self keyForAddress:currentAddress withMemoryKey:key];
-      if (![currentKeyPair.publicKey isKindOfClass:[NSData class]]) return NULL;
+      // Get the current key from the address manager
+      currentKeyPair = [self.addressManager keyPairForAddress:currentAddress
+                                               usingMemoryKey:key];
+      if (![currentKeyPair.publicKey isKindOfClass:[BCPublicKey class]])
+        return NULL;
 
       // Sign the transaction
       signedHash = [currentKeyPair signHash:currentHash withMemoryKey:key];
@@ -63,7 +64,7 @@
 
       // Append it with the SIG_HASH all code which specifies the method we used
       // to sign
-      [currentSignature appendUInt32:SIGHASH_ALL];
+      [currentSignature appendUInt8:SIGHASH_ALL];
 
       // Create the unlock script (Also known as sig script)
       unlockScript = [BCMutableScript script];
@@ -73,7 +74,7 @@
       [unlockScript writeBytes:currentSignature];
 
       // Append the Public Key of the owning Key Pair
-      [unlockScript writeBytes:currentKeyPair.publicKey];
+      [unlockScript writeBytes:currentKeyPair.publicKey.data];
 
       // Create an updated input transaction
       updatedInput = [transaction.inputs objectAtIndex:i];
@@ -95,16 +96,6 @@
 
     return transaction;
   }
-}
-
-- (BCKeyPair *)keyForAddress:(BCAddress *)address withMemoryKey:(NSData *)memoryKey {
-  NSParameterAssert([address isKindOfClass:[BCAddress class]]);
-  if (![address isKindOfClass:[BCAddress class]]) return NULL;
-
-  [self.keys.masterKeyPair childKeyPairAt:0 withMemoryKey:memoryKey];
-  // TODO: Find Key
-  NSLog(@"Key For Address '%@'", address);
-  return self.keys.masterKeyPair;
 }
 
 @end

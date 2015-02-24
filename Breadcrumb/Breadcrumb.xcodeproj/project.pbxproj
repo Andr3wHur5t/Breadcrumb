@@ -12,6 +12,8 @@
 		370E68901A8EB28700862518 /* libsecp256k1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 370E688E1A8EB28700862518 /* libsecp256k1.a */; };
 		370E68931A8EB31E00862518 /* NSString+Base58.h in Headers */ = {isa = PBXBuildFile; fileRef = 370E68911A8EB31E00862518 /* NSString+Base58.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		370E68941A8EB31E00862518 /* NSString+Base58.m in Sources */ = {isa = PBXBuildFile; fileRef = 370E68921A8EB31E00862518 /* NSString+Base58.m */; };
+		370FEF1C1A99D5D40037E8EF /* BCAMMasterKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 370FEF1A1A99D5D40037E8EF /* BCAMMasterKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		370FEF1D1A99D5D40037E8EF /* BCAMMasterKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 370FEF1B1A99D5D40037E8EF /* BCAMMasterKey.m */; };
 		3752B1C41A83709B0029C91C /* BreadcrumbCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 3752B1C31A83709B0029C91C /* BreadcrumbCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */; };
 		3773FB0C1A9450FC00EDB119 /* BCKeySequenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3773FB0B1A9450FC00EDB119 /* BCKeySequenceTests.m */; };
@@ -42,7 +44,7 @@
 		377A19311A875751007AA1CD /* BCScript.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A192F1A875751007AA1CD /* BCScript.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19321A875751007AA1CD /* BCScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19301A875751007AA1CD /* BCScript.m */; };
 		377A19341A875F16007AA1CD /* BCScriptOpCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19331A875F16007AA1CD /* BCScriptOpCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19351A879185007AA1CD /* BCScript+DefaultScripts.h */; };
+		377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19351A879185007AA1CD /* BCScript+DefaultScripts.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19381A879185007AA1CD /* BCScript+DefaultScripts.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19361A879185007AA1CD /* BCScript+DefaultScripts.m */; };
 		377A193D1A88871E007AA1CD /* BCTransactionOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A193B1A88871E007AA1CD /* BCTransactionOutput.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A193E1A88871E007AA1CD /* BCTransactionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A193C1A88871E007AA1CD /* BCTransactionOutput.m */; };
@@ -65,9 +67,16 @@
 		377A196D1A8C020C007AA1CD /* BCsecp256k1.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A196B1A8C020C007AA1CD /* BCsecp256k1.m */; };
 		37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */ = {isa = PBXBuildFile; fileRef = 37BFECBE1A82D1460081BE4B /* Breadcrumb.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37BFECC51A82D1460081BE4B /* Breadcrumb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BFECB91A82D1460081BE4B /* Breadcrumb.framework */; };
-		37C67F491A933495005FF82D /* libTomMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C67F481A933495005FF82D /* libTomMath.a */; };
 		37C67F4B1A9334BE005FF82D /* tommath.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C67F4A1A9334BE005FF82D /* tommath.h */; };
 		37C77DC41A969968008D56FE /* BCMnemonicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DC31A969968008D56FE /* BCMnemonicTests.m */; };
+		37C77DC61A96AB14008D56FE /* libTomMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C77DC51A96AB14008D56FE /* libTomMath.a */; };
+		37C77DCA1A96B027008D56FE /* BCAddressManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C77DC81A96B027008D56FE /* BCAddressManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		37C77DCB1A96B027008D56FE /* BCAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DC91A96B027008D56FE /* BCAddressManager.m */; };
+		37C77DCD1A97DDCF008D56FE /* BCScriptTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DCC1A97DDCF008D56FE /* BCScriptTests.m */; };
+		37C77DD11A9809B2008D56FE /* BCCoin.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C77DCF1A9809B2008D56FE /* BCCoin.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		37C77DD21A9809B2008D56FE /* BCCoin.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DD01A9809B2008D56FE /* BCCoin.m */; };
+		37C77DD51A981364008D56FE /* BCPublicKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 37C77DD31A981364008D56FE /* BCPublicKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		37C77DD61A981364008D56FE /* BCPublicKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C77DD41A981364008D56FE /* BCPublicKey.m */; };
 		37D51B851A8CC9FB00A843B7 /* BRBIP39Mnemonic.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37D51B861A8CC9FB00A843B7 /* BRBIP39Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */; };
 		37D51B931A8CCA2F00A843B7 /* NSData+Bitcoin.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -101,8 +110,9 @@
 		370E688E1A8EB28700862518 /* libsecp256k1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsecp256k1.a; path = ../../libs/libsecp256k1/libsecp256k1.a; sourceTree = "<group>"; };
 		370E68911A8EB31E00862518 /* NSString+Base58.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Base58.h"; path = "Categories/NSString+Base58.h"; sourceTree = "<group>"; };
 		370E68921A8EB31E00862518 /* NSString+Base58.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Base58.m"; path = "Categories/NSString+Base58.m"; sourceTree = "<group>"; };
+		370FEF1A1A99D5D40037E8EF /* BCAMMasterKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAMMasterKey.h; path = "Address Manager/BCAMMasterKey.h"; sourceTree = "<group>"; };
+		370FEF1B1A99D5D40037E8EF /* BCAMMasterKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCAMMasterKey.m; path = "Address Manager/BCAMMasterKey.m"; sourceTree = "<group>"; };
 		3752B1C31A83709B0029C91C /* BreadcrumbCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BreadcrumbCore.h; sourceTree = "<group>"; };
-		3767EC791A82E25300AFD6D6 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3767F14F1A830D4100AFD6D6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3767F1581A830F5200AFD6D6 /* Breadcrumb-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Breadcrumb-Prefix.pch"; sourceTree = "<group>"; };
 		3773FB0B1A9450FC00EDB119 /* BCKeySequenceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCKeySequenceTests.m; sourceTree = "<group>"; };
@@ -159,9 +169,16 @@
 		37BFECBE1A82D1460081BE4B /* Breadcrumb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Breadcrumb.h; sourceTree = "<group>"; };
 		37BFECC41A82D1460081BE4B /* BreadcrumbTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreadcrumbTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BFECCA1A82D1460081BE4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		37C67F481A933495005FF82D /* libTomMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTomMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		37C67F4A1A9334BE005FF82D /* tommath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tommath.h; path = ../../libTomMath/libTomMath/tommath.h; sourceTree = "<group>"; };
 		37C77DC31A969968008D56FE /* BCMnemonicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCMnemonicTests.m; sourceTree = "<group>"; };
+		37C77DC51A96AB14008D56FE /* libTomMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTomMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		37C77DC81A96B027008D56FE /* BCAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAddressManager.h; path = "Address Manager/BCAddressManager.h"; sourceTree = "<group>"; };
+		37C77DC91A96B027008D56FE /* BCAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCAddressManager.m; path = "Address Manager/BCAddressManager.m"; sourceTree = "<group>"; };
+		37C77DCC1A97DDCF008D56FE /* BCScriptTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCScriptTests.m; sourceTree = "<group>"; };
+		37C77DCF1A9809B2008D56FE /* BCCoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCCoin.h; path = Coins/BCCoin.h; sourceTree = "<group>"; };
+		37C77DD01A9809B2008D56FE /* BCCoin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCCoin.m; path = Coins/BCCoin.m; sourceTree = "<group>"; };
+		37C77DD31A981364008D56FE /* BCPublicKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCPublicKey.h; path = Keys/BCPublicKey.h; sourceTree = "<group>"; };
+		37C77DD41A981364008D56FE /* BCPublicKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCPublicKey.m; path = Keys/BCPublicKey.m; sourceTree = "<group>"; };
 		37D51B831A8CC9FB00A843B7 /* BRBIP39Mnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BRBIP39Mnemonic.h; path = Crumbs/BRBIP39Mnemonic.h; sourceTree = "<group>"; };
 		37D51B841A8CC9FB00A843B7 /* BRBIP39Mnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BRBIP39Mnemonic.m; path = Crumbs/BRBIP39Mnemonic.m; sourceTree = "<group>"; };
 		37D51B8D1A8CCA2F00A843B7 /* NSData+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Bitcoin.h"; path = "Crumbs/NSData+Bitcoin.h"; sourceTree = "<group>"; };
@@ -184,7 +201,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37C67F491A933495005FF82D /* libTomMath.a in Frameworks */,
+				37C77DC61A96AB14008D56FE /* libTomMath.a in Frameworks */,
 				370E68901A8EB28700862518 /* libsecp256k1.a in Frameworks */,
 				370E688F1A8EB28700862518 /* libbase58.a in Frameworks */,
 			);
@@ -204,10 +221,10 @@
 		3711194E1A8320DF002D7E6B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				37C77DC51A96AB14008D56FE /* libTomMath.a */,
 				370E688D1A8EB28700862518 /* libbase58.a */,
 				370E688E1A8EB28700862518 /* libsecp256k1.a */,
 				3767F14F1A830D4100AFD6D6 /* UIKit.framework */,
-				3767EC791A82E25300AFD6D6 /* libcrypto.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -215,6 +232,8 @@
 		3767EC7B1A82E56C00AFD6D6 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				37C77DC71A96AFC8008D56FE /* Address Manager */,
+				377A18FE1A843FEE007AA1CD /* Address */,
 				377A195C1A8AE00A007AA1CD /* Protected Data */,
 				377A19531A8ADBA4007AA1CD /* Keys */,
 				377A192E1A8756BE007AA1CD /* Script */,
@@ -284,7 +303,6 @@
 			isa = PBXGroup;
 			children = (
 				377A19171A858D93007AA1CD /* Provider */,
-				377A18FE1A843FEE007AA1CD /* Address */,
 				377A18FD1A843FE5007AA1CD /* Wallet */,
 			);
 			name = Abstracts;
@@ -409,6 +427,8 @@
 				377A19591A8ADD29007AA1CD /* BCKeyPair.m */,
 				377A19651A8B0144007AA1CD /* BCKeySequence.h */,
 				377A19661A8B0144007AA1CD /* BCKeySequence.m */,
+				37C77DD31A981364008D56FE /* BCPublicKey.h */,
+				37C77DD41A981364008D56FE /* BCPublicKey.m */,
 			);
 			name = Keys;
 			sourceTree = "<group>";
@@ -454,6 +474,7 @@
 			children = (
 				37BFECBE1A82D1460081BE4B /* Breadcrumb.h */,
 				3752B1C31A83709B0029C91C /* BreadcrumbCore.h */,
+				37C77DCE1A98099B008D56FE /* Coins */,
 				377A18F21A843712007AA1CD /* Abstracts */,
 				3767EC7B1A82E56C00AFD6D6 /* Interfaces */,
 				37BFECED1A82D2AA0081BE4B /* Model */,
@@ -487,6 +508,7 @@
 				3773FB171A95266800EDB119 /* BCWalletGenerationTests.m */,
 				37F10D5F1A9579DC005FD095 /* BCKeyPairTests.m */,
 				37C77DC31A969968008D56FE /* BCMnemonicTests.m */,
+				37C77DCC1A97DDCF008D56FE /* BCScriptTests.m */,
 			);
 			path = BreadcrumbTests;
 			sourceTree = "<group>";
@@ -503,7 +525,6 @@
 			isa = PBXGroup;
 			children = (
 				37C67F4A1A9334BE005FF82D /* tommath.h */,
-				37C67F481A933495005FF82D /* libTomMath.a */,
 				370E688B1A8D97AB00862518 /* RIPEMD160.c */,
 				37D51B9D1A8CCA5C00A843B7 /* ccMemory.h */,
 				37D51B9E1A8CCA5C00A843B7 /* Reachability.h */,
@@ -520,6 +541,26 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+		37C77DC71A96AFC8008D56FE /* Address Manager */ = {
+			isa = PBXGroup;
+			children = (
+				37C77DC81A96B027008D56FE /* BCAddressManager.h */,
+				37C77DC91A96B027008D56FE /* BCAddressManager.m */,
+				370FEF1A1A99D5D40037E8EF /* BCAMMasterKey.h */,
+				370FEF1B1A99D5D40037E8EF /* BCAMMasterKey.m */,
+			);
+			name = "Address Manager";
+			sourceTree = "<group>";
+		};
+		37C77DCE1A98099B008D56FE /* Coins */ = {
+			isa = PBXGroup;
+			children = (
+				37C77DCF1A9809B2008D56FE /* BCCoin.h */,
+				37C77DD01A9809B2008D56FE /* BCCoin.m */,
+			);
+			name = Coins;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -533,10 +574,12 @@
 				37D51BA41A8CCE1B00A843B7 /* BRMnemonic.h in Headers */,
 				37BFECBF1A82D1460081BE4B /* Breadcrumb.h in Headers */,
 				37D51B851A8CC9FB00A843B7 /* BRBIP39Mnemonic.h in Headers */,
+				37C77DCA1A96B027008D56FE /* BCAddressManager.h in Headers */,
 				377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */,
 				377A19071A8441CD007AA1CD /* BCAWallet.h in Headers */,
 				377A196C1A8C020C007AA1CD /* BCsecp256k1.h in Headers */,
 				377A19311A875751007AA1CD /* BCScript.h in Headers */,
+				37C77DD11A9809B2008D56FE /* BCCoin.h in Headers */,
 				377A19031A844121007AA1CD /* BCAmount.h in Headers */,
 				377A195A1A8ADD29007AA1CD /* BCKeyPair.h in Headers */,
 				377A19141A8583B1007AA1CD /* BCWallet+Transactions.h in Headers */,
@@ -549,12 +592,14 @@
 				37D51BA01A8CCA5C00A843B7 /* ccMemory.h in Headers */,
 				377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */,
 				377A19461A897F94007AA1CD /* BCMutableTransaction.h in Headers */,
+				370FEF1C1A99D5D40037E8EF /* BCAMMasterKey.h in Headers */,
 				37D51B931A8CCA2F00A843B7 /* NSData+Bitcoin.h in Headers */,
 				377A195F1A8AE03A007AA1CD /* BCProtectedData.h in Headers */,
 				377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */,
 				377A19341A875F16007AA1CD /* BCScriptOpCodes.h in Headers */,
 				37D51BA11A8CCA5C00A843B7 /* Reachability.h in Headers */,
 				377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */,
+				37C77DD51A981364008D56FE /* BCPublicKey.h in Headers */,
 				377A19101A844D76007AA1CD /* BCWallet.h in Headers */,
 				37D51B951A8CCA2F00A843B7 /* NSData+Hash.h in Headers */,
 				37C67F4B1A9334BE005FF82D /* tommath.h in Headers */,
@@ -683,6 +728,7 @@
 			files = (
 				377A196D1A8C020C007AA1CD /* BCsecp256k1.m in Sources */,
 				377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */,
+				37C77DD61A981364008D56FE /* BCPublicKey.m in Sources */,
 				370E688C1A8D97AB00862518 /* RIPEMD160.c in Sources */,
 				370E68941A8EB31E00862518 /* NSString+Base58.m in Sources */,
 				377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */,
@@ -698,9 +744,12 @@
 				377A195B1A8ADD29007AA1CD /* BCKeyPair.m in Sources */,
 				377A19681A8B0144007AA1CD /* BCKeySequence.m in Sources */,
 				377A19151A8583B1007AA1CD /* BCWallet+Transactions.m in Sources */,
+				370FEF1D1A99D5D40037E8EF /* BCAMMasterKey.m in Sources */,
 				377A19231A85A5FC007AA1CD /* NSData+Encryption.m in Sources */,
 				377A19321A875751007AA1CD /* BCScript.m in Sources */,
+				37C77DCB1A96B027008D56FE /* BCAddressManager.m in Sources */,
 				377A191B1A858DB3007AA1CD /* BCAProvider.m in Sources */,
+				37C77DD21A9809B2008D56FE /* BCCoin.m in Sources */,
 				377A19081A8441CD007AA1CD /* BCAWallet.m in Sources */,
 				37D51B941A8CCA2F00A843B7 /* NSData+Bitcoin.m in Sources */,
 				377A191F1A858FFF007AA1CD /* BCProviderChain.m in Sources */,
@@ -723,6 +772,7 @@
 				37C77DC41A969968008D56FE /* BCMnemonicTests.m in Sources */,
 				3773FB161A95215900EDB119 /* BCEncodingTests.m in Sources */,
 				3773FB181A95266800EDB119 /* BCWalletGenerationTests.m in Sources */,
+				37C77DCD1A97DDCF008D56FE /* BCScriptTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,7 +891,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${CONFIGURATION_BUILD_DIR}\"",
+					"${CONFIGURATION_BUILD_DIR}",
 					"$(SDKROOT)/usr/lib/system",
 					"\"$(SRCROOT)/../libs/\"/**",
 				);
@@ -870,7 +920,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${CONFIGURATION_BUILD_DIR}\"",
+					"${CONFIGURATION_BUILD_DIR}",
 					"$(SDKROOT)/usr/lib/system",
 					"\"$(SRCROOT)/../libs/\"/**",
 				);

@@ -29,7 +29,6 @@
 
 @implementation BCKeyPair
 
-@synthesize address = _address;
 @synthesize publicKey = _publicKey;
 @synthesize privateKey = _privateKey;
 
@@ -39,21 +38,29 @@
                      compressedPub:(BOOL)compressed
                       andMemoryKey:(NSData *)memoryKey {
   @autoreleasepool {
+    NSData *pubData;
     NSParameterAssert([privateKey isKindOfClass:[NSData class]]);
-    if (![privateKey isKindOfClass:[NSData class]]) return NULL;
+    if (![privateKey isKindOfClass:[NSData class]]) {
+      privateKey = NULL;
+      memoryKey = NULL;
+      return NULL;
+    }
     self = [super init];
     if (self) {
       _isCompressed = compressed;
-      _publicKey =
-          [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey
-                                              compressed:_isCompressed];
+
+      pubData = [[BCsecp256k1 sharedInstance] publicKeyFromKey:privateKey
+                                                    compressed:_isCompressed];
+      if (![pubData isKindOfClass:[NSData class]]) {
+        privateKey = NULL;
+        memoryKey = NULL;
+        return NULL;
+      }
+
+      _publicKey = [[BCPublicKey alloc] initWithData:pubData];
       _privateKey = [privateKey protectedWithKey:memoryKey];
       privateKey = NULL;
       memoryKey = NULL;
-
-      if (![_publicKey isKindOfClass:[NSData class]]) return NULL;
-      _address = [BCAddress addressFromPublicKey:_publicKey];
-      if (![_address isKindOfClass:[BCAddress class]]) return NULL;
     }
     return self;
   }
@@ -69,9 +76,21 @@
     self = [self initWithPrivateKey:privateKey
                       compressedPub:true  // ASSUMING TRUE, FIX!
                        andMemoryKey:memoryKey];
-    privateKey = NULL;
     memoryKey = NULL;
-    if (self) _chainCode = chainCode;
+    if (!self) {
+      privateKey = NULL;
+      return NULL;
+    }
+
+    _chainCode = chainCode;
+    // Update Public Key
+    _publicKey = [[BCDerivablePublicKey alloc]
+        initWithData:[[BCsecp256k1 sharedInstance]
+                         publicKeyFromKey:privateKey
+                               compressed:_isCompressed]
+        andChainCode:_chainCode];
+
+    privateKey = NULL;
     return self;
   }
 }
@@ -119,12 +138,8 @@
 
 #pragma mark Public Info
 
-- (BCAddress *)address {
-  return _address;
-}
-
-- (NSData *)publicKey {
-  NSParameterAssert([_publicKey isKindOfClass:[NSData class]]);
+- (BCPublicKey *)publicKey {
+  NSParameterAssert([_publicKey isKindOfClass:[BCPublicKey class]]);
   return _publicKey;
 }
 
@@ -168,13 +183,13 @@
 - (BOOL)didSign:(NSData *)signedData withOriginalHash:(NSData *)hash {
   NSParameterAssert([signedData isKindOfClass:[NSData class]]);
   NSParameterAssert([hash isKindOfClass:[NSData class]]);
-  if (![_publicKey isKindOfClass:[NSData class]] ||
+  if (![_publicKey isKindOfClass:[BCPublicKey class]] ||
       ![signedData isKindOfClass:[NSData class]] ||
       ![hash isKindOfClass:[NSData class]])
     return FALSE;
   return [[BCsecp256k1 sharedInstance] signature:signedData
                                       originHash:hash
-                             isValidForPublicKey:_publicKey];
+                             isValidForPublicKey:_publicKey.data];
 }
 
 #pragma mark Derivation Operations
@@ -204,7 +219,7 @@
       // Build Normal
       // Allows master pub -> child pub
       // REQ: POINT(q)
-      [data appendData:self.publicKey];
+      [data appendData:self.publicKey.data];
     }
 
     // Append The index for Both
@@ -239,7 +254,7 @@
       return NULL;
     }
 
-    // Create the key pair object, it will create the public key automaticly.
+    // Create the key pair object, it will create the public key automatically.
     return [[[self class] alloc] initWithPrivateKey:childPrivate
                                           chainCode:childChainCode
                                        andMemoryKey:memoryKey];
@@ -258,7 +273,7 @@
   mp_init(&nParentKey);
   mp_init(&nResult);
   mp_init(&nLeftSegment);
-  nCurveOrder = [[self class] curveOrder];
+  nCurveOrder = [BCsecp256k1 curveOrder];
 
   // Convert our data into big numbers
   mp_read_unsigned_bin(&nParentKey, parent.bytes, (int)parent.length);
@@ -276,21 +291,6 @@
 
   data = [NSData dataWithBytes:bytes length:length];
   return [data isKindOfClass:[NSData class]] ? data : NULL;
-}
-
-+ (mp_int)curveOrder {
-  // TODO: Move to ECDSA helper
-  static dispatch_once_t onceToken;
-  static mp_int curveOrder;
-  dispatch_once(&onceToken, ^{
-      mp_init(&curveOrder);
-      // sepc256k1 curve order as defined https://en.bitcoin.it/wiki/Secp256k1
-      mp_read_radix(
-          &curveOrder,
-          "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
-          16);
-  });
-  return curveOrder;
 }
 
 #pragma mark Utilities

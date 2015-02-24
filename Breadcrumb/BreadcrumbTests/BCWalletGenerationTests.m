@@ -16,7 +16,21 @@
 
 @implementation BCWalletGenerationTests
 
+#pragma mark Internal Tests
+
+- (void)testWalletCreationVector0 {
+  BCWallet *wallet;
+  NSData *password;
+  password = [NSMutableData dataWithLength:32];
+
+  // Random Construction Test
+  wallet = [[BCWallet alloc] initNewWithPassword:password];
+  XCTAssert([wallet isKindOfClass:[BCWallet class]], @"Failed to construct");
+}
+
 #pragma mark BIP Defined Vectors
+
+// This is a memonic test Not a wallet Generation Test
 
 // correct horse battery staple
 // Private Key: C4BBCB1FBEC99D65BF59D85C8CB62EE2DB963F0FE106F483D9AFA73BD4E39A8A
@@ -40,6 +54,5 @@
 // DeterministicKey{pub=02fb9b3bf3374d0e1b9573156b3c0a778b2f0979482e0fd7fa07e8af42dd55eb7c,
 // chainCode=156940426ae5cfc90eea3dd6c94a0b3255d99fbb7ad69435f1581011db8020b0,
 // path=M/0H/0/0} mvihzZu32GdpYrhVHi8CYXF2yUDaKG2ivu
-
 
 @end
