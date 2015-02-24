@@ -10,7 +10,7 @@
 
 @implementation BCAProvider
 
-- (void)UTXOforAmount:(NSNumber *)amount
+- (void)UTXOforAmount:(uint64_t)amount
          andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback {
   NSAssert(FALSE, @"Called method on abstract class.");
@@ -18,7 +18,16 @@
 
 - (void)publishTransaction:(BCMutableTransaction *)transaction
                    forCoin:(BCCoin *)coin
-            withCompletion:(void (^)(NSError *))completion {
+            withCompletion:(void (^)(NSData *,NSError *))completion {
+  NSAssert(FALSE, @"Called method on abstract class.");
+}
+
+- (void)syncAddressManager:(BCAddressManager *)addressManager withCallback:(void(^)(NSError *))callback {
+  NSAssert(FALSE, @"Called method on abstract class.");
+}
+
+- (void)getBalanceForAddressManager:(BCAddressManager *)addressManager
+                       withCallback:(void (^)(uint64_t, NSError *))callback {
   NSAssert(FALSE, @"Called method on abstract class.");
 }
 

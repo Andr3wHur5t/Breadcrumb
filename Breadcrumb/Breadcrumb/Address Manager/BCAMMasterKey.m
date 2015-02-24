@@ -11,7 +11,7 @@
 #import "BCsecp256k1.h"
 
 // Set this to change our edge address search distance
-#define GAP_DISTANCE 100
+#define GAP_DISTANCE 20
 
 @interface BCAMMasterKey ()
 
@@ -61,7 +61,7 @@
 
 #pragma mark Index Management
 - (void)setLastUsedIndex:(uint16_t)lastUsedIndex {
-  [self expandAddressToIndex:lastUsedIndex];
+  [self expandAddressToIndex:lastUsedIndex + GAP_DISTANCE];
   _lastUsedIndex = lastUsedIndex;
 }
 

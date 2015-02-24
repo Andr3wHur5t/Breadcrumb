@@ -24,7 +24,7 @@
  @param addresses   The addresses to get the UTXOs for.
  @param callback    The callback to call once the operation completes
  */
-- (void)UTXOforAmount:(NSNumber *)amount
+- (void)UTXOforAmount:(uint64_t)amount
          andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback;
 
@@ -42,9 +42,10 @@
  */
 - (void)publishTransaction:(BCMutableTransaction *)transaction
                    forCoin:(BCCoin *)coin
-            withCompletion:(void (^)(NSError *))completion;
+            withCompletion:(void (^)(NSData *, NSError *))completion;
 
-- (void)syncAddressManager:(BCAddressManager *)addressManager;
+- (void)syncAddressManager:(BCAddressManager *)addressManager
+              withCallback:(void (^)(NSError *))callback;
 
 - (void)getBalanceForAddressManager:(BCAddressManager *)addressManager
                        withCallback:(void (^)(uint64_t, NSError *))callback;

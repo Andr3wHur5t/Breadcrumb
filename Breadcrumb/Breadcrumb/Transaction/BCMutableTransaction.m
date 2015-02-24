@@ -10,6 +10,8 @@
 #import "BreadcrumbCore.h"
 
 #define BC_BITCOIN_VERSION 1
+static NSString *const kTransactionBuildingErrorDomain =
+    @"com.breadcrumb.transactionBuilder";
 
 @implementation BCMutableTransaction
 
@@ -198,35 +200,36 @@
 // TODO: randomly swap order of outputs so the change address isn't publicly
 // known
 + (BCMutableTransaction *)buildTransactionWith:(NSArray *)utxos
-                                     forAmount:(NSNumber *)amount
+                                     forAmount:(uint64_t)amount
                                             to:(BCAddress *)address
-                                       feePerK:(NSNumber *)feePerK
-                             withChangeAddress:(BCAddress *)changeAddress {
-  uint64_t targetAmount = 0, changeAmount = 0, feeAmount = 0, utxoSumAmount = 0,
+                                       feePerK:(uint64_t)feePerK
+                                 changeAddress:(BCAddress *)changeAddress
+                                     withError:(NSError **)error {
+  uint64_t changeAmount = 0, feeAmount = 0, utxoSumAmount = 0,
            transactionSize = 0;
   BCTransactionOutput *targetOutput, *changeOutput;
   BCTransactionInput *utxoInput;
   BCMutableTransaction *newTransaction;
 
-  NSLog(@"Send: %@ to: '%@' Change Address: '%@'", amount, address,
-        changeAddress);
   // Validate addresses
   if (![address isKindOfClass:[BCAddress class]] ||
-      ![changeAddress isKindOfClass:[BCAddress class]])
+      ![changeAddress isKindOfClass:[BCAddress class]]) {
+    if (error) *error = [self invalidAddressesError];
     return NULL;
-
-  // Validate UTXOs
-  if (![utxos isKindOfClass:[NSArray class]]) return NULL;
-  for (NSUInteger i = 0; i < utxos.count; ++i) {
-    BCTransaction *tx = [utxos objectAtIndex:i];
-    if (![tx isKindOfClass:[BCTransaction class]]) return NULL;
-    if (tx.isSigned) return NULL;
   }
 
-  // Set our target amount as a usable value
-  targetAmount = [amount unsignedIntegerValue];
-
-  // Validate target amount within params
+  // Validate UTXOs
+  if (![utxos isKindOfClass:[NSArray class]]) {
+    if (error) *error = [self invalidUTXOsError];
+    return NULL;
+  }
+  for (NSUInteger i = 0; i < utxos.count; ++i) {
+    BCTransaction *tx = [utxos objectAtIndex:i];
+    if (![tx isKindOfClass:[BCTransaction class]]) {
+      if (error) *error = [self invalidUTXOsError];
+      return NULL;
+    }
+  }
 
   // Create Mutable Transaction
   newTransaction = [BCMutableTransaction mutableTransaction];
@@ -244,20 +247,22 @@
   }
 
   // Set Target Outputs
-  targetOutput = [BCTransactionOutput standardOutputForAmount:@(targetAmount)
-                                                    toAddress:address];
-  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
+  targetOutput =
+      [BCTransactionOutput standardOutputForAmount:amount toAddress:address];
+  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) {
+    if (error) *error = [self failedToCreateOutputError];
+    return NULL;
+  }
   [newTransaction addOutput:targetOutput];
 
   // Calculate the fee Based off of the transaction size. Assume Change Output
   transactionSize = [newTransaction currentSize] + 39;
-  feeAmount =
-      ((CGFloat)transactionSize / 1000.0f) * [feePerK unsignedIntegerValue];
+  feeAmount = ((CGFloat)transactionSize / 1000.0f) * feePerK;
   feeAmount = MAX(feeAmount, 10000);
 
   // Check For Funds
-  if (utxoSumAmount < (targetAmount + feeAmount)) {
-    // not enough Funds Error
+  if (utxoSumAmount < (amount + feeAmount)) {
+    if (error) *error = [self insufficientUTXOFundsError];
     return NULL;
   }
 
@@ -265,22 +270,73 @@
   // to keep the leftover we need a change address so that you only spend the
   // desired amount. Anything left over in the transaction is considered the
   // mining fee.
-  changeAmount = utxoSumAmount - (targetAmount + feeAmount);
+  changeAmount = utxoSumAmount - (amount + feeAmount);
 
   // Check if we are over the limit for standard transactions
   if (transactionSize >= 100000) {
-    // Non Standard Transactions, Over size limit.
+    if (error) *error = [self nonStandardTransactionError];
     return NULL;
   }
 
   // Set Change Output
-  changeOutput = [BCTransactionOutput standardOutputForAmount:@(changeAmount)
+  changeOutput = [BCTransactionOutput standardOutputForAmount:changeAmount
                                                     toAddress:changeAddress];
-  if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) return NULL;
+  if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) {
+    if (error) *error = [self failedToCreateOutputError];
+    return NULL;
+  }
   [newTransaction addOutput:changeOutput];
 
   // Return the built transaction
   return newTransaction;
+}
+
+#pragma mark Errors
+
++ (NSError *)nonStandardTransactionError {
+  return
+      [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                          code:505
+                      userInfo:@{
+                        NSLocalizedDescriptionKey :
+                            @"Insufficient funds in UTXOs to build transaction."
+                      }];
+}
+
++ (NSError *)insufficientUTXOFundsError {
+  return [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                             code:506
+                         userInfo:@{
+                           NSLocalizedDescriptionKey :
+                               @"Non-standard transaction size is non standard."
+                         }];
+}
+
++ (NSError *)invalidAddressesError {
+  return [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                             code:507
+                         userInfo:@{
+                           NSLocalizedDescriptionKey :
+                               @"Invalid destination addresses provided."
+                         }];
+}
+
++ (NSError *)invalidUTXOsError {
+  return
+      [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                          code:508
+                      userInfo:@{
+                        NSLocalizedDescriptionKey : @"Invalid UTXOs provided."
+                      }];
+}
+
++ (NSError *)failedToCreateOutputError {
+  return
+      [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                          code:509
+                      userInfo:@{
+                        NSLocalizedDescriptionKey : @"Failed to create output."
+                      }];
 }
 
 @end

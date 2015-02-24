@@ -19,7 +19,7 @@
 
 @implementation BCAddress
 
-@synthesize type = _type;
+@synthesize typeCode = _typeCode;
 
 #pragma mark Construction
 
@@ -37,7 +37,7 @@
     if (![_dataRepresentation isKindOfClass:[NSData class]]) return NULL;
 
     // Get the version byte from the data
-    _type = [_dataRepresentation UInt8AtOffset:0];
+    _typeCode = [_dataRepresentation UInt8AtOffset:0];
 
     _stringRepresentation = addressString;
   }

@@ -75,13 +75,16 @@
  @param utxos         Unsigned transactions to use as inputs.
  @param amount        The amount the transaction is for.
  @param address       The address the transaction will send the amount to.
+ @param error         Where to put the error message from the transaction
+ builder.
 
  @return The built unsigned transaction.
  */
-+ (instancetype)buildTransactionWith:(NSArray *)utxos
-                           forAmount:(NSNumber *)amount
-                                  to:(BCAddress *)address
-                             feePerK:(NSNumber *)feePerK
-                   withChangeAddress:(BCAddress *)changeAddress;
++ (BCMutableTransaction *)buildTransactionWith:(NSArray *)utxos
+                                     forAmount:(uint64_t)amount
+                                            to:(BCAddress *)address
+                                       feePerK:(uint64_t)feePerK
+                                 changeAddress:(BCAddress *)changeAddress
+                                     withError:(NSError **)error;
 
 @end

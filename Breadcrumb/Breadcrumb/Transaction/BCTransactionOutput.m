@@ -49,18 +49,15 @@
 
   script = [BCScript scriptWithData:scriptData];
   if (![script isKindOfClass:[BCScript class]]) return NULL;
-  
+
   if (length) *length = position;
 
-  return [self initWithScript:script andValue:@(value)];
+  return [self initWithScript:script andValue:value];
 }
 
-- (instancetype)initWithScript:(BCScript *)script andValue:(NSNumber *)value {
+- (instancetype)initWithScript:(BCScript *)script andValue:(uint64_t)value {
   NSParameterAssert([script isKindOfClass:[BCScript class]]);
-  NSParameterAssert([value isKindOfClass:[NSNumber class]]);
-  if (![script isKindOfClass:[BCScript class]] ||
-      ![value isKindOfClass:[NSNumber class]])
-    return NULL;
+  if (![script isKindOfClass:[BCScript class]]) return NULL;
 
   self = [self init];
   if (self) {
@@ -74,18 +71,15 @@
   return [[[self class] alloc] initWithData:data];
 }
 
-+ (instancetype)outputWithScript:(BCScript *)script andValue:(NSNumber *)value {
++ (instancetype)outputWithScript:(BCScript *)script andValue:(uint64_t)value {
   return [[[self class] alloc] initWithScript:script andValue:value];
 }
 
-+ (instancetype)standardOutputForAmount:(NSNumber *)amount
++ (instancetype)standardOutputForAmount:(uint64_t)amount
                               toAddress:(BCAddress *)address {
   BCScript *transactionScript;
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
-  NSParameterAssert([amount isKindOfClass:[NSNumber class]]);
-  if (![address isKindOfClass:[BCAddress class]] ||
-      ![amount isKindOfClass:[NSNumber class]])
-    return NULL;
+  if (![address isKindOfClass:[BCAddress class]]) return NULL;
 
   transactionScript = [BCScript standardTransactionScript:address];
   if (![transactionScript isKindOfClass:[BCScript class]]) return NULL;
@@ -103,11 +97,11 @@
 
 - (NSString *)toString {
   return [NSString
-      stringWithFormat:@"Value: %@\nScript: '%@'", self.value, self.script];
+      stringWithFormat:@"Value: %@\nScript: '%@'", @(self.value), self.script];
 }
 
 - (NSData *)toData {
-  uint64_t value, scriptSize;
+  uint64_t scriptSize;
   NSData *scriptData;
   NSMutableData *buffer = [[NSMutableData alloc] init];
 
@@ -118,11 +112,8 @@
   // Get the scripts length
   scriptSize = scriptData.length;
 
-  // Get our transaction value.
-  value = [self.value unsignedIntegerValue];
-
   // Append the buffer
-  [buffer appendUInt64:value];
+  [buffer appendUInt64:self.value];
   [buffer appendVarInt:scriptSize];
   [buffer appendData:scriptData];
 

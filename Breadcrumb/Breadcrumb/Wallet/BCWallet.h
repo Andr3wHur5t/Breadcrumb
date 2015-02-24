@@ -22,24 +22,118 @@
  */
 @interface BCWallet : BCAWallet
 #pragma mark Construction
-/*!
- @brief Constructs a new wallet by generating a mnemonic phrase, and using it
- as the seed for the wallets' root.
 
- @param password The password data to protect the wallets private info with.
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param password The password to protect the wallets secrets with.
+ @param provider The provider which will comunicate with the network.
  */
-- (instancetype)initNewWithPassword:(NSData *)password;
+- (instancetype)initNewWithPassword:(NSData *)password
+                        andProvider:(BCAProvider *)provider;
 
 /*!
- @brief Constructs a new wallet using the inputed phrase, and password data.
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
 
- @param phrase   The mnemonic phrase to use when generating the wallet.
- @param password The password data to be used in generation.
+ @param password The password to protect the wallets secrets with.
+ @param coin          The coin the wallet is for.
+ */
+- (instancetype)initNewWithPassword:(NSData *)password andCoin:(BCCoin *)coin;
+
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param password      The password to protect the wallets secrets with.
+ @param coin          The coin the wallet is for.
+ @param provider      The provider which will comunicate with the network.
+ @param sequenceType  The HD sequence the wallet should conform to.
+ @param callback      The callback the wallet should call when it finishes
+ generating.
+ */
+- (instancetype)initNewWithPassword:(NSData *)password
+                               coin:(BCCoin *)coin
+                        andCallback:(void (^)(NSError *))callback;
+
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param password      The password to protect the wallets secrets with.
+ @param coin          The coin the wallet is for.
+ @param provider      The provider which will comunicate with the network.
+ @param sequenceType  The HD sequence the wallet should conform to.
+ @param callback      The callback the wallet should call when it finishes
+ generating.
+ */
+- (instancetype)initNewWithPassword:(NSData *)password
+                               coin:(BCCoin *)coin
+                           provider:(BCAProvider *)provider
+                       sequenceType:(BCKeySequenceType)sequenceType
+                        andCallback:(void (^)(NSError *))callback;
+
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param phrase        The mnemonic phrase that the wallet should generate its'
+ seed with.
+ @param password      The password to protect the wallets secrets with.
+ @param provider      The provider which will comunicate with the network.
+ @param callback      The callback the wallet should call when it finishes
+ generating.
  */
 - (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
-                            andPassword:(NSData *)password;
+                               provider:(BCAProvider *)provider
+                               password:(NSData *)password
+                            andCallback:(void (^)(NSError *))callback;
 
-#pragma mark Info Retrieval
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param phrase        The mnemonic phrase that the wallet should generate its'
+ seed with.
+ @param password      The password to protect the wallets secrets with.
+  @param coin          The coin the wallet is for.
+ @param callback      The callback the wallet should call when it finishes
+ generating.
+ */
+- (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
+                               password:(NSData *)password
+                                   coin:(BCCoin *)coin
+                            andCallback:(void (^)(NSError *))callback;
+
+/*!
+ @brief Constructs a wallet with a new mnemonic phrase using the provided
+ password to protect the wallet in memory, and the provider to comunicate with
+ the bitcoin network.
+
+ @param phrase        The mnemonic phrase that the wallet should generate its'
+ seed with.
+ @param coin          The coin the wallet is for.
+ @param password      The password to protect the wallets secrets with.
+ @param provider      The provider which will comunicate with the network.
+ @param sequenceType  The HD sequence the wallet should conform to.
+ @param callback      The callback the wallet should call when it finishes
+ generating.
+ */
+- (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
+                                   coin:(BCCoin *)coin
+                               provider:(BCAProvider *)provider
+                           sequenceType:(BCKeySequenceType)sequenceType
+                               password:(NSData *)password
+                            andCallback:(void (^)(NSError *))callback;
+
+#pragma mark Info
 /*!
  @brief Gets the mnemonic phrase used to generate the root wallet key, this
  should be given to the user so they can recover their wallet.
@@ -66,25 +160,29 @@
                                           NSData *memoryKey))callback;
 
 /*!
- @brief Synchronizes the wallets state with the network/server.
+ @brief Synchronizes the wallets state with the network/server via the provider.
  */
-- (void)synchronize;
+- (void)synchronize:(void (^)(NSError *))callback;
 
-#pragma mark Addresses
+/*!
+ @brief Gets the current recive address from the address manager.
 
+ @param callback The callback which will be called with the address.
+ */
 - (void)getCurrentAddress:(void (^)(BCAddress *))callback;
 
+/*!
+ @brief  Gets the balance of the wallet from it's provider.
+
+ @param callback The callback to call with the balance, or error.
+ */
 - (void)getBalance:(void (^)(uint64_t, NSError *))callback;
 
-#pragma mark Delegate Classes
 /*!
- @brief The class to be used as the provider object.
+ @brief The coin the wallet works with.
 
- @discussion You should be able to simply override this with your own class, and
- use that as your new provider.
-
- Im going to remove this and allow the user to pass the provider as a param.
+ @discussion The coin is simply a configuration object.
  */
-+ (Class)defaultProvider;
+@property(weak, nonatomic, readonly) BCCoin *coin;
 
 @end

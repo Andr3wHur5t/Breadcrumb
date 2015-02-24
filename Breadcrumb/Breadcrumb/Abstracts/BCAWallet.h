@@ -27,13 +27,13 @@
  @brief Sends the inputted amount to the address, and invokes the callback with
  any errors.
 
- @param amount  The amount to send.
+ @param amount  The amount to send in satoshi.
  @param address  The address to send the amount to.
  @param callback The callback to call when the operation completes or fails
  */
-- (void)send:(NSNumber *)amount
+- (void)send:(uint64_t)amount
                to:(BCAddress *)address
     usingPassword:(NSData *)password
-     withCallback:(void (^)(NSError *))callback;
+     withCallback:(void (^)(NSData *, NSError *))callback;
 
 @end

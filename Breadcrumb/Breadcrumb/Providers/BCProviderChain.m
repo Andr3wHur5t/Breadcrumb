@@ -9,6 +9,7 @@
 #import "BCProviderChain.h"
 #import "BCTransaction.h"
 #import "BCMutableTransaction.h"
+#import "NSData+Hash.h"
 #import "BreadcrumbCore.h"
 
 // Chain Error Constants
@@ -27,6 +28,7 @@ static NSString *const kBCChainProvider_Spent = @"spent";
 static NSString *const kBCChainProvider_Confirmations = @"confirmations";
 
 static NSString *const kBCChainProvider_SignedHex = @"signed_hex";
+static NSString *const kBCChainProvider_TransactionHash = @"transaction_hash";
 
 // Chain API
 // TODO: Get API Key From Plist?
@@ -48,65 +50,55 @@ static NSString *const kChainBalanceURL =
 
 - (void)getBalanceForAddressManager:(BCAddressManager *)addressManager
                        withCallback:(void (^)(uint64_t, NSError *))callback {
-  NSMutableArray *addressList = [[NSMutableArray alloc] init];
-  [addressList addObjectsFromArray:addressManager.bip32External.addresses];
-  [addressList addObjectsFromArray:addressManager.bip32Internal.addresses];
-  [addressList addObjectsFromArray:addressManager.bip44Internal.addresses];
-  [addressList addObjectsFromArray:addressManager.bip44External.addresses];
-
-  [[self class] getBalance:addressList
-                      coin:addressManager.coin
-                  callback:callback];
+  [[self class]
+      getBalance:[[self class] addressesFromAddressManager:addressManager]
+            coin:addressManager.coin
+        callback:callback];
 }
 
 #pragma mark Sync Interface
 
-- (void)syncAddressManager:(BCAddressManager *)addressManager {
+- (void)syncAddressManager:(BCAddressManager *)addressManager
+              withCallback:(void (^)(NSError *))callback {
   if (![addressManager isKindOfClass:[BCAddressManager class]]) return;
 
-  [self setMaster:addressManager.bip32External toLast:0];
-  [self setMaster:addressManager.bip32Internal toLast:0];
-  [self setMaster:addressManager.bip44Internal toLast:0];
-  [self setMaster:addressManager.bip44External toLast:0];
-}
-
-- (void)setMaster:(BCAMMasterKey *)master toLast:(uint16_t)last {
-  master.lastUsedIndex = last;
-  [master expandAddressToIndex:last + 20];
+  // This is where we need to figure out this wallets state on the network.
+  addressManager.bip32External.lastUsedIndex = 0;
+  addressManager.bip32Internal.lastUsedIndex = 0;
+  addressManager.bip44Internal.lastUsedIndex = 0;
+  addressManager.bip44External.lastUsedIndex = 0;
+  if (callback) callback(NULL);
 }
 
 #pragma mark UTXO Interface
 
-- (void)UTXOforAmount:(NSNumber *)amount
+- (void)UTXOforAmount:(uint64_t)amount
          andAddresses:(BCAddressManager *)addresses
          withCallback:(void (^)(NSArray *, NSError *))callback {
-  NSMutableArray *addressList = [[NSMutableArray alloc] init];
-
-  [addressList addObjectsFromArray:addresses.bip32External.addresses];
-  [addressList addObjectsFromArray:addresses.bip32Internal.addresses];
-  [addressList addObjectsFromArray:addresses.bip44Internal.addresses];
-  [addressList addObjectsFromArray:addresses.bip44External.addresses];
-
-  [[self class] UTXOsForAddresses:addressList
-                             coin:addresses.coin
-                     withCallback:callback];
+  [[self class]
+      UTXOsForAddresses:[[self class] addressesFromAddressManager:addresses]
+                   coin:addresses.coin
+           withCallback:callback];
 }
 
 #pragma mark Publish Interface
 
 - (void)publishTransaction:(BCMutableTransaction *)transaction
                    forCoin:(BCCoin *)coin
-            withCompletion:(void (^)(NSError *))completion {
+            withCompletion:(void (^)(NSData *, NSError *))completion {
   NSDictionary *payload;
+  NSData *transactionData;
   NSMutableURLRequest *request;
   NSError *serializationError;
-  __block void (^sCallback)(NSError *);
+  __block void (^sCallback)(NSData *, NSError *);
+  if (![transaction isKindOfClass:[BCMutableTransaction class]] ||
+      ![coin isKindOfClass:[BCCoin class]])
+    return;
 
-  NSLog(@"TX: '%@'", [[transaction toData] toHex]);
+  transactionData = [transaction toData];
+  if (![transactionData isKindOfClass:[NSData class]]) return;
 
-  return;
-
-  payload = @{kBCChainProvider_SignedHex : [[transaction toData] toHex]};
+  payload = @{kBCChainProvider_SignedHex : [transactionData toHex]};
 
   request = [[NSMutableURLRequest alloc]
       initWithURL:[NSURL URLWithString:
@@ -121,11 +113,10 @@ static NSString *const kChainBalanceURL =
                                       options:0
                                         error:&serializationError];
   if ([serializationError isKindOfClass:[NSError class]]) {
-    completion(serializationError);
+    completion(NULL, serializationError);
     return;
   }
 
-  // TODO: Dispatch on main
   sCallback = completion;
 
   [NSURLConnection
@@ -136,10 +127,18 @@ static NSString *const kChainBalanceURL =
                     connectionProcessingWithResult:^(NSHTTPURLResponse *
                                                          response,
                                                      id data, NSError *error) {
+                        NSString *txHash;
                         if ([error isKindOfClass:[NSError class]]) {
-                          sCallback(error);
+                          sCallback(NULL, error);
+                        } else if ([data isKindOfClass:[NSDictionary class]]) {
+                          txHash = [data
+                              objectForKey:kBCChainProvider_TransactionHash];
+                          if ([txHash isKindOfClass:[NSString class]])
+                            sCallback([txHash hexToData], NULL);
+                          else
+                            sCallback(NULL, NULL);
                         } else {
-                          sCallback(NULL);
+                          sCallback(NULL, NULL);
                         }
                     }]];
 }
@@ -368,6 +367,17 @@ static NSString *const kChainBalanceURL =
 
   return [addressesSting isKindOfClass:[NSString class]] ? addressesSting
                                                          : NULL;
+}
+
++ (NSArray *)addressesFromAddressManager:(BCAddressManager *)addressManager {
+  NSMutableArray *addressList = [[NSMutableArray alloc] init];
+
+  [addressList addObjectsFromArray:addressManager.bip32External.addresses];
+  [addressList addObjectsFromArray:addressManager.bip32Internal.addresses];
+  [addressList addObjectsFromArray:addressManager.bip44Internal.addresses];
+  [addressList addObjectsFromArray:addressManager.bip44External.addresses];
+
+  return addressList;
 }
 
 #pragma mark Errors

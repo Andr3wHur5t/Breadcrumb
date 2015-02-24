@@ -35,7 +35,7 @@
 		377A19151A8583B1007AA1CD /* BCWallet+Transactions.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19131A8583B1007AA1CD /* BCWallet+Transactions.m */; };
 		377A191A1A858DB3007AA1CD /* BCAProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19181A858DB3007AA1CD /* BCAProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A191B1A858DB3007AA1CD /* BCAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19191A858DB3007AA1CD /* BCAProvider.m */; };
-		377A191E1A858FFF007AA1CD /* BCProviderChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A191C1A858FFF007AA1CD /* BCProviderChain.h */; };
+		377A191E1A858FFF007AA1CD /* BCProviderChain.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A191C1A858FFF007AA1CD /* BCProviderChain.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A191F1A858FFF007AA1CD /* BCProviderChain.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A191D1A858FFF007AA1CD /* BCProviderChain.m */; };
 		377A19221A85A5FC007AA1CD /* NSData+Encryption.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19201A85A5FC007AA1CD /* NSData+Encryption.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19231A85A5FC007AA1CD /* NSData+Encryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19211A85A5FC007AA1CD /* NSData+Encryption.m */; };

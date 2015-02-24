@@ -20,20 +20,20 @@
                     atOffset:(NSUInteger)offset
                   withLength:(NSUInteger *)length;
 
-- (instancetype)initWithScript:(BCScript *)script andValue:(NSNumber *)value;
+- (instancetype)initWithScript:(BCScript *)script andValue:(uint64_t)value;
 
 + (instancetype)outputWithData:(NSData *)data;
 
-+ (instancetype)outputWithScript:(BCScript *)script andValue:(NSNumber *)value;
++ (instancetype)outputWithScript:(BCScript *)script andValue:(uint64_t)value;
 
-+ (instancetype)standardOutputForAmount:(NSNumber *)amount
++ (instancetype)standardOutputForAmount:(uint64_t)amount
                               toAddress:(BCAddress *)address;
 
 #pragma mark Metadata
 /*!
  @brief The amount the output is for.
  */
-@property(strong, nonatomic, readonly) NSNumber *value;
+@property(assign, nonatomic, readonly) uint64_t value;
 
 /*!
  @brief The transactions script.

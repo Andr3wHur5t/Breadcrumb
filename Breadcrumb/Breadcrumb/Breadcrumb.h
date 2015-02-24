@@ -40,4 +40,7 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 #pragma mark Wallets
 #import <Breadcrumb/BCWallet.h>
 
+#pragma mark Providers
+#import <Breadcrumb/BCProviderChain.h>
+
 #import <Breadcrumb/BreadcrumbCore.h>

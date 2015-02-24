@@ -7,6 +7,7 @@
 //
 
 #import "BCCoin.h"
+#import "BCAddress.h"
 
 @implementation BCCoin
 
@@ -22,6 +23,11 @@
 - (uint8_t)addressTypeForFlags:(NSUInteger)flags {
   NSAssert(false, @"Abstract Method!");
   return UINT8_MAX;
+}
+
+- (BOOL)typeIsValidForCoin:(BCAddress *)address {
+  NSAssert(false, @"Abstract Method!");
+  return FALSE;
 }
 
 - (uint32_t)coinId {
@@ -56,6 +62,14 @@
   }
 }
 
+- (BOOL)typeIsValidForCoin:(BCAddress *)address {
+  if (![address isKindOfClass:[BCAddress class]]) return FALSE;
+  // Dialaowing test net addresses, and private keys. https://en.bitcoin.it/wiki/List_of_address_prefixes
+  return (address.typeCode == 0x00 || address.typeCode == 0x05) &&
+         (address.typeCode != 111 || address.typeCode != 196 ||
+          address.typeCode != 239 || address.typeCode != 128);
+}
+
 - (uint32_t)coinId {
   return 0x80000000;
 }
@@ -70,6 +84,12 @@
       return 111;
       break;
   }
+}
+
+- (BOOL)typeIsValidForCoin:(BCAddress *)address {
+  if (![address isKindOfClass:[BCAddress class]]) return FALSE;
+  // Must be one of the regestered values https://en.bitcoin.it/wiki/List_of_address_prefixes
+  return address.typeCode == 111 || address.typeCode == 196;
 }
 
 - (uint32_t)coinId {

@@ -24,7 +24,8 @@
   password = [NSMutableData dataWithLength:32];
 
   // Random Construction Test
-  wallet = [[BCWallet alloc] initNewWithPassword:password];
+  wallet = [[BCWallet alloc] initNewWithPassword:password
+                                         andCoin:[BCCoin MainNetBitcoin]];
   XCTAssert([wallet isKindOfClass:[BCWallet class]], @"Failed to construct");
 }
 
@@ -55,4 +56,87 @@
 // chainCode=156940426ae5cfc90eea3dd6c94a0b3255d99fbb7ad69435f1581011db8020b0,
 // path=M/0H/0/0} mvihzZu32GdpYrhVHi8CYXF2yUDaKG2ivu
 
+// NT this is not a proper test yet
+- (void)NTtestWalletKeyGenVector0 {
+  // Test compatibility with BitcoinJ
+  NSData *password;
+  BCWallet *wallet;
+
+  password = [[NSMutableData alloc] initWithLength:32];
+  wallet = [[BCWallet alloc]
+      initUsingMnemonicPhrase:@"slab ski horn medal document cat minute "
+      @"uniform worth coyote sight dragon"
+                     password:password
+                         coin:[BCCoin TestNet3Bitcoin]
+                  andCallback:NULL];
+
+  NSAssert(wallet, @"Failed");
+  [wallet
+      keySequenceWithPassword:password
+                usingCallback:^(BCKeySequence *sequence, NSData *memoryKey) {
+                    BCKeyPair *m_0h, *m_0h_0, *m_0h_0_0;
+                    // Verify the root seed matches
+                    NSAssert([[sequence.rootSeed dataUsingMemoryKey:memoryKey]
+                                 isEqualToData:@"77e572c9238590d687ca29cd3c6a6b"
+                                               @"f9f973a26eafadf49e24880d1c62f"
+                                               @"3ec03ac7867aa2b1a0102c5bc11cc"
+                                               @"dc40eea2580ab41a818fea2166b60"
+                                               @"816a96c98b1".hexToData],
+                             @"Failed");
+
+                    // Verify HD
+                    // M/0'
+                    m_0h = [sequence.masterKeyPair childKeyPairAt:0x80000000
+                                                    withMemoryKey:memoryKey];
+
+                    // Chain Code
+                    NSAssert([m_0h.chainCode
+                                 isEqualToData:@"e92d1221934bfe476a6311a1c4efca"
+                                               @"755fcf27170dbdde60e2efb52a82a"
+                                               @"1bf91".hexToData],
+                             @"Failed");
+
+                    // Pub Key
+                    NSAssert([m_0h.publicKey
+                                 isEqualToData:@"031c243bb8b8c1a3f31f4a68ed550e"
+                                               @"80862bb314387b0c06872a95142f2"
+                                               @"55e65d6".hexToData],
+                             @"Failed");
+
+                    // M/0'/0
+                    m_0h_0 = [m_0h childKeyPairAt:0 withMemoryKey:memoryKey];
+
+                    // Chain Code
+                    NSAssert([m_0h_0.chainCode
+                                 isEqualToData:@"0ff81906965fa4957fd97958839a70"
+                                               @"33dc6ddcb46ef100e0ceb3f6841d8"
+                                               @"86e0a".hexToData],
+                             @"Failed");
+
+                    // Pub Key
+                    NSAssert([m_0h_0.publicKey
+                                 isEqualToData:@"02cefa13934831168b8d6e12e1c1e3"
+                                               @"41240d3e0c9be18a8557758c98a17"
+                                               @"f7d9f97".hexToData],
+                             @"Failed");
+
+                    // M/0'/0/0
+                    m_0h_0_0 =
+                        [m_0h_0 childKeyPairAt:0 withMemoryKey:memoryKey];
+
+                    // Chain Code
+                    NSAssert([m_0h_0_0.chainCode
+                                 isEqualToData:@"f0219686103125a3993ec60d73238a"
+                                               @"03fbd36ec89fe539514fedbda0766"
+                                               @"c0bd5".hexToData],
+                             @"Failed");
+
+                    // Pub Key
+                    NSAssert([m_0h_0_0.publicKey
+                                 isEqualToData:@"033319568f40dca5ee98bfada06bd1"
+                                               @"c239d62946646b854f49b055c973f"
+                                               @"9e5c265".hexToData],
+                             @"Failed");
+                }];
+}
 @end

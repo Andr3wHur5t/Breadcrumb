@@ -16,11 +16,13 @@
 
  @param transaction The transaction to sign.
  @param key         The key to decrypt the wallets keys with.
+ @param error       The location to put the signing error info if any.
 
  @return The signed transaction.
  */
 - (BCMutableTransaction *)_signTransaction:(BCMutableTransaction *)transaction
-                                   withKey:(NSData *)key;
+                                   withKey:(NSData *)key
+                                  andError:(NSError **)error;
 @end
 
 @interface BCWallet (_SecurityUtilities)

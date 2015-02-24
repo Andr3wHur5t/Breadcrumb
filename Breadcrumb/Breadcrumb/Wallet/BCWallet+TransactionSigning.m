@@ -30,7 +30,8 @@
 @implementation BCWallet (_TransactionSigning)
 
 - (BCMutableTransaction *)_signTransaction:(BCMutableTransaction *)transaction
-                                   withKey:(NSData *)key {
+                                   withKey:(NSData *)key
+                                  andError:(NSError **)error {
   @autoreleasepool {  // Ensure immediate deallocation of sensitive data.
     BCTransactionInput *updatedInput;
     NSMutableData *currentSignature;
@@ -42,25 +43,36 @@
     for (NSUInteger i = 0; i < transaction.inputs.count; ++i) {
       // Get The Hash of the current transaction
       currentHash = [[transaction toData] SHA256_2];
-      if (![currentHash isKindOfClass:[NSData class]]) return NULL;
+      if (![currentHash isKindOfClass:[NSData class]]) {
+        if (error) *error = [[self class] internalSigningError:601];
+        return NULL;
+      }
 
       currentAddress =
           ((BCTransactionInput *)[transaction.inputs objectAtIndex:i])
               .controllingAddress;
-      if (![currentAddress isKindOfClass:[BCAddress class]]) return NULL;
+      if (![currentAddress isKindOfClass:[BCAddress class]]) {
+        if (error) *error = [[self class] internalSigningError:602];
+        return NULL;
+      }
 
       // Get the current key from the address manager
       currentKeyPair = [self.addressManager keyPairForAddress:currentAddress
                                                usingMemoryKey:key];
-      if (![currentKeyPair.publicKey isKindOfClass:[BCPublicKey class]])
+      if (![currentKeyPair.publicKey isKindOfClass:[BCPublicKey class]]) {
+        if (error) *error = [[self class] internalSigningError:603];
         return NULL;
+      }
 
       // Sign the transaction
       signedHash = [currentKeyPair signHash:currentHash withMemoryKey:key];
 
       // Sign the hash with the key that owns the input
       currentSignature = [[NSMutableData alloc] initWithData:signedHash];
-      if (![currentSignature isKindOfClass:[NSData class]]) return NULL;
+      if (![currentSignature isKindOfClass:[NSData class]]) {
+        if (error) *error = [[self class] internalSigningError:604];
+        return NULL;
+      }
 
       // Append it with the SIG_HASH all code which specifies the method we used
       // to sign
@@ -68,7 +80,10 @@
 
       // Create the unlock script (Also known as sig script)
       unlockScript = [BCMutableScript script];
-      if (![unlockScript isKindOfClass:[BCScript class]]) return NULL;
+      if (![unlockScript isKindOfClass:[BCScript class]]) {
+        if (error) *error = [[self class] internalSigningError:605];
+        return NULL;
+      }
 
       // Append the signature
       [unlockScript writeBytes:currentSignature];
@@ -78,7 +93,10 @@
 
       // Create an updated input transaction
       updatedInput = [transaction.inputs objectAtIndex:i];
-      if (![updatedInput isKindOfClass:[BCTransactionInput class]]) return NULL;
+      if (![updatedInput isKindOfClass:[BCTransactionInput class]]) {
+        if (error) *error = [[self class] internalSigningError:606];
+        return NULL;
+      }
 
       // Create A clone of the transaction input, but set the script signature
       // to the script we just created.
@@ -88,7 +106,10 @@
                  script:unlockScript
                 address:updatedInput.controllingAddress
             andSequence:updatedInput.sequence];
-      if (![updatedInput isKindOfClass:[BCTransactionInput class]]) return NULL;
+      if (![updatedInput isKindOfClass:[BCTransactionInput class]]) {
+        if (error) *error = [[self class] internalSigningError:607];
+        return NULL;
+      }
 
       // Set The transaction Input to the transaction
       [transaction.inputs setObject:updatedInput atIndexedSubscript:i];
@@ -98,6 +119,16 @@
   }
 }
 
++ (NSError *)internalSigningError:(NSUInteger)code {
+  return [NSError
+      errorWithDomain:@"com.breadcrumb.transactionSigning"
+                 code:code
+             userInfo:@{
+               NSLocalizedDescriptionKey : [NSString
+                   stringWithFormat:@"Transaction signing error. (Code: %@)",
+                                    @(code)]
+             }];
+}
 @end
 
 @implementation BCWallet (_SecurityUtilities)

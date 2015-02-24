@@ -34,34 +34,109 @@
 
 #pragma mark Construction
 
-- (instancetype)initNewWithPassword:(NSData *)password {
+- (instancetype)initNewWithPassword:(NSData *)password andCoin:(BCCoin *)coin {
+  return [self initNewWithPassword:password
+                              coin:coin
+                          provider:[[BCProviderChain alloc] init]
+                      sequenceType:BCKeySequenceType_BIP44
+                       andCallback:NULL];
+}
+
+- (instancetype)initNewWithPassword:(NSData *)password
+                               coin:(BCCoin *)coin
+                        andCallback:(void (^)(NSError *))callback {
+  return [self initNewWithPassword:password
+                              coin:coin
+                          provider:[[BCProviderChain alloc] init]
+                      sequenceType:BCKeySequenceType_BIP44
+                       andCallback:callback];
+}
+
+- (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
+                               password:(NSData *)password
+                                   coin:(BCCoin *)coin
+                            andCallback:(void (^)(NSError *))callback {
+  return [self initUsingMnemonicPhrase:phrase
+                                  coin:coin
+                              provider:[[BCProviderChain alloc] init]
+                          sequenceType:BCKeySequenceType_BIP44
+                              password:password
+                           andCallback:callback];
+}
+
+- (instancetype)initNewWithPassword:(NSData *)password
+                        andProvider:(BCAProvider *)provider {
+  return [self initNewWithPassword:password
+                              coin:[BCCoin MainNetBitcoin]
+                          provider:provider
+                      sequenceType:BCKeySequenceType_BIP44
+                       andCallback:NULL];
+}
+
+- (instancetype)initNewWithPassword:(NSData *)password
+                               coin:(BCCoin *)coin
+                           provider:(BCAProvider *)provider
+                       sequenceType:(BCKeySequenceType)sequenceType
+                        andCallback:(void (^)(NSError *))callback {
   @autoreleasepool {
     NSString *mnemonicPhrase;
     mnemonicPhrase = [BCMnemonic newMnemonic];
     if (![mnemonicPhrase isKindOfClass:[NSString class]]) return NULL;
 
-    return [self initUsingMnemonicPhrase:mnemonicPhrase andPassword:password];
+    return [self initUsingMnemonicPhrase:mnemonicPhrase
+                                    coin:coin
+                                provider:provider
+                            sequenceType:BCKeySequenceType_BIP44
+                                password:password
+                             andCallback:callback];
   }
 }
 
 - (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
-                            andPassword:(NSData *)password {
+                               provider:(BCAProvider *)provider
+                               password:(NSData *)password
+                            andCallback:(void (^)(NSError *))callback {
+  return [self initUsingMnemonicPhrase:phrase
+                                  coin:[BCCoin MainNetBitcoin]
+                              provider:provider
+                          sequenceType:BCKeySequenceType_BIP44
+                              password:password
+                           andCallback:callback];
+}
+
+- (instancetype)initUsingMnemonicPhrase:(NSString *)phrase
+                                   coin:(BCCoin *)coin
+                               provider:(BCAProvider *)provider
+                           sequenceType:(BCKeySequenceType)sequenceType
+                               password:(NSData *)password
+                            andCallback:(void (^)(NSError *))callback {
   @autoreleasepool {
     __block NSData *sPassword;
     __block NSString *sPhrase;
+    __block void (^sCallback)(NSError *);
     NSParameterAssert([phrase isKindOfClass:[NSString class]]);
     if (![phrase isKindOfClass:[NSString class]]) return NULL;
 
     self = [super init];
-    if (!self) return NULL;
+    if (!self) {
+      callback([[self class] walletGenerationErrorWithCode:1]);
+      return NULL;
+    }
 
     // Sanitize the phrase
     sPhrase = [BCMnemonic sanitizePhrase:phrase];
-    if (![sPhrase isKindOfClass:[NSString class]]) return NULL;
+    if (![sPhrase isKindOfClass:[NSString class]]) {
+      callback([[self class] walletGenerationErrorWithCode:2]);
+      return NULL;
+    }
 
-    // Set the password to something block safe
     sPassword = password;
+    _provider = provider;
 
+    sCallback = ^(NSError *error) {
+        if (callback)
+          dispatch_async(dispatch_get_main_queue(), ^{ callback(error); });
+    };
     // We will be doing some long running operations, run them on a background
     // queue
     dispatch_async(self.queue, ^() {
@@ -70,7 +145,7 @@
         // Generate the memory key using the inputted password
         memoryKey = [[self class] _keyFromPassword:password];
         if (![memoryKey isKindOfClass:[NSData class]]) {
-          NSLog(@"Failed to generate wallet memory key!");
+          sCallback([[self class] walletGenerationErrorWithCode:3]);
           return;
         }
 
@@ -81,7 +156,7 @@
         privateKey = [BCMnemonic keyFromPhrase:sPhrase withPassphrase:NULL];
         sPhrase = NULL;
         if (![privateKey isKindOfClass:[NSData class]]) {
-          NSLog(@"Failed to generate wallet private key!");
+          sCallback([[self class] walletGenerationErrorWithCode:4]);
           memoryKey = NULL;
           return;
         }
@@ -91,26 +166,26 @@
                                            andMemoryKey:memoryKey];
         privateKey = NULL;
         if (![_keys isKindOfClass:[BCKeySequence class]]) {
-          NSLog(@"Failed to generate wallet key sequence!");
+          sCallback([[self class] walletGenerationErrorWithCode:5]);
           memoryKey = NULL;
           return;
         }
 
-        // TODO: Configure with the inputted coin, and preferred path.
-        _addressManager = [[BCAddressManager alloc]
-            initWithKeySequence:self.keys
-                       coinType:[BCCoin TestNet3Bitcoin]
-                  preferredPath:BCKeySequenceType_BIP44
-                   andMemoryKey:memoryKey];
+        // Address manager needed to manage key paths, and addresses.
+        _addressManager =
+            [[BCAddressManager alloc] initWithKeySequence:self.keys
+                                                 coinType:coin
+                                            preferredPath:sequenceType
+                                             andMemoryKey:memoryKey];
         memoryKey = NULL;
         if (![_addressManager isKindOfClass:[BCAddressManager class]]) {
-          NSLog(@"Failed to construct address manager!");
+          sCallback([[self class] walletGenerationErrorWithCode:6]);
           return;
         }
     });
 
     // First Item to execute post construction is sync.
-    [self synchronize];
+    [self synchronize:NULL];
 
     // We will return self before configuration, this means we need to dispatch
     // all operations on the wallets queue to ensure they happen in sync.
@@ -220,31 +295,46 @@
 
 #pragma mark Wallet Info
 
-- (void)synchronize {
-  dispatch_async(self.queue,
-                 ^{ [self.provider syncAddressManager:self.addressManager]; });
+- (void)synchronize:(void (^)(NSError *))callback {
+  dispatch_async(self.queue, ^{
+      [self.provider syncAddressManager:self.addressManager
+                           withCallback:^(NSError *error) {
+                               if (!callback) return;
+                               dispatch_async(dispatch_get_main_queue(),
+                                              ^{ callback(error); });
+                           }];
+  });
 }
 
 - (void)getBalance:(void (^)(uint64_t, NSError *))callback {
+  if (!callback) return;
   dispatch_async(self.queue, ^{
-      [self.provider getBalanceForAddressManager:self.addressManager
-                                    withCallback:callback];
+      [self.provider
+          getBalanceForAddressManager:self.addressManager
+                         withCallback:^(uint64_t balance, NSError *error) {
+                             dispatch_async(dispatch_get_main_queue(),
+                                            ^{ callback(balance, error); });
+                         }];
   });
 }
 
 - (BCAProvider *)provider {
-  // Allow them to set the provider with by changing the returned class
-  // TODO: Allow passing startup params
-  if (!_provider) _provider = [[[[self class] defaultProvider] alloc] init];
+  if (!_provider) _provider = [[BCProviderChain alloc] init];
   return _provider;
 }
 
 - (void)getCurrentAddress:(void (^)(BCAddress *))callback {
-  __block void (^sCallback)(BCAddress *) = callback;
+  if (!callback) return;
   dispatch_async(self.queue, ^{
       dispatch_async(dispatch_get_main_queue(),
-                     ^{ sCallback(self.addressManager.firstUnusedExternal); });
+                     ^{ callback(self.addressManager.firstUnusedExternal); });
   });
+}
+
+- (BCCoin *)coin {
+  if (![self.addressManager isKindOfClass:[BCAddressManager class]])
+    return NULL;
+  return self.addressManager.coin;
 }
 
 #pragma mark Queue
@@ -254,10 +344,17 @@
   return __queue;
 }
 
-#pragma mark Defaults
+#pragma mark errors
 
-+ (Class)defaultProvider {
-  return [BCProviderChain class];
++ (NSError *)walletGenerationErrorWithCode:(NSUInteger)code {
+  return [NSError
+      errorWithDomain:@"com.breadcrumb.walletGeneration"
+                 code:code
+             userInfo:@{
+               NSLocalizedDescriptionKey : [NSString
+                   stringWithFormat:@"Wallet generation error. (Code: %@)",
+                                    @(code)]
+             }];
 }
 
 @end

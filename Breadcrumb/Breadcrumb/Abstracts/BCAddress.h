@@ -7,15 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-@class BCCoin;
 
-/*!
- @brief This defines a set of known address types.
- */
-typedef enum : uint8_t {  // TODO: Update Names.
-                 BCAddressType_Old = 0x00,
-                 BCAddressType_New = 0x05
-               } BCAddressType;
+@class BCCoin;
 
 @interface BCAddress : NSObject
 
@@ -51,12 +44,9 @@ typedef enum : uint8_t {  // TODO: Update Names.
 - (NSData *)toDataWithoutType;
 
 /*!
- @brief The type of address.
-
- @discussion This is stated by the first byte of the decoded address, New
- addresses use new technologies like multi-signature.
+ @brief The code representing the type.
  */
-@property(assign, nonatomic, readonly) BCAddressType type;
+@property(assign, nonatomic, readonly) uint8_t typeCode;
 
 #pragma mark Conversion
 /*!

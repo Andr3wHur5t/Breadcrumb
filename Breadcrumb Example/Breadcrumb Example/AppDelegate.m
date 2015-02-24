@@ -135,9 +135,7 @@
 
 - (void)walletDemo {
   NSData *password;
-  BCAddress *address;
-  NSNumber *amount;
-  // This is an example of our high level simple interface
+  // This is an example of our high level interface
 
   // The password is an NSData object so that you can easily use touch
   // authentication, and other authentication sources.
@@ -148,8 +146,17 @@
   // phrase.
   NSString *phrase = @"palace canal coast awake mother captain mountain bronze "
       @"cabbage unfair patrol robot";
-  BCWallet *wallet =
-      [[BCWallet alloc] initUsingMnemonicPhrase:phrase andPassword:password];
+  BCWallet *wallet = [[BCWallet alloc]
+      initUsingMnemonicPhrase:phrase
+                     provider:[[BCProviderChain alloc] init]
+                     password:password
+                  andCallback:^(NSError *error) {
+                      if (!error)
+                        NSLog(@"Generated wallet");
+                      else
+                        NSLog(@"Failed to generate wallet because '%@'",
+                              error.localizedDescription);
+                  }];
 
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password
@@ -176,18 +183,17 @@
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  address = [@"1fcgJ8z4kcEG4aPwGTjXZp3z6sDTUvoU8" toBitcoinAddress];
-  // TODO: Change amount to uint64_t
-  amount = [@(1e3) toSatoshi];
-  [wallet send:amount
-                 to:address
+  [wallet send:1e3  // Satoshi
+                 to:[@"1fcgJ8z4kcEG4aPwGTjXZp3z6sDTUvoU8" toBitcoinAddress]
       usingPassword:password
-       withCallback:^(NSError *error) {
+       withCallback:^(NSData *transactionHash, NSError *error) {
            if ([error isKindOfClass:[NSError class]])
              [self showAlertWithTitle:@"Woops"
                            andMessage:error.localizedDescription];
-           else
+           else {
              [self showAlertWithTitle:@"Sent!" andMessage:@"You Sent Bitcoin!"];
+             NSLog(@"Transaction Name: '%@'", [transactionHash toHex]);
+           }
        }];
 }
 
@@ -197,89 +203,6 @@
                              delegate:NULL
                     cancelButtonTitle:@"OK"
                     otherButtonTitles:nil] show];
-}
-
-#pragma mark Test Vectors (TODO: MOVE TO XCTESTS)
-
-- (void)testWalletKeyGenVector0 {
-  // Test compatibility with BitcoinJ
-  NSData *password;
-  BCWallet *wallet;
-
-  password = [[NSMutableData alloc] initWithLength:32];
-  wallet = [[BCWallet alloc]
-      initUsingMnemonicPhrase:@"slab ski horn medal document cat minute "
-      @"uniform worth coyote sight dragon"
-                  andPassword:password];
-
-  NSAssert(wallet, @"Failed");
-  [wallet
-      keySequenceWithPassword:password
-                usingCallback:^(BCKeySequence *sequence, NSData *memoryKey) {
-                    BCKeyPair *m_0h, *m_0h_0, *m_0h_0_0;
-                    // Verify the root seed matches
-                    NSAssert([[sequence.rootSeed dataUsingMemoryKey:memoryKey]
-                                 isEqualToData:@"77e572c9238590d687ca29cd3c6a6b"
-                                               @"f9f973a26eafadf49e24880d1c62f"
-                                               @"3ec03ac7867aa2b1a0102c5bc11cc"
-                                               @"dc40eea2580ab41a818fea2166b60"
-                                               @"816a96c98b1".hexToData],
-                             @"Failed");
-
-                    // Verify HD
-                    // M/0'
-                    m_0h = [sequence.masterKeyPair childKeyPairAt:0x80000000
-                                                    withMemoryKey:memoryKey];
-
-                    // Chain Code
-                    NSAssert([m_0h.chainCode
-                                 isEqualToData:@"e92d1221934bfe476a6311a1c4efca"
-                                               @"755fcf27170dbdde60e2efb52a82a"
-                                               @"1bf91".hexToData],
-                             @"Failed");
-
-                    // Pub Key
-                    NSAssert([m_0h.publicKey
-                                 isEqualToData:@"031c243bb8b8c1a3f31f4a68ed550e"
-                                               @"80862bb314387b0c06872a95142f2"
-                                               @"55e65d6".hexToData],
-                             @"Failed");
-
-                    // M/0'/0
-                    m_0h_0 = [m_0h childKeyPairAt:0 withMemoryKey:memoryKey];
-
-                    // Chain Code
-                    NSAssert([m_0h_0.chainCode
-                                 isEqualToData:@"0ff81906965fa4957fd97958839a70"
-                                               @"33dc6ddcb46ef100e0ceb3f6841d8"
-                                               @"86e0a".hexToData],
-                             @"Failed");
-
-                    // Pub Key
-                    NSAssert([m_0h_0.publicKey
-                                 isEqualToData:@"02cefa13934831168b8d6e12e1c1e3"
-                                               @"41240d3e0c9be18a8557758c98a17"
-                                               @"f7d9f97".hexToData],
-                             @"Failed");
-
-                    // M/0'/0/0
-                    m_0h_0_0 =
-                        [m_0h_0 childKeyPairAt:0 withMemoryKey:memoryKey];
-
-                    // Chain Code
-                    NSAssert([m_0h_0_0.chainCode
-                                 isEqualToData:@"f0219686103125a3993ec60d73238a"
-                                               @"03fbd36ec89fe539514fedbda0766"
-                                               @"c0bd5".hexToData],
-                             @"Failed");
-
-                    // Pub Key
-                    NSAssert([m_0h_0_0.publicKey
-                                 isEqualToData:@"033319568f40dca5ee98bfada06bd1"
-                                               @"c239d62946646b854f49b055c973f"
-                                               @"9e5c265".hexToData],
-                             @"Failed");
-                }];
 }
 
 @end
