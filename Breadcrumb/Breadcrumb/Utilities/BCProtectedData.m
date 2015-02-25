@@ -53,14 +53,14 @@
 
 + (NSData *)encrypt:(NSData *)data withKey:(NSData *)key {
   @autoreleasepool {
-    NSData *cypherText = [data AES256Encrypt:key];
+    NSData *cypherText = [data AES256ETMEncrypt:key];
     return [cypherText isKindOfClass:[NSData class]] ? cypherText : NULL;
   }
 }
 
 + (NSData *)decrypt:(NSData *)data withKey:(NSData *)key {
   @autoreleasepool {
-    NSData *clearText = [data AES256Decrypt:key];
+    NSData *clearText = [data AES256ETMDecrypt:key];
     return [clearText isKindOfClass:[NSData class]] ? clearText : NULL;
   }
 }

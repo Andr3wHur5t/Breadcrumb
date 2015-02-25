@@ -120,44 +120,107 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
 
 @implementation NSData (Encryption)
 
-- (NSData *)AES256Encrypt:(NSData *)key {
+- (NSData *)AES256ETMEncrypt:(NSData *)key {
   @autoreleasepool {
-    return [self AES256CryptOperation:kCCEncrypt withKey:key];
+    NSData *hmac, *iv;
+    NSMutableData *enc;
+    // Encrypt
+    enc = [NSMutableData secureDataWithData:[self AES256Encrypt:key]];
+    if (![enc isKindOfClass:[NSData class]]) {
+      key = NULL;
+      return NULL;
+    }
+
+    // Get Hmac IV from key
+    iv = [key SHA256];
+    key = NULL;
+    if (![iv isKindOfClass:[NSData class]]) {
+      iv = NULL;
+      return NULL;
+    }
+
+    // HMAC
+    hmac = [enc SHA512HmacWithKey:iv];
+    iv = NULL;
+    if (![hmac isKindOfClass:[NSData class]]) {
+      return NULL;
+    }
+
+    // Append fist 8 of hmac
+    [enc appendBytes:hmac.bytes length:8];
+    return enc;
+  }
+}
+
+- (NSData *)AES256Encrypt:(NSData *)key {
+  return [self AES256CryptOperation:kCCEncrypt withKey:key];
+}
+
+- (NSData *)AES256ETMDecrypt:(NSData *)key {
+  @autoreleasepool {
+    NSData *check, *iv, *hmac, *enc;
+    if (self.length <= 8) {
+      key = NULL;
+      return NULL;
+    }
+
+    // Remove Check (Last 8 bytes)
+    check = [self subdataWithRange:NSMakeRange(self.length - 8, 8)];
+
+    // Hmac Verify
+    iv = [key SHA256];
+    if (![iv isKindOfClass:[NSData class]]) {
+      key = NULL;
+      return NULL;
+    }
+
+    enc = [self subdataWithRange:NSMakeRange(0, self.length - 8)];
+    hmac = [enc SHA512HmacWithKey:iv];
+    iv = NULL;
+
+    if (![hmac isKindOfClass:[NSData class]]) {
+      key = NULL;
+      return NULL;
+    }
+    
+    hmac = [hmac subdataWithRange:NSMakeRange(0, 8)];
+    if (![check isEqualToData:hmac]) {
+      key = NULL;
+      return NULL;
+    }
+    check = NULL;
+    hmac = NULL;
+
+    // Decrypt
+    return [enc AES256Decrypt:key];
   }
 }
 
 - (NSData *)AES256Decrypt:(NSData *)key {
-  @autoreleasepool {
-    return [self AES256CryptOperation:kCCDecrypt withKey:key];
-  }
+  return [self AES256CryptOperation:kCCDecrypt withKey:key];
 }
 
 - (NSData *)AES256CryptOperation:(CCOperation)operation withKey:(NSData *)key {
   @autoreleasepool {
+    NSMutableData *secureData =
+        [NSMutableData secureDataWithLength:[self length] + kCCBlockSizeAES128];
     NSData *keyData =
         [NSData dataWithBytes:key.bytes length:kCCKeySizeAES256 + 1];
-
-    NSUInteger dataLength = [self length];
-
-    // See the doc: For block ciphers, the output size will always be less than
-    // or
-    // equal to the input size plus the size of one block.
-    // That's why we need to add the size of one block here
-    size_t bufferSize = dataLength + kCCBlockSizeAES128;
-    void *buffer = malloc(bufferSize);
 
     size_t numBytes = 0;
     CCCryptorStatus cryptStatus = CCCrypt(
         operation, kCCAlgorithmAES128, kCCOptionPKCS7Padding, keyData.bytes,
         kCCKeySizeAES256, NULL /* initialization vector (optional) */,
-        [self bytes], dataLength, /* input */
-        buffer, bufferSize,       /* output */
+        self.bytes, self.length,                      /* input */
+        [secureData mutableBytes], secureData.length, /* output */
         &numBytes);
 
-    if (cryptStatus == kCCSuccess)
-      return [NSData dataWithBytesNoCopy:buffer length:numBytes];
+    if (cryptStatus == kCCSuccess) {
+      secureData.length = numBytes;
+      return secureData;
+    }
 
-    free(buffer);
+    secureData = NULL;
     return nil;
   }
 }
@@ -187,6 +250,16 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
     NSParameterAssert(password);
     if (![password isKindOfClass:[NSData class]]) return NULL;
     return scrypt(password, salt, n, r, p, length);
+  }
+}
+
+#pragma mark Random
+
++ (NSData *)pseudoRandomDataWithLength:(NSUInteger)length {
+  @autoreleasepool {
+    NSMutableData *entropy = [NSMutableData secureDataWithLength:length];
+    SecRandomCopyBytes(kSecRandomDefault, entropy.length, entropy.mutableBytes);
+    return [entropy isKindOfClass:[NSData class]] ? entropy : NULL;
   }
 }
 

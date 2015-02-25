@@ -25,6 +25,9 @@
  */
 - (NSData *)AES256Decrypt:(NSData *)key;
 
+- (NSData *)AES256ETMEncrypt:(NSData *)key;
+- (NSData *)AES256ETMDecrypt:(NSData *)key;
+
 #pragma mark Scrypt
 /*!
  @brief Scrypts the inputed password with the salt, and the output length.
@@ -53,4 +56,9 @@
                  blockSize:(uint32_t)r
      parallelizationFactor:(uint32_t)p
           withOutputLength:(NSUInteger)length;
+
+#pragma mark Sec Random
+
++ (NSData *)pseudoRandomDataWithLength:(NSUInteger)length;
+
 @end
