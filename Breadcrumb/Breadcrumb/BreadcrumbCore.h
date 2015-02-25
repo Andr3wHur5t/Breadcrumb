@@ -14,3 +14,4 @@
 #import <Breadcrumb/NSString+Base58.h>
 #import <Breadcrumb/BRMnemonic.h>
 #import <Breadcrumb/BRBIP39Mnemonic.h>
+#import <Breadcrumb/BCAmount.h>

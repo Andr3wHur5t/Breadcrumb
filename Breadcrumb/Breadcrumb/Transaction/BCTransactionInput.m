@@ -17,7 +17,6 @@
 @synthesize controllingAddress = _controllingAddress;
 
 @synthesize scriptSig = _scriptSig;
-@synthesize isSigned = _isSigned;
 
 #pragma mark Construction
 
@@ -53,6 +52,7 @@
   position += _length;
 
   // Get the scripts data
+  if (_data.length <= position + scriptLength) return NULL;
   scriptData = [_data subdataWithRange:NSMakeRange(position, scriptLength)];
   position += scriptLength;
 
@@ -100,7 +100,6 @@
     _previousOutputIndex = index;
     _scriptSig = script;
     _sequence = sequence;
-    _isSigned = FALSE;
     _controllingAddress = address;
   }
   return self;
@@ -116,10 +115,9 @@
 
 - (NSString *)toString {
   return [NSString stringWithFormat:@"Output Hash: '%@'\nOutput Index: %@\nSig "
-                                    @"Script: '%@'\nSigned: %@\nSequence: %x",
+                                    @"Script: '%@'\nSequence: %x",
                                     self.previousOutputHash.toHex,
                                     @(self.previousOutputIndex), self.scriptSig,
-                                    self.isSigned ? @"True" : @"False",
                                     self.sequence];
 }
 

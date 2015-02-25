@@ -66,11 +66,6 @@
  */
 @property(assign, nonatomic, readonly) uint32_t sequence;
 
-/*!
- @brief States if the transaction has been signed.
- */
-@property(assign, nonatomic, readonly) BOOL isSigned;
-
 #pragma mark Fee Calculation
 
 - (NSUInteger)size;

@@ -91,6 +91,7 @@ static NSString *const kTransactionBuildingErrorDomain =
   if (!_outputs) _outputs = [[NSMutableArray alloc] init];
   return _outputs;
 }
+
 #pragma mark mutation
 
 - (void)addInput:(BCTransactionInput *)input {
@@ -113,6 +114,8 @@ static NSString *const kTransactionBuildingErrorDomain =
   NSString *inputsString, *outputsString;
   if (![self inputsAreValid]) return @"Has invalid input.";
   if (![self outputsAreValid]) return @"Has invalid output.";
+
+  // TODO: Calculate Fee, And Outputs
 
   inputsString = @"";
   for (BCTransactionInput *input in self.inputs)
@@ -243,7 +246,7 @@ static NSString *const kTransactionBuildingErrorDomain =
     [newTransaction addInput:utxoInput];
 
     // Sum the UTXOs values
-    utxoSumAmount += [utxo.value unsignedIntegerValue];
+    utxoSumAmount += utxo.value;
   }
 
   // Set Target Outputs

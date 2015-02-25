@@ -97,7 +97,7 @@
 
 - (NSString *)toString {
   return [NSString
-      stringWithFormat:@"Value: %@\nScript: '%@'", @(self.value), self.script];
+          stringWithFormat:@"Value: %@\nScript: '%@'", [BCAmount prettyPrint:self.value], self.script];
 }
 
 - (NSData *)toData {

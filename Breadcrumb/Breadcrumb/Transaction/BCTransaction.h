@@ -22,7 +22,6 @@
  @param script        The transactions script.
  @param hash          The hash of the transaction object.
  @param value         The value of the transaction.
- @param spent         The amount spent of the transaction.
  @param confirmations The number of confirmations of the transaction.
  @param isSigned      States if the transaction has been signed.
  */
@@ -30,8 +29,7 @@
                            script:(BCScript *)script
                              hash:(NSData *)hash
                       outputIndex:(uint32_t)outputIndex
-                            value:(NSNumber *)value
-                            spent:(NSNumber *)spent
+                            value:(uint64_t)value
                     confirmations:(NSNumber *)confirmations
                         andSigned:(BOOL)isSigned;
 
@@ -56,12 +54,7 @@
 /*!
  @brief The value of the transaction.
  */
-@property(strong, nonatomic, readonly) NSNumber *value;
-
-/*!
- @brief The amount of this transaction has been spent.
- */
-@property(strong, nonatomic, readonly) NSNumber *spent;
+@property(assign, nonatomic, readonly) uint64_t value;
 
 /*!
  @brief The number of confirmations the transaction has.

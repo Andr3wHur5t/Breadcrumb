@@ -18,7 +18,6 @@
 @synthesize outputIndex = _outputIndex;
 
 @synthesize value = _value;
-@synthesize spent = _spent;
 @synthesize confirmations = _confirmations;
 
 @synthesize isSigned = _isSigned;
@@ -29,8 +28,7 @@
                            script:(BCScript *)script
                              hash:(NSData *)hash
                       outputIndex:(uint32_t)outputIndex
-                            value:(NSNumber *)value
-                            spent:(NSNumber *)spent
+                            value:(uint64_t)value
                     confirmations:(NSNumber *)confirmations
                         andSigned:(BOOL)isSigned {
   self = [super init];
@@ -49,10 +47,7 @@
 
     _outputIndex = outputIndex;
 
-    if (![value isKindOfClass:[NSNumber class]]) return NULL;
     _value = value;
-    if (![spent isKindOfClass:[NSNumber class]]) return NULL;
-    _spent = spent;
 
     // Optional value, can be NULL
     _confirmations =
@@ -74,13 +69,13 @@
       addresses = [address toString];
     }
 
-  return [NSString stringWithFormat:@"Address(es): %@\nValue: %@\nSpent: %@\n"
-                                    @"Confirmations: %@\nHash: %@\nOutput "
-                                    @"Index:%@\nScript: '%@'\nisSigned: %@\n",
-                                    addresses, self.value, self.spent,
-                                    self.confirmations, self.hash.toHex,
-                                    @(self.outputIndex), self.script,
-                                    self.isSigned ? @"true" : @"false"];
+  return [NSString
+      stringWithFormat:@"Address(es): %@\nValue: %@\n"
+                       @"Confirmations: %@\nHash: %@\nOutput "
+                       @"Index:%@\nScript: '%@'\nisSigned: %@\n",
+                       addresses, [BCAmount prettyPrint:self.value],
+                       self.confirmations, self.hash.toHex, @(self.outputIndex),
+                       self.script, self.isSigned ? @"true" : @"false"];
 }
 
 @end

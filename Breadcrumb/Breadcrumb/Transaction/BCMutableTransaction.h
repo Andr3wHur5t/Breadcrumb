@@ -20,7 +20,6 @@
 - (instancetype)initWithData:(NSData *)data;
 
 #pragma mark Configuration
-
 /*!
  @brief The input transactions.
  */
@@ -37,7 +36,6 @@
 @property(assign, nonatomic, readwrite) uint32_t lockTime;
 
 #pragma mark mutation
-
 /*!
  @brief Adds an input object to the transaction.
 
@@ -69,9 +67,6 @@
 /*!
  @brief Builds a transaction with the inputed UTXOs, amount, and output address.
 
- @discussion This optimizes transaction will target the smallest UTXOs first to
- attempt to reduce the number of UTXO.
-
  @param utxos         Unsigned transactions to use as inputs.
  @param amount        The amount the transaction is for.
  @param address       The address the transaction will send the amount to.
@@ -86,5 +81,4 @@
                                        feePerK:(uint64_t)feePerK
                                  changeAddress:(BCAddress *)changeAddress
                                      withError:(NSError **)error;
-
 @end

@@ -430,7 +430,7 @@ static NSString *const kChainBalanceURL =
   NSMutableArray *addresses;
   BCScript *script;
   NSString *scriptHex, *transactionHash;
-  NSNumber *value, *spent, *confirmations, *isSigned, *outputIndex;
+  NSNumber *value, *confirmations, *isSigned, *outputIndex;
 
   rawAddresses = [chainTransaction objectForKey:kBCChainProvider_Addresses];
   if (![rawAddresses isKindOfClass:[NSArray class]]) return NULL;
@@ -462,9 +462,6 @@ static NSString *const kChainBalanceURL =
   value = [chainTransaction objectForKey:kBCChainProvider_Value];
   if (![value isKindOfClass:[NSNumber class]]) return NULL;
 
-  spent = [chainTransaction objectForKey:kBCChainProvider_Spent];
-  if (![spent isKindOfClass:[NSNumber class]]) return NULL;
-
   confirmations =
       [chainTransaction objectForKey:kBCChainProvider_Confirmations];
   if (![confirmations isKindOfClass:[NSNumber class]]) return NULL;
@@ -475,8 +472,7 @@ static NSString *const kChainBalanceURL =
                  script:script
                    hash:transactionHash.hexToData
             outputIndex:[outputIndex unsignedIntValue]
-                  value:value
-                  spent:spent
+                  value:[value unsignedIntegerValue]
           confirmations:confirmations
               andSigned:[isSigned boolValue]];
 }
