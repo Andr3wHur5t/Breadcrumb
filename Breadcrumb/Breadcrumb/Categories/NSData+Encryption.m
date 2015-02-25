@@ -152,10 +152,6 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
   }
 }
 
-- (NSData *)AES256Encrypt:(NSData *)key {
-  return [self AES256CryptOperation:kCCEncrypt withKey:key];
-}
-
 - (NSData *)AES256ETMDecrypt:(NSData *)key {
   @autoreleasepool {
     NSData *check, *iv, *hmac, *enc;
@@ -182,7 +178,7 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
       key = NULL;
       return NULL;
     }
-    
+
     hmac = [hmac subdataWithRange:NSMakeRange(0, 8)];
     if (![check isEqualToData:hmac]) {
       key = NULL;
@@ -194,6 +190,10 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
     // Decrypt
     return [enc AES256Decrypt:key];
   }
+}
+
+- (NSData *)AES256Encrypt:(NSData *)key {
+  return [self AES256CryptOperation:kCCEncrypt withKey:key];
 }
 
 - (NSData *)AES256Decrypt:(NSData *)key {

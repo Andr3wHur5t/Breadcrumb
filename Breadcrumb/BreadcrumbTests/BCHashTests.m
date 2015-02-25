@@ -17,6 +17,24 @@
 
 #pragma mark Encryption
 
+- (void)testAES256 {
+  NSData *d, *bd, *k, *enc, *dec;
+
+  for (NSUInteger i = 0; i < 14; ++i) {
+    d = [NSData pseudoRandomDataWithLength:45];
+    bd = [NSData pseudoRandomDataWithLength:45];
+    k = [NSData pseudoRandomDataWithLength:32];
+
+    // Valid Check
+    enc = [d AES256Encrypt:k];
+    XCTAssert([enc isKindOfClass:[NSData class]], @"Failed");
+    dec = [enc AES256Decrypt:k];
+    XCTAssert([dec isKindOfClass:[NSData class]], @"Failed");
+    XCTAssert([dec isEqualToData:d], @"Failed");
+    dec = NULL;
+  }
+}
+
 - (void)testAES256ETM {
   NSData *d, *bd, *k, *enc, *dec;
 
@@ -24,8 +42,7 @@
     d = [NSData pseudoRandomDataWithLength:45];
     bd = [NSData pseudoRandomDataWithLength:45];
     k = [NSData pseudoRandomDataWithLength:32];
-    
-    
+
     // Valid Check
     enc = [d AES256ETMEncrypt:k];
     XCTAssert([enc isKindOfClass:[NSData class]], @"Failed");
@@ -33,12 +50,12 @@
     XCTAssert([dec isKindOfClass:[NSData class]], @"Failed");
     XCTAssert([dec isEqualToData:d], @"Failed");
     dec = NULL;
-    
+
     // Invalid Check
-    dec = [k AES256ETMDecrypt:k]; // Mis match size
+    dec = [k AES256ETMDecrypt:k];  // Mis match size
     XCTAssert(![dec isKindOfClass:[NSData class]], @"Failed");
-    
-    dec = [bd AES256ETMDecrypt:k]; // Same Size dif data
+
+    dec = [bd AES256ETMDecrypt:k];  // Same Size dif data
     XCTAssert(![dec isKindOfClass:[NSData class]], @"Failed");
   }
 }

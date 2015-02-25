@@ -25,8 +25,9 @@
       return NULL;
 
     // We want to use secure mutable data because it will zero it self out.
-    _cypherText = [NSMutableData
-        secureDataWithData:[[self class] encrypt:data withKey:memoryKey]];
+    _cypherText = [[self class] encrypt:data withKey:memoryKey];
+    memoryKey = NULL;
+    data = NULL;
   }
   return self;
 }
@@ -44,8 +45,7 @@
 
     // Attempt to decrypt the entered data, return secure data so it will zero
     // it self out.
-    return [NSMutableData secureDataWithData:[[self class] decrypt:_cypherText
-                                                           withKey:memoryKey]];
+    return [[self class] decrypt:_cypherText withKey:memoryKey];
   }
 }
 
@@ -53,14 +53,20 @@
 
 + (NSData *)encrypt:(NSData *)data withKey:(NSData *)key {
   @autoreleasepool {
+    // Note: Returns [NSMutableData secureData] zeros self out apon dealloc
     NSData *cypherText = [data AES256ETMEncrypt:key];
+    data = NULL;
+    key = NULL;
     return [cypherText isKindOfClass:[NSData class]] ? cypherText : NULL;
   }
 }
 
 + (NSData *)decrypt:(NSData *)data withKey:(NSData *)key {
   @autoreleasepool {
+    // Note: Returns [NSMutableData secureData] zeros self out apon dealloc
     NSData *clearText = [data AES256ETMDecrypt:key];
+    data = NULL;
+    key = NULL;
     return [clearText isKindOfClass:[NSData class]] ? clearText : NULL;
   }
 }
