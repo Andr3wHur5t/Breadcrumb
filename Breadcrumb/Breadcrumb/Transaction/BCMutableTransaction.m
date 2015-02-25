@@ -258,7 +258,6 @@ static NSString *const kTransactionBuildingErrorDomain =
   // Calculate the fee Based off of the transaction size. Assume Change Output
   transactionSize = [newTransaction currentSize] + 39;
   feeAmount = ((CGFloat)transactionSize / 1000.0f) * feePerK;
-  feeAmount = MAX(feeAmount, 10000);
 
   // Check For Funds
   if (utxoSumAmount < (amount + feeAmount)) {
@@ -294,22 +293,22 @@ static NSString *const kTransactionBuildingErrorDomain =
 #pragma mark Errors
 
 + (NSError *)nonStandardTransactionError {
-  return
-      [NSError errorWithDomain:kTransactionBuildingErrorDomain
-                          code:505
-                      userInfo:@{
-                        NSLocalizedDescriptionKey :
-                            @"Non-standard transaction size is non standard."
-                      }];
+  return [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                             code:505
+                         userInfo:@{
+                           NSLocalizedDescriptionKey :
+                               @"Non-standard transaction size is non standard."
+                         }];
 }
 
 + (NSError *)insufficientUTXOFundsError {
-  return [NSError errorWithDomain:kTransactionBuildingErrorDomain
-                             code:506
-                         userInfo:@{
-                           NSLocalizedDescriptionKey :
-                               @"Insufficient funds in UTXOs to build transaction."
-                         }];
+  return
+      [NSError errorWithDomain:kTransactionBuildingErrorDomain
+                          code:506
+                      userInfo:@{
+                        NSLocalizedDescriptionKey :
+                            @"Insufficient funds in UTXOs to build transaction."
+                      }];
 }
 
 + (NSError *)invalidAddressesError {

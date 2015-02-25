@@ -27,9 +27,6 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 #import <Breadcrumb/BCScript.h>
 #import <Breadcrumb/BCScript+DefaultScripts.h>
 
-#pragma mark Abstracts
-#import <Breadcrumb/BCAWallet.h>
-
 #pragma mark Concrete Interfaces
 #import <Breadcrumb/BCAmount.h>
 #import <Breadcrumb/BCAddress.h>
@@ -39,8 +36,10 @@ FOUNDATION_EXPORT const unsigned char BreadcrumbVersionString[];
 
 #pragma mark Wallets
 #import <Breadcrumb/BCWallet.h>
+#import <Breadcrumb/BCWallet+Transactions.h>
 
 #pragma mark Providers
+#import <Breadcrumb/BCAProvider.h>
 #import <Breadcrumb/BCProviderChain.h>
 
 #import <Breadcrumb/BreadcrumbCore.h>

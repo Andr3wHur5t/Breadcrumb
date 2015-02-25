@@ -25,13 +25,11 @@
 		377A18F11A8424A8007AA1CD /* BCMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A18EF1A8424A8007AA1CD /* BCMnemonic.m */; };
 		377A19031A844121007AA1CD /* BCAmount.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19011A844121007AA1CD /* BCAmount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19041A844121007AA1CD /* BCAmount.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19021A844121007AA1CD /* BCAmount.m */; };
-		377A19071A8441CD007AA1CD /* BCAWallet.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19051A8441CD007AA1CD /* BCAWallet.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		377A19081A8441CD007AA1CD /* BCAWallet.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19061A8441CD007AA1CD /* BCAWallet.m */; };
 		377A190B1A84446C007AA1CD /* BCAddress.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19091A84446C007AA1CD /* BCAddress.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A190C1A84446C007AA1CD /* BCAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A190A1A84446C007AA1CD /* BCAddress.m */; };
 		377A19101A844D76007AA1CD /* BCWallet.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A190E1A844D76007AA1CD /* BCWallet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19111A844D76007AA1CD /* BCWallet.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A190F1A844D76007AA1CD /* BCWallet.m */; };
-		377A19141A8583B1007AA1CD /* BCWallet+Transactions.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19121A8583B1007AA1CD /* BCWallet+Transactions.h */; };
+		377A19141A8583B1007AA1CD /* BCWallet+Transactions.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19121A8583B1007AA1CD /* BCWallet+Transactions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19151A8583B1007AA1CD /* BCWallet+Transactions.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19131A8583B1007AA1CD /* BCWallet+Transactions.m */; };
 		377A191A1A858DB3007AA1CD /* BCAProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19181A858DB3007AA1CD /* BCAProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A191B1A858DB3007AA1CD /* BCAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19191A858DB3007AA1CD /* BCAProvider.m */; };
@@ -124,8 +122,6 @@
 		377A18EF1A8424A8007AA1CD /* BCMnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCMnemonic.m; path = Mnemonic/BCMnemonic.m; sourceTree = "<group>"; };
 		377A19011A844121007AA1CD /* BCAmount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAmount.h; path = Amount/BCAmount.h; sourceTree = "<group>"; };
 		377A19021A844121007AA1CD /* BCAmount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCAmount.m; path = Amount/BCAmount.m; sourceTree = "<group>"; };
-		377A19051A8441CD007AA1CD /* BCAWallet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAWallet.h; path = Abstracts/BCAWallet.h; sourceTree = "<group>"; };
-		377A19061A8441CD007AA1CD /* BCAWallet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCAWallet.m; path = Abstracts/BCAWallet.m; sourceTree = "<group>"; };
 		377A19091A84446C007AA1CD /* BCAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCAddress.h; path = Abstracts/BCAddress.h; sourceTree = "<group>"; };
 		377A190A1A84446C007AA1CD /* BCAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BCAddress.m; path = Abstracts/BCAddress.m; sourceTree = "<group>"; };
 		377A190E1A844D76007AA1CD /* BCWallet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BCWallet.h; path = Wallet/BCWallet.h; sourceTree = "<group>"; };
@@ -303,18 +299,8 @@
 			isa = PBXGroup;
 			children = (
 				377A19171A858D93007AA1CD /* Provider */,
-				377A18FD1A843FE5007AA1CD /* Wallet */,
 			);
 			name = Abstracts;
-			sourceTree = "<group>";
-		};
-		377A18FD1A843FE5007AA1CD /* Wallet */ = {
-			isa = PBXGroup;
-			children = (
-				377A19051A8441CD007AA1CD /* BCAWallet.h */,
-				377A19061A8441CD007AA1CD /* BCAWallet.m */,
-			);
-			name = Wallet;
 			sourceTree = "<group>";
 		};
 		377A18FE1A843FEE007AA1CD /* Address */ = {
@@ -576,7 +562,6 @@
 				37D51B851A8CC9FB00A843B7 /* BRBIP39Mnemonic.h in Headers */,
 				37C77DCA1A96B027008D56FE /* BCAddressManager.h in Headers */,
 				377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */,
-				377A19071A8441CD007AA1CD /* BCAWallet.h in Headers */,
 				377A196C1A8C020C007AA1CD /* BCsecp256k1.h in Headers */,
 				377A19311A875751007AA1CD /* BCScript.h in Headers */,
 				37C77DD11A9809B2008D56FE /* BCCoin.h in Headers */,
@@ -750,7 +735,6 @@
 				37C77DCB1A96B027008D56FE /* BCAddressManager.m in Sources */,
 				377A191B1A858DB3007AA1CD /* BCAProvider.m in Sources */,
 				37C77DD21A9809B2008D56FE /* BCCoin.m in Sources */,
-				377A19081A8441CD007AA1CD /* BCAWallet.m in Sources */,
 				37D51B941A8CCA2F00A843B7 /* NSData+Bitcoin.m in Sources */,
 				377A191F1A858FFF007AA1CD /* BCProviderChain.m in Sources */,
 				37D51B981A8CCA2F00A843B7 /* NSMutableData+Bitcoin.m in Sources */,

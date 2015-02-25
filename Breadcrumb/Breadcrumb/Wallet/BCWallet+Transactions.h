@@ -10,7 +10,48 @@
 #import "BCTransaction.h"
 #import "BCMutableTransaction.h"
 
+static const uint64_t kBCStandardFeePerKB = 20000;
+
 @interface BCWallet (Transactions)
+
+/*!
+ @brief Sends the inputted amount to the address, and invokes the callback with
+ any errors.
+
+ @param amount  The amount to send in satoshi.
+ @param address  The address to send the amount to.
+ @param callback The callback to call when the operation completes or fails
+ */
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+         feePerKB:(uint64_t)feePerKB
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSData *, NSError *))callback;
+
+/*!
+ @brief Sends the inputted amount to the address, and invokes the callback with
+ any errors.
+
+ @param amount  The amount to send in satoshi.
+ @param address  The address to send the amount to.
+ @param callback The callback to call when the operation completes or fails
+ */
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSData *, NSError *))callback;
+
+/*!
+ @brief Sends the inputted amount to the address, and invokes the callback with
+ any errors.
+
+ @param amount  The amount to send in satoshi.
+ @param address  The address to send the amount to.
+ */
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+    usingPassword:(NSData *)password;
+
 /*!
  @brief Creates a transaction for the current wallet at the specified amount to
  the specified address.

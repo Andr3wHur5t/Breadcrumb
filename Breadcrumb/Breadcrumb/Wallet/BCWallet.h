@@ -14,13 +14,16 @@
 // Synchronous interfaces are available in _BCWallet.h these interfaces should
 // be dispatched on the wallets queue.
 
-#import <Breadcrumb/Breadcrumb.h>
+#import <Foundation/Foundation.h>
+#import "BCAProvider.h"
+#import "BCCoin.h"
+#import "BCAddress.h"
 
 /*!
  @brief Simple interface into basic bitcoin wallet functions through different
  providers.
  */
-@interface BCWallet : BCAWallet
+@interface BCWallet : NSObject
 #pragma mark Construction
 
 /*!
@@ -184,5 +187,10 @@
  @discussion The coin is simply a configuration object.
  */
 @property(weak, nonatomic, readonly) BCCoin *coin;
+
+/*!
+ @brief The wallets network interface provider.
+ */
+@property(strong, nonatomic, readonly) BCAProvider *provider;
 
 @end

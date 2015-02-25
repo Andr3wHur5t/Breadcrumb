@@ -19,16 +19,37 @@ static NSString *const kBCWalletError_Domain =
                to:(BCAddress *)address
     usingPassword:(NSData *)password
      withCallback:(void (^)(NSData *, NSError *))callback {
+  [self send:amount
+                 to:address
+           feePerKB:kBCStandardFeePerKB
+      usingPassword:password
+       withCallback:callback];
+}
+
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+    usingPassword:(NSData *)password {
+  [self send:amount
+                 to:address
+           feePerKB:kBCStandardFeePerKB
+      usingPassword:password
+       withCallback:NULL];
+}
+
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+         feePerKB:(uint64_t)feePerKB
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSData *, NSError *))callback {
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
-  NSParameterAssert([(id)callback isKindOfClass:NSClassFromString(@"NSBlock")]);
-  if (![address isKindOfClass:[BCAddress class]] ||
-      ![(id)callback isKindOfClass:NSClassFromString(@"NSBlock")])
-    return;
+  if (![address isKindOfClass:[BCAddress class]]) return;
   @autoreleasepool {
     __block uint64_t sAmount = amount;
     __block BCAddress *sAddress = address;
     void (^sCallback)(NSData *, NSError *) = ^(NSData *data, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{ callback(data, error); });
+        if (callback)
+          dispatch_async(dispatch_get_main_queue(),
+                         ^{ callback(data, error); });
     };
 
     // Validate password
@@ -62,7 +83,7 @@ static NSString *const kBCWalletError_Domain =
 
             // Create Unsigned transaction, and Sign
             [self _unsignedTransactionForAmount:sAmount
-                                       feePerKB:10000  // Get Param As input
+                                       feePerKB:feePerKB
                                              to:sAddress
                                    withCallback:
                                        [self  // Set the callback to sign the

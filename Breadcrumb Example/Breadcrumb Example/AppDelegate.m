@@ -146,9 +146,12 @@
   // phrase.
   NSString *phrase = @"palace canal coast awake mother captain mountain bronze "
       @"cabbage unfair patrol robot";
+  
   BCWallet *wallet = [[BCWallet alloc]
       initUsingMnemonicPhrase:phrase
+                         coin:[BCCoin TestNet3Bitcoin]
                      provider:[[BCProviderChain alloc] init]
+                 sequenceType:BCKeySequenceType_BIP44
                      password:password
                   andCallback:^(NSError *error) {
                       if (!error)
@@ -183,8 +186,8 @@
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  [wallet send:300000  // Satoshi
-                 to:[@"1HFNosFJYfkPZJj6J2BN7svuM8NpTD5A7F" toBitcoinAddress]
+  [wallet send:1800000  // Satoshi
+                 to:[@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
            if ([error isKindOfClass:[NSError class]])
