@@ -175,19 +175,22 @@
   [wallet getCurrentAddress:^(BCAddress *currentAddress) {
       [self showAlertWithTitle:@"Your Address"
                     andMessage:[currentAddress toString]];
-      NSLog(@"Address: '%@'", currentAddress);
+      NSLog(@"\nAddress: '%@'", currentAddress);
   }];
 
   // Get balance
   [wallet getBalance:^(uint64_t balance, NSError *error) {
-      NSLog(@"balance: %@", @(balance));
+    NSLog(@"balance: %@", [BCAmount prettyPrint:balance]);
   }];
 
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  [wallet send:1800000  // Satoshi
-                 to:[@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]
+  BCAddress *address = [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress];
+  uint64_t amount = [BCAmount BTC:1.345666];
+  NSLog(@"\nSending %@ to: %@",[BCAmount prettyPrint:amount], address);
+  [wallet send:amount  // Satoshi
+                 to:address
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
            if ([error isKindOfClass:[NSError class]])
