@@ -33,6 +33,8 @@
                                    withKey:(NSData *)key
                                   andError:(NSError **)error {
   @autoreleasepool {  // Ensure immediate deallocation of sensitive data.
+    NSMutableArray *signedInputs, *emptyScriptInputs;
+    NSArray *originalInputs;
     BCTransactionInput *updatedInput;
     NSMutableData *currentSignature;
     NSData *currentHash, *signedHash;
@@ -40,7 +42,35 @@
     BCKeyPair *currentKeyPair;
     BCAddress *currentAddress;
 
-    for (NSUInteger i = 0; i < transaction.inputs.count; ++i) {
+    originalInputs = [transaction.inputs copy];
+
+    // We need empty versions of the input for each transaction for when we sign.
+    // https://github.com/minium/Bitcoin-Spec/blob/master/Images/SIGHASH_ALL.pdf
+    emptyScriptInputs = [[NSMutableArray alloc] init];
+    BCTransactionInput *newEmpty, *org;
+    for (NSUInteger i = 0; i < originalInputs.count; ++i) {
+      org = [originalInputs objectAtIndex:i];
+      
+      // Create the empty transaction
+      newEmpty = [[BCTransactionInput alloc]
+           initWithHash:org.previousOutputHash
+          previousIndex:org.previousOutputIndex
+                 script:[BCScript scriptWithData:NULL]
+                address:org.controllingAddress
+            andSequence:org.sequence];
+
+      [emptyScriptInputs setObject:newEmpty atIndexedSubscript:i];
+    }
+
+    // Sign Transaction Inputs
+    signedInputs = [[NSMutableArray alloc] init];
+    for (NSUInteger i = 0; i < originalInputs.count; ++i) {
+      // Set all inputs to empty
+      [transaction.inputs setArray:emptyScriptInputs];
+      
+      // Set the current index to its original script
+      [transaction.inputs setObject:[originalInputs objectAtIndex:i] atIndexedSubscript:i];
+      
       // Get The Hash of the current transaction
       currentHash = [[transaction toData] SHA256_2];
       if (![currentHash isKindOfClass:[NSData class]]) {
@@ -111,10 +141,12 @@
         return NULL;
       }
 
-      // Set The transaction Input to the transaction
-      [transaction.inputs setObject:updatedInput atIndexedSubscript:i];
+      // Add the signed input to the signed inputs array
+      [signedInputs setObject:updatedInput atIndexedSubscript:i];
     }
 
+    // Replace all transaction inputs with the signed inputs
+    [transaction.inputs setArray:signedInputs];
     return transaction;
   }
 }

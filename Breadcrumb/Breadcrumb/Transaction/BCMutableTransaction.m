@@ -299,7 +299,7 @@ static NSString *const kTransactionBuildingErrorDomain =
                           code:505
                       userInfo:@{
                         NSLocalizedDescriptionKey :
-                            @"Insufficient funds in UTXOs to build transaction."
+                            @"Non-standard transaction size is non standard."
                       }];
 }
 
@@ -308,7 +308,7 @@ static NSString *const kTransactionBuildingErrorDomain =
                              code:506
                          userInfo:@{
                            NSLocalizedDescriptionKey :
-                               @"Non-standard transaction size is non standard."
+                               @"Insufficient funds in UTXOs to build transaction."
                          }];
 }
 

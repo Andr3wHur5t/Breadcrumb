@@ -183,8 +183,8 @@
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  [wallet send:1e3  // Satoshi
-                 to:[@"1fcgJ8z4kcEG4aPwGTjXZp3z6sDTUvoU8" toBitcoinAddress]
+  [wallet send:300000  // Satoshi
+                 to:[@"1HFNosFJYfkPZJj6J2BN7svuM8NpTD5A7F" toBitcoinAddress]
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
            if ([error isKindOfClass:[NSError class]])

@@ -23,7 +23,7 @@
  my top priority to not store the memory key.
  */
 @property(strong, nonatomic, readonly) BCProtectedData *proMemKey;
-@property(strong, nonatomic, readonly) NSData *tempNonce;
+@property(strong, nonatomic, readonly) NSData *passcode;
 
 @end
 
@@ -34,7 +34,7 @@
 @synthesize addresses = _addresses;
 @synthesize lastUsedIndex = _lastUsedIndex;
 
-@synthesize tempNonce = _tempNonce;
+@synthesize passcode = _passcode;
 @synthesize proMemKey = _proMemKey;
 
 #pragma Construction
@@ -52,14 +52,15 @@
     _coin = coin;
 
     // !!!!!!! REMOVE ME !!!!!!!
-    _tempNonce = [BCsecp256k1 pseudoRandomDataWithLength:32];
-    _proMemKey = [memKey protectedWithKey:_tempNonce];
+    _passcode = [BCsecp256k1 pseudoRandomDataWithLength:32];
+    _proMemKey = [memKey protectedWithKey:_passcode];
 
     return self;
   }
 }
 
 #pragma mark Index Management
+
 - (void)setLastUsedIndex:(uint16_t)lastUsedIndex {
   [self expandAddressToIndex:lastUsedIndex + GAP_DISTANCE];
   _lastUsedIndex = lastUsedIndex;
@@ -68,11 +69,10 @@
 - (void)expandAddressToIndex:(uint16_t)index {
   uint16_t count, initial;
   if (self.addresses.count > index) return;
-  
+
   initial = self.addresses.count;
   count = index - initial;
-  for (uint16_t i = 0 ; i < count; ++i)
-    [self addressAtIndex:initial + i];
+  for (uint16_t i = 0; i < count; ++i) [self addressAtIndex:initial + i];
 }
 
 #pragma mark Address Management
@@ -110,19 +110,17 @@
     }
 
     // Get secured mem key
-    memKey = [self.proMemKey dataUsingMemoryKey:self.tempNonce];
+    memKey = [self.proMemKey dataUsingMemoryKey:self.passcode];
     if (![memKey isKindOfClass:[NSData class]]) return NULL;
     if (memKey.length != 32) return NULL;
 
     childKey = [self.key childKeyPairAt:index withMemoryKey:memKey];
     memKey = NULL;
-    if (![childKey isKindOfClass:[BCKeyPair class]])
-      return NULL;
+    if (![childKey isKindOfClass:[BCKeyPair class]]) return NULL;
 
     // Get its address
     address = [childKey.publicKey addressForCoin:_coin];
-    if (![address isKindOfClass:[BCAddress class]])
-      return NULL;
+    if (![address isKindOfClass:[BCAddress class]]) return NULL;
     [self cacheAddress:address atIndex:index];
     return address;
   }
@@ -168,7 +166,7 @@ point multipication which i have to understand better before implmentation.
   for (uint16_t i = 0; i < self.lastUsedIndex + GAP_DISTANCE; ++i)
     if ([address isEqualExcludingVersion:[self addressAtIndex:i]]) return i;
 
-  // We failed to find it.
+  // We failed
   return UINT16_MAX;
 }
 
@@ -184,6 +182,7 @@ point multipication which i have to understand better before implmentation.
     if (index == UINT16_MAX) return NULL;  // We Failed :(
 
     child = [self.key childKeyPairAt:index withMemoryKey:memoryKey];
+
     return [child isKindOfClass:[BCKeyPair class]] ? child : NULL;
   }
 }
