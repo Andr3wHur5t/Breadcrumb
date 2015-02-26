@@ -10,7 +10,7 @@
 
 static const uint64_t kBCAmountBits = 1e2;
 static const uint64_t kBCAmountmBTC = 1e5;
-static const uint64_t kBCAmountBTC = 1e9;
+static const uint64_t kBCAmountBTC = 1e8;
 
 typedef enum : NSUInteger {
                  BCUnitType_Satoshi,

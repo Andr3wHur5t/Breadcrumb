@@ -114,6 +114,7 @@
     __block NSData *sPassword;
     __block NSString *sPhrase;
     __block void (^sCallback)(NSError *);
+    __block void (^sCom)(NSError *);
     NSParameterAssert([phrase isKindOfClass:[NSString class]]);
     if (![phrase isKindOfClass:[NSString class]]) return NULL;
 
@@ -133,9 +134,10 @@
     sPassword = password;
     _provider = provider;
 
+    sCom = callback;
     sCallback = ^(NSError *error) {
-        if (callback)
-          dispatch_async(dispatch_get_main_queue(), ^{ callback(error); });
+        __block NSError *sError = error;
+        if (sCom) dispatch_async(dispatch_get_main_queue(), ^{ sCom(sError); });
     };
     // We will be doing some long running operations, run them on a background
     // queue
@@ -182,6 +184,8 @@
           sCallback([[self class] walletGenerationErrorWithCode:6]);
           return;
         }
+
+        sCallback(NULL);
     });
 
     // First Item to execute post construction is sync.

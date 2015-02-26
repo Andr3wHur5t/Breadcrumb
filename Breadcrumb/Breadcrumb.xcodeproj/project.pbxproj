@@ -50,14 +50,14 @@
 		377A19431A888741007AA1CD /* BCTransactionInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19411A888741007AA1CD /* BCTransactionInput.m */; };
 		377A19461A897F94007AA1CD /* BCMutableTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19441A897F94007AA1CD /* BCMutableTransaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19471A897F94007AA1CD /* BCMutableTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19451A897F94007AA1CD /* BCMutableTransaction.m */; };
-		377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A194C1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h */; };
+		377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A194C1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A194F1A89AE2E007AA1CD /* BCWallet+TransactionSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A194D1A89AE2E007AA1CD /* BCWallet+TransactionSigning.m */; };
-		377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19511A89BC52007AA1CD /* _BCWallet.h */; };
+		377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19511A89BC52007AA1CD /* _BCWallet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A195A1A8ADD29007AA1CD /* BCKeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19581A8ADD29007AA1CD /* BCKeyPair.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A195B1A8ADD29007AA1CD /* BCKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19591A8ADD29007AA1CD /* BCKeyPair.m */; };
 		377A195F1A8AE03A007AA1CD /* BCProtectedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A195D1A8AE03A007AA1CD /* BCProtectedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19601A8AE03A007AA1CD /* BCProtectedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A195E1A8AE03A007AA1CD /* BCProtectedData.m */; };
-		377A19631A8AF56D007AA1CD /* BCWallet+Restoration.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19611A8AF56D007AA1CD /* BCWallet+Restoration.h */; };
+		377A19631A8AF56D007AA1CD /* BCWallet+Restoration.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19611A8AF56D007AA1CD /* BCWallet+Restoration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19641A8AF56D007AA1CD /* BCWallet+Restoration.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19621A8AF56D007AA1CD /* BCWallet+Restoration.m */; };
 		377A19671A8B0144007AA1CD /* BCKeySequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 377A19651A8B0144007AA1CD /* BCKeySequence.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		377A19681A8B0144007AA1CD /* BCKeySequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 377A19661A8B0144007AA1CD /* BCKeySequence.m */; };
@@ -574,21 +574,21 @@
 				370E68931A8EB31E00862518 /* NSString+Base58.h in Headers */,
 				3767F1591A830F5200AFD6D6 /* Breadcrumb-Prefix.pch in Headers */,
 				377A193D1A88871E007AA1CD /* BCTransactionOutput.h in Headers */,
-				37D51BA01A8CCA5C00A843B7 /* ccMemory.h in Headers */,
 				377A19371A879185007AA1CD /* BCScript+DefaultScripts.h in Headers */,
 				377A19461A897F94007AA1CD /* BCMutableTransaction.h in Headers */,
 				370FEF1C1A99D5D40037E8EF /* BCAMMasterKey.h in Headers */,
 				37D51B931A8CCA2F00A843B7 /* NSData+Bitcoin.h in Headers */,
 				377A195F1A8AE03A007AA1CD /* BCProtectedData.h in Headers */,
-				377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */,
 				377A19341A875F16007AA1CD /* BCScriptOpCodes.h in Headers */,
 				37D51BA11A8CCA5C00A843B7 /* Reachability.h in Headers */,
 				377A19521A89BC52007AA1CD /* _BCWallet.h in Headers */,
 				37C77DD51A981364008D56FE /* BCPublicKey.h in Headers */,
 				377A19101A844D76007AA1CD /* BCWallet.h in Headers */,
 				37D51B951A8CCA2F00A843B7 /* NSData+Hash.h in Headers */,
-				37C67F4B1A9334BE005FF82D /* tommath.h in Headers */,
+				377A194E1A89AE2E007AA1CD /* BCWallet+TransactionSigning.h in Headers */,
 				377A19631A8AF56D007AA1CD /* BCWallet+Restoration.h in Headers */,
+				37C67F4B1A9334BE005FF82D /* tommath.h in Headers */,
+				37D51BA01A8CCA5C00A843B7 /* ccMemory.h in Headers */,
 				37D51B971A8CCA2F00A843B7 /* NSMutableData+Bitcoin.h in Headers */,
 				377A18F01A8424A8007AA1CD /* BCMnemonic.h in Headers */,
 				377A192B1A870C67007AA1CD /* BCTransaction.h in Headers */,
