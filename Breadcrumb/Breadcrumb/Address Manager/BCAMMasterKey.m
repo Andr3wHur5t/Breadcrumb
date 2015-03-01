@@ -13,20 +13,6 @@
 // Set this to change our edge address search distance
 #define GAP_DISTANCE 20
 
-@interface BCAMMasterKey ()
-
-/*!
- @brief !!!!!!! THIS IS TEMP !!!!!!!! REMOVE THIS !!!!!!!!
-
- @discussion I didnt have time to add a EC point system to do pub key
- diriviation im adding this as a temporary work around so I can demo this. It us
- my top priority to not store the memory key.
- */
-@property(strong, nonatomic, readonly) BCProtectedData *proMemKey;
-@property(strong, nonatomic, readonly) NSData *passcode;
-
-@end
-
 @implementation BCAMMasterKey
 
 @synthesize key = _key;
@@ -34,14 +20,9 @@
 @synthesize addresses = _addresses;
 @synthesize lastUsedIndex = _lastUsedIndex;
 
-@synthesize passcode = _passcode;
-@synthesize proMemKey = _proMemKey;
-
 #pragma Construction
 
-- (instancetype)initWithKeyPair:(BCKeyPair *)key
-                         memKey:(NSData *)memKey
-                        andCoin:(BCCoin *)coin {
+- (instancetype)initWithKeyPair:(BCKeyPair *)key andCoin:(BCCoin *)coin {
   @autoreleasepool {
     NSParameterAssert([key isKindOfClass:[BCKeyPair class]]);
     if (![key isKindOfClass:[BCKeyPair class]]) return NULL;
@@ -50,10 +31,6 @@
 
     _key = key;
     _coin = coin;
-
-    // !!!!!!! REMOVE ME !!!!!!!
-    _passcode = [BCsecp256k1 pseudoRandomDataWithLength:32];
-    _proMemKey = [memKey protectedWithKey:_passcode];
 
     return self;
   }
@@ -95,41 +72,6 @@
   return [self addressAtIndex:self.lastUsedIndex + 1];
 }
 
-// !!!!!! TMP solution !!!!!!
-- (BCAddress *)addressAtIndex:(uint16_t)index {
-  @autoreleasepool {
-    NSData *memKey;
-    BCKeyPair *childKey;
-    BCAddress *address;
-    // Check Cache
-    if (self.addresses.count > index) {
-      address = [self.addresses objectAtIndex:index];
-
-      // if we found return, else generate address.
-      if ([address isKindOfClass:[BCAddress class]]) return address;
-    }
-
-    // Get secured mem key
-    memKey = [self.proMemKey dataUsingMemoryKey:self.passcode];
-    if (![memKey isKindOfClass:[NSData class]]) return NULL;
-    if (memKey.length != 32) return NULL;
-
-    childKey = [self.key childKeyPairAt:index withMemoryKey:memKey];
-    memKey = NULL;
-    if (![childKey isKindOfClass:[BCKeyPair class]]) return NULL;
-
-    // Get its address
-    address = [childKey.publicKey addressForCoin:_coin];
-    if (![address isKindOfClass:[BCAddress class]]) return NULL;
-    [self cacheAddress:address atIndex:index];
-    return address;
-  }
-}
-
-/*
- This is what we want to migtate to, pub parent -> pub child but it requires ec
-point multipication which i have to understand better before implmentation.
-
 - (BCAddress *)addressAtIndex:(uint16_t)index {
   BCPublicKey *child;
   BCAddress *address;
@@ -147,14 +89,13 @@ point multipication which i have to understand better before implmentation.
 
   // Get the child public key at the correct index.
   child = [(BCDerivablePublicKey *)self.key.publicKey childKeyAtIndex:index];
-  if (![child isKindOfClass:[BCKeyPair class]]) return NULL;
+  if (![child isKindOfClass:[BCPublicKey class]]) return NULL;
 
   // Get its address
   address = [child addressForCoin:_coin];
   [self cacheAddress:address atIndex:index];
   return [address isKindOfClass:[BCAddress class]] ? address : NULL;
 }
- */
 
 - (uint16_t)indexOfAddress:(BCAddress *)address {
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);

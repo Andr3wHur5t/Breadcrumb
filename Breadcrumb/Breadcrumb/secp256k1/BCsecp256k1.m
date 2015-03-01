@@ -108,13 +108,21 @@
         //        NSLog(@"Invalid pub key");  // TODO: Report as errors
         return FALSE;
         break;
-
       default:
         return FALSE;
         break;
     }
   }
 }
+
+- (NSData *)publicKey:(NSData *)publicKey add:(NSData *)tweek {
+  NSMutableData *mPubKey = [NSMutableData dataWithData:publicKey];
+  if ( !secp256k1_ec_pubkey_tweak_add([mPubKey mutableBytes], (int)mPubKey.length, tweek.bytes) ) {
+    return NULL;
+  }
+  return [NSData dataWithData:mPubKey];
+}
+
 
 #pragma mark Shared access
 

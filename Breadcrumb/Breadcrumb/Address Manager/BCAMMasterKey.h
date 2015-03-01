@@ -16,9 +16,7 @@
 
  @param key The key to construct with.
  */
-- (instancetype)initWithKeyPair:(BCKeyPair *)key
-                         memKey:(NSData *)memKey
-                        andCoin:(BCCoin *)coin;
+- (instancetype)initWithKeyPair:(BCKeyPair *)key andCoin:(BCCoin *)coin;
 
 #pragma mark Metadata
 /*!

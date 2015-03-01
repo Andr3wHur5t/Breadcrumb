@@ -46,6 +46,10 @@
              originHash:(NSData *)hash
     isValidForPublicKey:(NSData *)publicKey;
 
+#pragma mark Public Key Tweeks
+
+- (NSData *)publicKey:(NSData *)publicKey add:(NSData *)tweek;
+- (NSData *)publicKey:(NSData *)publicKey multiply:(NSData *)tweek;
 
 #pragma mark Shared access
 

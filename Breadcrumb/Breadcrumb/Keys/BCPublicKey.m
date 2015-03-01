@@ -8,6 +8,7 @@
 
 #import "BCPublicKey.h"
 #import "BCKeySequence.h"
+#import "BCsecp256k1.h"
 #import "BreadcrumbCore.h"
 
 @implementation BCPublicKey
@@ -70,10 +71,6 @@
   // TODO: add tests in HD.
   NSMutableData *dataToDerive;
   NSData *childChain, *opData;
-  // This is to remind me that i didn't finish this.
-  NSAssert(
-      false,
-      @"- (BCPublicKey *)childKeyAtIndex:(uint32_t)index; is not implemented.");
 
   // Check For Hardened key
   if (index >= BIP32_PRIME) return NULL;
@@ -84,7 +81,7 @@
 
   // dataToDerive = serP(Kpar) || ser32(i);
   [dataToDerive appendData:self.data];
-  [dataToDerive appendUInt32:index];
+  [dataToDerive appendUInt32:CFSwapInt32(index)];
 
   // HMAC-SHA512(key = chainCode, data = dataToDerive);
   opData = [dataToDerive SHA512HmacWithKey:self.chainCode];
@@ -95,29 +92,16 @@
   childChain = [opData subdataWithRange:NSMakeRange(32, 32)];
   opData = [opData subdataWithRange:NSMakeRange(0, 32)];
 
-  // TODO: Add this, idk how to do ec point arithmetic Ill get back to this when
-  // i have time to look it up.
-
   // childPublic = point(opData) + self.data.
-
-  // This is breadwallets openssl imp I'm using this a a reference till I can
-  // finish end, to end send.
-
-  //   EC_GROUP_set_point_conversion_form(group, POINT_CONVERSION_COMPRESSED);
-  //   EC_POINT_oct2point(group, KPoint, K.bytes, K.length, ctx);
-  //   EC_POINT_mul(group, ILPoint, ILbn, NULL, NULL, ctx);
-  //   EC_POINT_add(group, KPoint, ILPoint, KPoint, ctx); // K = P(IL) + K
-  //   K.length = EC_POINT_point2oct(group, KPoint, POINT_CONVERSION_COMPRESSED,
-  //   NULL, 0, ctx);
+  opData = [[BCsecp256k1 sharedInstance] publicKey:self.data add:opData];
 
   // In case parse256(IL) ≥ n or Ki is the point at infinity
-  if (false) {
+  if (false)
     // key invalid, and one should proceed with the next value for i.
     return [self childKeyAtIndex:index + 1];
-  }
 
   //  return opData;
-  return NULL;
+  return [[BCPublicKey alloc] initWithData:opData];
 }
 
 @end

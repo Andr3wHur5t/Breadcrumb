@@ -47,7 +47,6 @@
             @[ @(0x8000002C), @(self.coin.coinId), @(BIP32_PRIME | 0), @(1) ]
                 andMemoryKey:memoryKey];
     _bip44Internal = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                     memKey:memoryKey
                                                     andCoin:self.coin];
 
     currentKey = [self.keySequence
@@ -55,7 +54,6 @@
             @[ @(0x8000002C), @(self.coin.coinId), @(BIP32_PRIME | 0), @(0) ]
                 andMemoryKey:memoryKey];
     _bip44External = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                     memKey:memoryKey
                                                     andCoin:self.coin];
 
     // Set bip 32 masters
@@ -63,14 +61,12 @@
         [self.keySequence keyPairForComponents:@[ @(BIP32_PRIME | 0), @(1) ]
                                   andMemoryKey:memoryKey];
     _bip32Internal = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                     memKey:memoryKey
                                                     andCoin:self.coin];
 
     currentKey =
         [self.keySequence keyPairForComponents:@[ @(BIP32_PRIME | 0), @(0) ]
                                   andMemoryKey:memoryKey];
     _bip32External = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                     memKey:memoryKey
                                                     andCoin:self.coin];
 
     memoryKey = NULL;
