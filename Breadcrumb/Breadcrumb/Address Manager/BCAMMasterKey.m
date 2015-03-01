@@ -3,9 +3,11 @@
 //  Breadcrumb
 //
 //  Created by Andrew Hurst on 2/22/15.
-//  Copyright (c) 2015 Breadcrumb. All rights reserved.
+//  Copyright (c) 2015 Breadcrumb.
 //
-
+//  Distributed under the MIT software license, see the accompanying
+//  file LICENSE or http://www.opensource.org/licenses/mit-license.php.
+//
 #import "BCAMMasterKey.h"
 #import "BCProtectedData.h"
 #import "BCsecp256k1.h"
