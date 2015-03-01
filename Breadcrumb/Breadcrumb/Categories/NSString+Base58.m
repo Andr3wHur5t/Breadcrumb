@@ -30,16 +30,7 @@
 #import "NSString+Base58.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Hash.h"
-#import "libbase58.h"
-
-// extern bool b58tobin(void *bin, size_t *binsz, const char *b58, size_t
-// b58sz);
-// extern int b58check(const void *bin, size_t binsz, const char *b58, size_t
-// b58sz);
-//
-// extern bool b58enc(char *b58, size_t *b58sz, const void *bin, size_t binsz);
-// extern bool b58check_enc(char *b58c, size_t *b58c_sz, uint8_t ver, const void
-// *data, size_t datasz);
+#import "ccMemory.h"
 
 #define BITCOIN_PUBKEY_ADDRESS 0
 #define BITCOIN_SCRIPT_ADDRESS 5
@@ -55,30 +46,59 @@
 #define BIP38_LOTSEQUENCE_FLAG 0x04
 #define BIP38_INVALID_FLAG (0x10 | 0x08 | 0x02 | 0x01)
 
-static bool sha256(void *output, const void *input, size_t inputSize) {
-  NSData *hash = [[NSData dataWithBytes:input length:inputSize] SHA256];
-  output = (void *)[hash bytes];
-  return [hash isKindOfClass:[NSData class]];
-}
+// From Breadwallets implmentation of base58
+// https://github.com/voisine/breadwallet/blob/ce1d76ef20d39be0ae31c4d5f22f912de4ac0b89/BreadWallet/NSString%2BBitcoin.m
+static const UniChar base58chars[] = {
+  '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
+  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n',
+  'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+};
+static const int8_t base58map[] = {
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+  -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, -1, -1, -1, -1,
+  -1, 9, 10, 11, 12, 13, 14, 15, 16, -1, 17, 18, 19, 20, 21, -1,
+  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, -1, -1, -1, -1, -1,
+  -1, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, -1, 44, 45, 46,
+  47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, -1, -1, -1, -1, -1
+};
 
 @implementation NSString (BCBase58)
 #pragma mark Encoding
 
 + (NSString *)base58WithData:(NSData *)data {
-  NSString *output;
-  char base58String[data.length * 2];  // Assuming 2x larger...
-  size_t length;
-
-  if (!b58enc(base58String, &length, [data bytes], data.length)) {
-    // Try again
-    if (!b58enc(base58String, &length, [data bytes], data.length)) {
-      NSLog(@"Failed to encode");
-      return NULL;
+  // From https://github.com/voisine/breadwallet/blob/ce1d76ef20d39be0ae31c4d5f22f912de4ac0b89/BreadWallet/NSString%2BBitcoin.m
+  size_t i, z = 0;
+  
+  while (z < data.length && ((const uint8_t *)data.bytes)[z] == 0) z++; // count leading zeroes
+  
+  uint8_t buf[(data.length - z)*138/100 + 1]; // log(256)/log(58), rounded up
+  
+  CC_XZEROMEM(buf, sizeof(buf));
+  
+  for (i = z; i < data.length; i++) {
+    uint32_t carry = ((const uint8_t *)data.bytes)[i];
+    
+    for (ssize_t j = sizeof(buf) - 1; j >= 0; j--) {
+      carry += (uint32_t)buf[j] << 8;
+      buf[j] = carry % 58;
+      carry /= 58;
     }
   }
-
-  output = [NSString stringWithUTF8String:base58String];
-  return [output isKindOfClass:[NSString class]] ? output : NULL;
+  i = 0;
+  
+  while (i < sizeof(buf) && buf[i] == 0) i++; // skip leading zeroes
+  
+  CFMutableStringRef str = CFStringCreateMutable(SecureAllocator(), z + sizeof(buf) - i);
+  
+  while (z-- > 0) CFStringAppendCharacters(str, base58chars, 1);
+  
+  while (i < sizeof(buf)) CFStringAppendCharacters(str, &base58chars[buf[i++]], 1);
+  
+  CC_XZEROMEM(buf, sizeof(buf));
+  
+  return CFBridgingRelease(str);
 }
 
 + (NSString *)base58checkWithData:(NSData *)data {
@@ -111,21 +131,56 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
 #pragma mark Decoding
 
 - (NSData *)base58ToData {
-  void *bin;
-  size_t length, buffSize;
-  NSData *data;
-
-  buffSize = self.length;
-  bin = malloc(buffSize);
-  length = buffSize;
-  if (!b58tobin(bin, &length, self.UTF8String, self.length)) {
-    NSLog(@"Failed to decode");
-    return NULL;
+  // From https://github.com/voisine/breadwallet/blob/ce1d76ef20d39be0ae31c4d5f22f912de4ac0b89/BreadWallet/NSString%2BBitcoin.m
+  size_t i, z = 0;
+  
+  
+  // Check all chars are allowed
+  BOOL pass;
+  for (NSUInteger i = 0; i < self.length; ++i) {
+    pass = false;
+    for (NSUInteger q = 0; q < 59; ++q)
+      if ( [self characterAtIndex:i] == base58chars[q] )
+        pass = true;
+    if ( !pass )
+      return NULL;
   }
-
-  data = [[NSData dataWithBytes:bin length:buffSize]
-      subdataWithRange:NSMakeRange(buffSize - length, length)];
-  return data;
+  
+  
+  // Decode
+  while (z < self.length && [self characterAtIndex:z] == *base58chars) z++; // count leading zeroes
+  
+  uint8_t buf[(self.length - z)*733/1000 + 1]; // log(58)/log(256), rounded up
+  
+  CC_XZEROMEM(buf, sizeof(buf));
+  
+  for (i = z; i < self.length; i++) {
+    
+    UniChar c = [self characterAtIndex:i];
+    
+    if (c >= sizeof(base58map)/sizeof(*base58map) || base58map[c] == -1) break; // invalid base58 digit
+    
+    uint32_t carry = base58map[c];
+    
+    for (ssize_t j = sizeof(buf) - 1; j >= 0; j--) {
+      carry += (uint32_t)buf[j]*58;
+      buf[j] = carry & 0xff;
+      carry >>= 8;
+    }
+  }
+  i = 0;
+  
+  while (i < sizeof(buf) && buf[i] == 0) i++; // skip leading zeroes
+  
+  NSMutableData *d = [NSMutableData secureDataWithCapacity:z + sizeof(buf) - i];
+  
+  d.length = z;
+  
+  [d appendBytes:&buf[i] length:sizeof(buf) - i];
+  
+  CC_XZEROMEM(buf, sizeof(buf));
+  
+  return d;
 }
 
 - (NSData *)base58checkToData {
@@ -225,11 +280,6 @@ static bool sha256(void *output, const void *input, size_t inputSize) {
 //- (BOOL)isValidBitcoinBIP38Key {
 //  return NULL;
 //}
-
-+ (void)setBase58SHA256 {
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{ b58_sha256_impl = sha256; });
-}
 
 #pragma mark Old
 

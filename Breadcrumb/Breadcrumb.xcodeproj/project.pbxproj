@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		370E688C1A8D97AB00862518 /* RIPEMD160.c in Sources */ = {isa = PBXBuildFile; fileRef = 370E688B1A8D97AB00862518 /* RIPEMD160.c */; };
-		370E688F1A8EB28700862518 /* libbase58.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 370E688D1A8EB28700862518 /* libbase58.a */; };
 		370E68901A8EB28700862518 /* libsecp256k1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 370E688E1A8EB28700862518 /* libsecp256k1.a */; };
 		370E68931A8EB31E00862518 /* NSString+Base58.h in Headers */ = {isa = PBXBuildFile; fileRef = 370E68911A8EB31E00862518 /* NSString+Base58.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		370E68941A8EB31E00862518 /* NSString+Base58.m in Sources */ = {isa = PBXBuildFile; fileRef = 370E68921A8EB31E00862518 /* NSString+Base58.m */; };
@@ -199,7 +198,6 @@
 			files = (
 				37C77DC61A96AB14008D56FE /* libTomMath.a in Frameworks */,
 				370E68901A8EB28700862518 /* libsecp256k1.a in Frameworks */,
-				370E688F1A8EB28700862518 /* libbase58.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
