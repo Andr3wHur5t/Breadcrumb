@@ -268,7 +268,7 @@ static NSString *const kChainBalanceURL =
                             if (![itemBalance isKindOfClass:[NSNumber class]])
                               return;
 
-                            balance += [itemBalance integerValue];
+                            balance += [itemBalance unsignedIntegerValue];
                           }
 
                           sCallback(balance, NULL);

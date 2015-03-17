@@ -13,7 +13,7 @@
 #import "BCKeyPair.h"
 
 @interface BCAMMasterKey : NSObject
-#pragma Construction
+#pragma mark Construction
 /*!
  @brief Constructs the master key from the provided key.
 

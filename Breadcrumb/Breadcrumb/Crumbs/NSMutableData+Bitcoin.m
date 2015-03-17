@@ -33,7 +33,7 @@
 #import "ccMemory.h"
 
 static void *secureAllocate(CFIndex allocSize, CFOptionFlags hint, void *info) {
-  void *ptr = CC_XMALLOC(sizeof(CFIndex) + allocSize);
+  void *ptr = CC_XMALLOC(sizeof(CFIndex) + (unsigned long)allocSize);
 
   if (ptr) {  // we need to keep track of the size of the allocation so it can
     // be cleansed before deallocation
@@ -47,7 +47,7 @@ static void secureDeallocate(void *ptr, void *info) {
   CFIndex size = *((CFIndex *)ptr - 1);
 
   if (size) {
-    CC_XZEROMEM(ptr, size);
+    CC_XZEROMEM(ptr, (unsigned long)size);
     CC_XFREE((CFIndex *)ptr - 1, sizeof(CFIndex) + size);
   }
 }
@@ -61,7 +61,7 @@ static void *secureReallocate(void *ptr, CFIndex newsize, CFOptionFlags hint,
   CFIndex size = *((CFIndex *)ptr - 1);
 
   if (newptr && size) {
-    CC_XMEMCPY(newptr, ptr, (size < newsize) ? size : newsize);
+    CC_XMEMCPY(newptr, ptr, (size < newsize) ? (unsigned long)size : (unsigned long)newsize);
     secureDeallocate(ptr, info);
   }
 
@@ -70,7 +70,7 @@ static void *secureReallocate(void *ptr, CFIndex newsize, CFOptionFlags hint,
 
 // Since iOS does not page memory to storage, all we need to do is cleanse
 // allocated memory prior to deallocation.
-CFAllocatorRef SecureAllocator() {
+inline CFAllocatorRef SecureAllocator() {
   static CFAllocatorRef alloc = NULL;
   static dispatch_once_t onceToken = 0;
 
@@ -96,7 +96,7 @@ CFAllocatorRef SecureAllocator() {
 }
 
 + (NSMutableData *)secureDataWithCapacity:(NSUInteger)aNumItems {
-  return CFBridgingRelease(CFDataCreateMutable(SecureAllocator(), aNumItems));
+  return CFBridgingRelease(CFDataCreateMutable(SecureAllocator(), (CFIndex)aNumItems));
 }
 
 + (NSMutableData *)secureDataWithLength:(NSUInteger)length {
@@ -180,13 +180,13 @@ CFAllocatorRef SecureAllocator() {
   if (d.length == 0) {
     return;
   } else if (d.length < OP_PUSHDATA1) {
-    [self appendUInt8:d.length];
+    [self appendUInt8:(uint8_t)d.length];
   } else if (d.length < UINT8_MAX) {
     [self appendUInt8:OP_PUSHDATA1];
-    [self appendUInt8:d.length];
+    [self appendUInt8:(uint8_t)d.length];
   } else if (d.length < UINT16_MAX) {
     [self appendUInt8:OP_PUSHDATA2];
-    [self appendUInt16:d.length];
+    [self appendUInt16:(uint8_t)d.length];
   } else {
     [self appendUInt8:OP_PUSHDATA4];
     [self appendUInt32:(uint32_t)d.length];
@@ -211,15 +211,15 @@ CFAllocatorRef SecureAllocator() {
 #endif
 
   if (version == pubkeyAddress) {
-    [self appendUInt8:OP_DUP];
-    [self appendUInt8:OP_HASH160];
+    [self appendUInt8:(uint8_t)OP_DUP];
+    [self appendUInt8:(uint8_t)OP_HASH160];
     [self appendScriptPushData:hash];
-    [self appendUInt8:OP_EQUALVERIFY];
-    [self appendUInt8:OP_CHECKSIG];
+    [self appendUInt8:(uint8_t)OP_EQUALVERIFY];
+    [self appendUInt8:(uint8_t)OP_CHECKSIG];
   } else if (version == scriptAddress) {
-    [self appendUInt8:OP_HASH160];
+    [self appendUInt8:(uint8_t)OP_HASH160];
     [self appendScriptPushData:hash];
-    [self appendUInt8:OP_EQUAL];
+    [self appendUInt8:(uint8_t)OP_EQUAL];
   }
 }
 

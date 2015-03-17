@@ -12,6 +12,7 @@
 #import "BCAddress.h"
 #import "BCCoin.h"
 #import "BreadcrumbCore.h"
+#import "BCScript.h"
 
 @interface BCAddress () {
   NSString *_stringRepresentation;
@@ -44,6 +45,30 @@
 
     _stringRepresentation = addressString;
   }
+  return self;
+}
+
+- (instancetype)initWithScript:(BCScript *)script usingCoin:(BCCoin *)coin {
+  NSMutableData *buffer;
+  NSParameterAssert([script isKindOfClass:[BCScript class]]);
+  if (![script isKindOfClass:[BCScript class]]) return NULL;
+
+  self = [super init];
+  if (!self) return NULL;
+
+  // P2SH Type code
+  _typeCode = coin.P2SHCode;
+  buffer = [[NSMutableData alloc] init];
+  if (![buffer isKindOfClass:[NSMutableData class]]) return NULL;
+
+  [buffer appendUInt8:_typeCode];
+
+  // Hash160
+  [buffer appendData:[[[script toData] SHA256] RMD160]];
+
+  _dataRepresentation = [NSData dataWithData:buffer];
+  _stringRepresentation = [_dataRepresentation base58CheckEncoding];
+
   return self;
 }
 
@@ -118,6 +143,10 @@
   if (![addressString isKindOfClass:[NSString class]]) return NULL;
 
   return [addressString toBitcoinAddress];
+}
+
++ (BCAddress *)addressFromScript:(BCScript *)script usingCoin:(BCCoin *)coin {
+  return [[[self class] alloc] initWithScript:script usingCoin:(BCCoin *)coin];
 }
 
 @end

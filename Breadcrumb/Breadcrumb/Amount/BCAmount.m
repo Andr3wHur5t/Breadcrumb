@@ -19,7 +19,7 @@
   return (CGFloat)satoshi / (CGFloat)kBCAmountBits;
 }
 
-+ (uint64_t)satoshiTomBTC:(uint64_t)satoshi {
++ (CGFloat)satoshiTomBTC:(uint64_t)satoshi {
   return (CGFloat)satoshi / (CGFloat)kBCAmountmBTC;
 }
 

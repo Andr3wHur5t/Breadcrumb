@@ -321,7 +321,7 @@
     [result
         appendString:[formatter
                          stringFromNumber:isHardened
-                                              ? @([componentIndex intValue] -
+                                              ? @([componentIndex unsignedIntValue] -
                                                   BIP32_PRIME)
                                               : componentIndex]];
 

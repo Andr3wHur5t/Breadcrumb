@@ -52,7 +52,7 @@
   position += sizeof(uint32_t);
 
   // Get the scripts length
-  scriptLength = [_data varIntAtOffset:position length:&_length];
+  scriptLength = (NSUInteger)[_data varIntAtOffset:position length:&_length];
   position += _length;
 
   // Get the scripts data

@@ -264,7 +264,7 @@ static NSString *const kTransactionBuildingErrorDomain =
 
   // Calculate the fee Based off of the transaction size. Assume Change Output
   transactionSize = [newTransaction currentSize] + 39;
-  feeAmount = ((CGFloat)transactionSize / 1000.0f) * feePerK;
+  feeAmount = (uint64_t)((CGFloat)transactionSize / 1000.0f) * feePerK;
 
   // Check For Funds
   if (utxoSumAmount < (amount + feeAmount)) {

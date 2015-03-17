@@ -105,4 +105,7 @@ shouldn't be given to third parties.
 - (BCKeyPair *)keyPairForAddress:(BCAddress *)address
                   usingMemoryKey:(NSData *)memoryKey;
 
+- (NSArray *)keyPairsForScript:(BCScript *)script
+                usingMemoryKey:(NSData *)memoryKey;
+
 @end

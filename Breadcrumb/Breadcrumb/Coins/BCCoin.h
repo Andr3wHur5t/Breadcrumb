@@ -45,15 +45,16 @@
  */
 - (uint8_t)addressTypeForFlags:(NSUInteger)flags;
 
-
 /*!
  @brief Checks if the inputted address is valid for the coin.
- 
+
  @param address The address to check.
  */
 - (BOOL)typeIsValidForCoin:(BCAddress *)address;
 
 #pragma mark Default Coins
+
+@property(assign, nonatomic, readonly) uint8_t P2SHCode;
 
 /*!
  @brief This coin is configured for main net.

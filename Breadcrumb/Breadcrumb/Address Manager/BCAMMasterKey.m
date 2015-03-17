@@ -22,7 +22,7 @@
 @synthesize addresses = _addresses;
 @synthesize lastUsedIndex = _lastUsedIndex;
 
-#pragma Construction
+#pragma mark Construction
 
 - (instancetype)initWithKeyPair:(BCKeyPair *)key andCoin:(BCCoin *)coin {
   @autoreleasepool {
@@ -49,7 +49,7 @@
   uint16_t count, initial;
   if (self.addresses.count > index) return;
 
-  initial = self.addresses.count;
+  initial = (uint16_t)self.addresses.count;
   count = index - initial;
   for (uint16_t i = 0; i < count; ++i) [self addressAtIndex:initial + i];
 }
@@ -65,7 +65,7 @@
   if (![address isKindOfClass:[BCAddress class]]) return;
 
   // Fill Empty spaces with NULL. Will be caught by address at index.
-  for (uint16_t i = self.addresses.count; i < index; ++i)
+  for (uint16_t i = (uint16_t)self.addresses.count; i < index; ++i)
     [self.addresses setObject:[NSNull null] atIndexedSubscript:i];
   [self.addresses setObject:address atIndexedSubscript:index];
 }

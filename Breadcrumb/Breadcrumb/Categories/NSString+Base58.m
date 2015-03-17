@@ -80,7 +80,7 @@ static const int8_t base58map[] = {
   for (i = z; i < data.length; i++) {
     uint32_t carry = ((const uint8_t *)data.bytes)[i];
     
-    for (ssize_t j = sizeof(buf) - 1; j >= 0; j--) {
+    for (ssize_t j = (ssize_t)sizeof(buf) - 1; j >= 0; j--) {
       carry += (uint32_t)buf[j] << 8;
       buf[j] = carry % 58;
       carry /= 58;
@@ -90,7 +90,7 @@ static const int8_t base58map[] = {
   
   while (i < sizeof(buf) && buf[i] == 0) i++; // skip leading zeroes
   
-  CFMutableStringRef str = CFStringCreateMutable(SecureAllocator(), z + sizeof(buf) - i);
+  CFMutableStringRef str = CFStringCreateMutable(SecureAllocator(), (CFIndex)(z + sizeof(buf) - i));
   
   while (z-- > 0) CFStringAppendCharacters(str, base58chars, 1);
   
@@ -116,7 +116,7 @@ static const int8_t base58map[] = {
 + (NSString *)hexWithData:(NSData *)data {
   const uint8_t *bytes = data.bytes;
   NSMutableString *hex = CFBridgingRelease(
-      CFStringCreateMutable(SecureAllocator(), data.length * 2));
+      CFStringCreateMutable(SecureAllocator(), (CFIndex)(data.length * 2)));
 
   for (NSUInteger i = 0; i < data.length; i++)
     [hex appendFormat:@"%02x", bytes[i]];
@@ -137,10 +137,10 @@ static const int8_t base58map[] = {
   
   // Check all chars are allowed
   BOOL pass;
-  for (NSUInteger i = 0; i < self.length; ++i) {
+  for (NSUInteger w = 0; w < self.length; ++w) {
     pass = false;
     for (NSUInteger q = 0; q < 59; ++q)
-      if ( [self characterAtIndex:i] == base58chars[q] )
+      if ( [self characterAtIndex:w] == base58chars[q] )
         pass = true;
     if ( !pass )
       return NULL;
@@ -160,9 +160,9 @@ static const int8_t base58map[] = {
     
     if (c >= sizeof(base58map)/sizeof(*base58map) || base58map[c] == -1) break; // invalid base58 digit
     
-    uint32_t carry = base58map[c];
+    uint32_t carry = (uint32_t)base58map[c];
     
-    for (ssize_t j = sizeof(buf) - 1; j >= 0; j--) {
+    for (ssize_t j = (ssize_t)sizeof(buf) - 1; j >= 0; j--) {
       carry += (uint32_t)buf[j]*58;
       buf[j] = carry & 0xff;
       carry >>= 8;
@@ -188,7 +188,7 @@ static const int8_t base58map[] = {
   d = self.base58ToData;
   if (d.length < 4) return NULL;
   data =
-      CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
+      CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, (CFIndex)(d.length - 4)));
 
   // verify checksum
   if (*(uint32_t *)((const uint8_t *)d.bytes + d.length - 4) !=
@@ -402,18 +402,18 @@ static const int8_t base58map[] = {
 #endif
   } else if ((self.length == 30 || self.length == 22) &&
              [self characterAtIndex:0] == 'S') {  // mini private key format
-    NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length + 1];
+    NSMutableData *md = [NSMutableData secureDataWithCapacity:self.length + 1];
 
-    d.length = self.length;
-    [self getBytes:d.mutableBytes
-             maxLength:d.length
+    md.length = self.length;
+    [self getBytes:md.mutableBytes
+             maxLength:md.length
             usedLength:NULL
               encoding:NSUTF8StringEncoding
                options:0
                  range:NSMakeRange(0, self.length)
         remainingRange:NULL];
-    [d appendBytes:"?" length:1];
-    return (*(const uint8_t *)d.SHA256.bytes == 0) ? YES : NO;
+    [md appendBytes:"?" length:1];
+    return (*(const uint8_t *)md.SHA256.bytes == 0) ? YES : NO;
   } else
     return (self.hexToData.length == 32) ? YES : NO;  // hex encoded key
 }

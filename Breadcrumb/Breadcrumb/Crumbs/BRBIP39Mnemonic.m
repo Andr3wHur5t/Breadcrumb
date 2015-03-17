@@ -32,7 +32,7 @@
 #import "ccMemory.h"
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-#define WORDS @"BIP39EnglishWords"
+
 
 // BIP39 is method for generating a deterministic wallet seed from a mnemonic
 // phrase
@@ -71,7 +71,7 @@
   [d appendData:data.SHA256];  // append SHA256 checksum
 
   NSParameterAssert(n != 0);  // Failed To Load File
-  for (int i = 0; i < data.length * 3 / 4; i++) {
+  for (NSUInteger i = 0; i < data.length * 3 / 4; i++) {
     x = CFSwapInt32BigToHost(
         *(const uint32_t *)((const uint8_t *)d.bytes + i * 11 / 8));
     [a addObject:words[(x >> (sizeof(x) * 8 - (11 + ((i * 11) % 8)))) % n]];
@@ -99,7 +99,7 @@
     return nil;
   }
 
-  for (int i = 0; i < (a.count * 11 + 7) / 8; i++) {
+  for (NSUInteger i = 0; i < (a.count * 11 + 7) / 8; i++) {
     x = (uint32_t)[words indexOfObject : a[i * 8 / 11]];
     y = (i * 8 / 11 + 1 < a.count)
             ? (uint32_t)[words indexOfObject : a[i * 8 / 11 + 1]]
@@ -168,9 +168,9 @@
       [NSMutableData secureDataWithLength:CC_SHA512_DIGEST_LENGTH];
   NSData *password, *salt;
   CFMutableStringRef pw = CFStringCreateMutableCopy(
-      SecureAllocator(), phrase.length, (CFStringRef)phrase);
+      SecureAllocator(), (CFIndex)phrase.length, (CFStringRef)phrase);
   CFMutableStringRef s = CFStringCreateMutableCopy(
-      SecureAllocator(), 8 + passphrase.length, CFSTR("mnemonic"));
+      SecureAllocator(), 8 + (CFIndex)passphrase.length, CFSTR("mnemonic"));
 
   if (passphrase) CFStringAppend(s, (CFStringRef)passphrase);
   CFStringNormalize(pw, kCFStringNormalizationFormKD);

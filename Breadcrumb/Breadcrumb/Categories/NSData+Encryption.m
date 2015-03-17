@@ -72,11 +72,11 @@ static void blockmix_salsa8(uint64_t *dest, const uint64_t *src, uint64_t *b,
 }
 
 // scrypt key derivation: http://www.tarsnap.com/scrypt.html
-static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
+static NSData *scrypt(NSData *password, NSData *salt, uint64_t n, uint32_t r,
                       uint32_t p, NSUInteger length) {
   NSMutableData *d = [NSMutableData secureDataWithLength:length];
   uint8_t b[128 * r * p];
-  uint64_t x[16 * r], y[16 * r], z[8], *v = CC_XMALLOC(128 * r * (int)n), m;
+  uint64_t x[16 * r], y[16 * r], z[8], *v = CC_XMALLOC(128 * r * (unsigned int)n), m;
 
   CCKeyDerivationPBKDF(kCCPBKDF2, password.bytes, password.length, salt.bytes,
                        salt.length, kCCPRFHmacAlgSHA256, 1, b, sizeof(b));
@@ -116,7 +116,7 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r,
   CC_XZEROMEM(x, sizeof(x));
   CC_XZEROMEM(y, sizeof(y));
   CC_XZEROMEM(z, sizeof(z));
-  CC_XZEROMEM(v, 128 * r * (int)n);
+  CC_XZEROMEM(v, 128 * r * (unsigned int)n);
   CC_XFREE(v, 128 * r * (int)n);
   CC_XZEROMEM(&m, sizeof(m));
   return d;

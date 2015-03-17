@@ -29,7 +29,104 @@
   [self walletDemo];
   [self testPubKeyDiriviation];
 
+  BCScript *src =
+      [BCScript standardTransactionScript:
+                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]];
+  NSLog(@"%@", [src P2SHAddressForCoin:[BCCoin TestNet3Bitcoin]]);
+
+  src = [BCScript
+      opReturnScriptWithData:[@"Send Me Bitcoin!"
+                                 dataUsingEncoding:NSASCIIStringEncoding]];
+
+  [self testP2SHscripts];
+
   return YES;
+}
+
+- (void)testP2SHscripts {
+  NSData *reedemScript =
+      @"524104a882d414e478039cd5b52a92ffb13dd5e6bd4515497439dffd691a0f12af9575f"
+      @"a349b5694ed3155b136f09e63975a1700c9f4d4df849323dac06cf3bd6458cd41046ce"
+      @"31db9bdd543e72fe3039a1f1c047dab87037c36a669ff90e28da1848f640de68c2fe91"
+      @"3d363a51154a0c62d7adea1b822d05035077418267b1a1379790187410411ffd36c707"
+      @"76538d079fbae117dc38effafb33304af83ce4894589747aee1ef992f63280567f52f5"
+      @"ba870678b4ab4ff6c8ea600bd217870a8b4f1f09f3a8e8353ae".hexToData;
+
+  BCPublicKey *currentKey;
+
+  NSMutableArray *pubKeys = [[NSMutableArray alloc] init];
+  currentKey = [[BCPublicKey alloc]
+      initWithData:@"04a882d414e478039cd5b52a92ffb13dd5e6bd4515497439dffd691a0f"
+                   @"12af9575fa349b5694ed3155b136f09e63975a1700c9f4d4df849323d"
+                   @"ac06cf3bd6458cd".hexToData];
+  [pubKeys addObject:currentKey];
+
+  currentKey = [[BCPublicKey alloc]
+      initWithData:@"046ce31db9bdd543e72fe3039a1f1c047dab87037c36a669ff90e28da1"
+                   @"848f640de68c2fe913d363a51154a0c62d7adea1b822d050350774182"
+                   @"67b1a1379790187".hexToData];
+  [pubKeys addObject:currentKey];
+
+  currentKey = [[BCPublicKey alloc]
+      initWithData:@"0411ffd36c70776538d079fbae117dc38effafb33304af83ce48945897"
+                   @"47aee1ef992f63280567f52f5ba870678b4ab4ff6c8ea600bd217870a"
+                   @"8b4f1f09f3a8e83".hexToData];
+  [pubKeys addObject:currentKey];
+
+  BCScript *script =
+      [BCScript multisigScriptWithPubkeys:pubKeys andMinumumSignitures:2];
+  [self compare:script.toData to:reedemScript];
+  NSAssert([reedemScript isEqualToData:script.toData], @"Failed");
+  NSAssert(
+      [[script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]
+          isEqual:[@"347N1Thc213QqfYCz3PZkjoJpNv5b14kBd" toBitcoinAddress]],
+      @"Failed");
+
+  // Check Type parsing
+  NSAssert(script.type == BCScriptType_MofN, @"failed");
+  NSAssert(
+      [BCScript standardTransactionScript:
+                    [script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]].type ==
+          BCScriptType_P2SH,
+      @"failed");
+  NSAssert(
+      [BCScript standardTransactionScript:
+                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]]
+              .type == BCScriptType_P2PKH,
+      @"failed");
+  NSAssert(
+      [BCScript
+          opReturnScriptWithData:[@"Helo there! :)"
+                                     dataUsingEncoding:NSUTF8StringEncoding]]
+              .type == BCScriptType_OPReturn,
+      @"failed");
+  script = [BCScript standardTransactionScript:
+                         [script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]];
+}
+
+- (void)compare:(NSData *)a to:(NSData *)b {
+  NSMutableArray *indexes;
+  uint8_t *aBytes, *bBytes;
+
+  aBytes = (uint8_t *)a.bytes;
+  bBytes = (uint8_t *)b.bytes;
+  indexes = [[NSMutableArray alloc] init];
+  for (NSUInteger i = 0; i < MIN(a.length, b.length); ++i)
+    if (aBytes[i] != aBytes[i]) [indexes addObject:@(i)];
+
+  for (NSUInteger i = MIN(a.length, b.length); i < MAX(a.length, b.length); ++i)
+    [indexes addObject:@(i)];
+
+  // Report
+  NSLog(@"%.2f%% diffrence",
+        ((CGFloat)(indexes.count +
+                   ABS((NSInteger)a.length - (NSInteger)b.length)) /
+         (CGFloat)MIN(a.length, b.length)) *
+            100.0f);
+  for (NSNumber *index in indexes) {
+    NSLog(@"%@:(%x, %x)", index, aBytes[[index integerValue]],
+          bBytes[[index integerValue]]);
+  }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -113,6 +210,15 @@
                               error.localizedDescription);
                   }];
 
+  //  BCWallet *wallet =
+  //      [[BCWallet alloc] initNewWithPassword:password
+  //                                       coin:[BCCoin MainNetBitcoin]
+  //                                   provider:[[BCProviderChain alloc] init]
+  //                               sequenceType:BCKeySequenceType_BIP44
+  //                                andCallback:^(NSError *e){
+  //
+  //                                }];
+
   // You can retrieve the wallets protected info like is mnemonic phrase using
   // the password
   [wallet mnemonicPhraseWithPassword:password
@@ -138,10 +244,10 @@
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  BCAddress *address = [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress];
+  BCAddress *address = [@"37SqqZNsA5LLKVhQQXEgQKeECzC57Ktkpu" toBitcoinAddress];
 
   // BCAmount converts to and from satoshi.
-  uint64_t amount = [BCAmount Bits:1.345666];
+  uint64_t amount = [BCAmount Bits:5];
   [wallet send:amount
                  to:address
       usingPassword:password

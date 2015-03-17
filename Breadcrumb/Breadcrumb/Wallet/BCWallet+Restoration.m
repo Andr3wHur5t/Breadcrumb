@@ -16,17 +16,25 @@
 @implementation BCWallet (Restoration)
 #pragma mark Construction
 
-+ (void)initUsingPrivateInfo:(NSDictionary *)privInfo
++ (instancetype)initUsingPrivateInfo:(NSDictionary *)privInfo
                   publicInfo:(NSDictionary *)pubInfo
                     password:(NSData *)password
               withCompletion:(void (^)(id))completion {
   @autoreleasepool {
     // TODO: Process info and restore
-    return;
+    return NULL;
   }
 }
 
 #pragma mark Restoration Data Retrieval
+
+- (NSDictionary *)privateInfo {
+  return NULL;
+}
+
+- (NSDictionary *)publicInfo {
+  return NULL;
+}
 
 #pragma mark Utilities
 

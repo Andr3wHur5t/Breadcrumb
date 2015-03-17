@@ -18,6 +18,7 @@
 @implementation BCMnemonic
 #pragma mark Generation
 
+// TODO: Allow For configuration of entropy length
 + (NSString *)newMnemonic {
   // Auto release pool ensures data is deallocated immediately
   @autoreleasepool {
@@ -95,6 +96,26 @@
     return [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:phrase
                                                   withPassphrase:passphrase];
   }
+}
+
++ (BOOL)wordIsValid:(NSString *)word {
+  NSString *currentWord;
+  NSArray *words =
+      [NSArray arrayWithContentsOfFile:[[BRBIP39Mnemonic bundle]
+                                           pathForResource:WORDS
+                                                    ofType:@"plist"]];
+  if (![words isKindOfClass:[NSArray class]]) {
+    NSLog(@"Missing BIP 39 words file.");
+    return FALSE;
+  }
+
+  for (NSUInteger i = 0; i < words.count; ++i) {
+    currentWord = [words objectAtIndex:i];
+    if ([currentWord isKindOfClass:[NSString class]])
+      if ([currentWord isEqualToString:word]) return TRUE;
+  }
+
+  return FALSE;
 }
 
 @end

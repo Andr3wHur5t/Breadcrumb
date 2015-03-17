@@ -82,4 +82,6 @@
 + (NSData *)keyFromPhrase:(NSString *)phrase
            withPassphrase:(NSString *)passphrase;
 
++ (BOOL)wordIsValid:(NSString *)word;
+
 @end

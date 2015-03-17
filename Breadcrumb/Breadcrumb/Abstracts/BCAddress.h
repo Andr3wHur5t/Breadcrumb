@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 
 @class BCCoin;
+@class BCScript;
 
 @interface BCAddress : NSObject
 
@@ -63,6 +64,8 @@
  */
 + (BCAddress *)addressFromPublicKey:(NSData *)publicKey
                           usingCoin:(BCCoin *)coin;
+
++ (BCAddress *)addressFromScript:(BCScript *)script  usingCoin:(BCCoin *)coin;
 
 #pragma mark Checks
 /*!

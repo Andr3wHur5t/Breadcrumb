@@ -35,6 +35,13 @@ typedef enum : NSUInteger {
 + (CGFloat)satoshiToBits:(uint64_t)satoshi;
 
 /*!
+ @brief Converts the amount of satoshi to mBTC.
+ 
+ @param satoshi The amount of satoshi to convert.
+ */
++ (CGFloat)satoshiTomBTC:(uint64_t)satoshi;
+
+/*!
  @brief Converts the inputted amount of satoshi to BTC.
 
  @param satoshi The amount of satoshi to convert.

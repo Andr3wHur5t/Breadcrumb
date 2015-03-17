@@ -164,7 +164,7 @@ static inline void byteswap32(uint32_t *v) {
   /* Wipe temporary variables */
   x.w = y.w = 0;
 }
-static inline void byteswap_digest(uint32_t *p) {
+static inline void __attribute__((unused)) byteswap_digest(uint32_t *p) {
   unsigned int i;
   for (i = 0; i < 4; i++) {
     byteswap32(p++);
@@ -365,7 +365,7 @@ static void ripemd160_done(ripemd160_state *self, unsigned char *out) {
 #endif
   memcpy(out, &self->h, RIPEMD160_DIGEST_SIZE);
 }
-static void ripemd160(const void *in, unsigned long length, void *out) {
+static void __attribute__((unused)) ripemd160(const void *in, unsigned long length, void *out) {
   ripemd160_state md;
   ripemd160_init(&md);
   ripemd160_process(&md, in, length);

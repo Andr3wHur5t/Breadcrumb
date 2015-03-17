@@ -66,6 +66,10 @@
       [emptyScriptInputs setObject:newEmpty atIndexedSubscript:i];
     }
 
+    // For Multi-signiture check if the Input For the Pub Key Or Pub Key Hash
+    // Need to detect tx type P2PKSH/P2SH , P2PK, and MULTI-SIG
+    // Detect In Address Manager?
+    
     // Sign Transaction Inputs
     signedInputs = [[NSMutableArray alloc] init];
     for (NSUInteger i = 0; i < originalInputs.count; ++i) {
@@ -90,6 +94,8 @@
         return NULL;
       }
 
+      // TODO: Switch From Address to script
+      // TODO: Alow for multiple keys to sign the input via array
       // Get the current key from the address manager
       currentKeyPair = [self.addressManager keyPairForAddress:currentAddress
                                                usingMemoryKey:key];
@@ -155,7 +161,7 @@
   }
 }
 
-+ (NSError *)internalSigningError:(NSUInteger)code {
++ (NSError *)internalSigningError:(NSInteger)code {
   return [NSError
       errorWithDomain:@"com.breadcrumb.transactionSigning"
                  code:code

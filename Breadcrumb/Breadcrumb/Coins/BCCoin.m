@@ -37,6 +37,10 @@
   return 0x80000000;
 }
 
+- (uint8_t)P2SHCode {
+  return 0x05;
+}
+
 #pragma mark Default Coins
 
 + (instancetype)MainNetBitcoin {
@@ -77,6 +81,10 @@
   return 0x80000000;
 }
 
+- (uint8_t)P2SHCode {
+  return 0x05;
+}
+
 @end
 
 @implementation BCTestNet3Bitcoin
@@ -97,6 +105,11 @@
 
 - (uint32_t)coinId {
   return 0x80000001;
+}
+
+
+- (uint8_t)P2SHCode {
+  return 196;
 }
 
 @end

@@ -11,6 +11,54 @@
 
 #import <Foundation/Foundation.h>
 #import "BCScriptOpCodes.h"
+#import "BCAddress.h"
+
+/*!
+ @brief Script types
+ */
+typedef enum : NSUInteger {
+                 /*!
+                  @brief Pay to public key hash (bitcoin address).
+
+                  @discussion OP_DUP OP_HASH160 <20 bytes of public key hash>
+                  OP_EQUALVERIFY OP_CHECKSIG
+                  */
+                 BCScriptType_P2PKH = 0,
+
+                 /*!
+                  @brief Pay to script hash.
+
+                  @discussion OP_HASH160 <20 bytes of script hash> OP_EQUAL
+                  */
+                 BCScriptType_P2SH,
+
+                 /*!
+                  @brief Pay to public key.
+
+                  @discussion <33 or 65 bytes of public key> OP_CHECKSIG
+                  */
+                 BCScriptType_P2PK,
+
+                 /*!
+                  @brief Multi signiture.
+
+                  @discussion OP_<m> [n <public key>s] OP_<n> OP_CHECKMULTISIG
+                  */
+                 BCScriptType_MofN,
+
+                 /*!
+                  @brief Op return script to push arbitrary data to the block
+                  chain. (Unspendable)
+
+                  @discussion OP_RETURN <message>
+                  */
+                 BCScriptType_OPReturn,
+
+                 /*!
+                  @brief A non standard transaction. (Unspendable)
+                  */
+                 BCScriptType_NonStandard
+               } BCScriptType;
 
 /*!
  @brief A immutable bitcoin script.
@@ -52,6 +100,13 @@
  @return The string representation.
  */
 - (NSString *)toString;
+
+@property(assign, nonatomic, readonly) BCScriptType type;
+
+@property(strong, nonatomic, readonly) NSArray *elements;
+
+
+- (BCAddress *)P2SHAddressForCoin:(BCCoin *)coin;
 
 @end
 

@@ -27,7 +27,7 @@
 - (instancetype)initWithData:(NSData *)data
                     atOffset:(NSUInteger)offset
                   withLength:(NSUInteger *)length {
-  int64_t value;
+  uint64_t value;
   NSUInteger scriptLength, valueLength, position = 0;
   NSData *scriptData, *_data;
   BCScript *script;

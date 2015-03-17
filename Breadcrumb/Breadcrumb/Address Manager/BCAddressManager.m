@@ -39,7 +39,7 @@
   }
 }
 
-#pragma Mark Configuration
+#pragma mark Configuration
 
 - (void)setMasters:(NSData *)memoryKey {
   @autoreleasepool {
@@ -49,28 +49,28 @@
         keyPairForComponents:
             @[ @(0x8000002C), @(self.coin.coinId), @(BIP32_PRIME | 0), @(1) ]
                 andMemoryKey:memoryKey];
-    _bip44Internal = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                    andCoin:self.coin];
+    _bip44Internal =
+        [[BCAMMasterKey alloc] initWithKeyPair:currentKey andCoin:self.coin];
 
     currentKey = [self.keySequence
         keyPairForComponents:
             @[ @(0x8000002C), @(self.coin.coinId), @(BIP32_PRIME | 0), @(0) ]
                 andMemoryKey:memoryKey];
-    _bip44External = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                    andCoin:self.coin];
+    _bip44External =
+        [[BCAMMasterKey alloc] initWithKeyPair:currentKey andCoin:self.coin];
 
     // Set bip 32 masters
     currentKey =
         [self.keySequence keyPairForComponents:@[ @(BIP32_PRIME | 0), @(1) ]
                                   andMemoryKey:memoryKey];
-    _bip32Internal = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                    andCoin:self.coin];
+    _bip32Internal =
+        [[BCAMMasterKey alloc] initWithKeyPair:currentKey andCoin:self.coin];
 
     currentKey =
         [self.keySequence keyPairForComponents:@[ @(BIP32_PRIME | 0), @(0) ]
                                   andMemoryKey:memoryKey];
-    _bip32External = [[BCAMMasterKey alloc] initWithKeyPair:currentKey
-                                                    andCoin:self.coin];
+    _bip32External =
+        [[BCAMMasterKey alloc] initWithKeyPair:currentKey andCoin:self.coin];
 
     memoryKey = NULL;
   }
@@ -135,6 +135,53 @@
 
     return NULL;
   }
+}
+
+- (NSArray *)keyPairsForScript:(BCScript *)script
+                usingMemoryKey:(NSData *)memoryKey {
+  NSMutableData *data = [[NSMutableData alloc] init];
+  BCAddress *address;
+  NSMutableArray *addresses;
+
+  addresses = [[NSMutableArray alloc] init];
+  switch (script.type) {
+    case BCScriptType_P2PKH:
+      // Fake an address
+      [data appendUInt8:0x01];
+      [data appendData:[script.elements objectAtIndex:2]];
+      if (data.length < 20) return NULL;
+
+      address = [data.base58CheckEncoding toBitcoinAddress];
+      return @[ [self keyPairForAddress:address usingMemoryKey:memoryKey] ];
+      break;
+    case BCScriptType_P2SH:
+      // Fake an address
+      [data appendUInt8:0x01];
+      [data appendData:[script.elements objectAtIndex:1]];
+      if (data.length < 20) return NULL;
+
+      address = [data.base58CheckEncoding toBitcoinAddress];
+      return @[ [self keyPairForAddress:address usingMemoryKey:memoryKey] ];
+      break;
+    case BCScriptType_P2PK:
+      // Check the pub key is valid
+      [data appendData:[script.elements objectAtIndex:0]];
+      if (data.length < 35) return NULL;
+      // Get its address
+      address =
+          [[[BCPublicKey alloc] initWithData:data] addressForCoin:self.coin];
+      return @[ [self keyPairForAddress:address usingMemoryKey:memoryKey] ];
+      break;
+    case BCScriptType_MofN:
+      // TODO: This
+      return NULL;
+      break;
+    default:
+      return NULL;
+      break;
+  }
+
+  return @[];
 }
 
 @end

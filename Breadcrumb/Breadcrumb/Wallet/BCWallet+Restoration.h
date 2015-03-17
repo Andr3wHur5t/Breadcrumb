@@ -21,9 +21,10 @@
  @param pubInfo  The wallets public info.
  @param password The password data used in the creation of the wallet.
  */
-- (instancetype)initUsingPrivateInfo:(NSDictionary *)privInfo
++ (instancetype)initUsingPrivateInfo:(NSDictionary *)privInfo
                           publicInfo:(NSDictionary *)pubInfo
-                         andPassword:(NSData *)password;
+                            password:(NSData *)password
+                      withCompletion:(void (^)(id))completion;
 
 #pragma mark Info
 /*!

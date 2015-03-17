@@ -23,6 +23,23 @@
  */
 + (instancetype)standardTransactionScript:(BCAddress *)address;
 
+/*!
+ @brief Creates a multi-signiture reedem script for the provided inputs
+
+ @param pubkeys       The public keys in order of signing.
+ @param minSignitures The mimumum number of signitures.
+
+ @return The mulit-signiture reedeem script.
+ */
++ (instancetype)multisigScriptWithPubkeys:(NSArray *)pubkeys
+                     andMinumumSignitures:(uint8_t)minSignitures;
+
 #pragma mark Messages
+/*!
+ @brief Creates an op return script with the specified data.
+
+ @param data The data to put in the op return script.
+ */
++ (instancetype)opReturnScriptWithData:(NSData *)data;
 
 @end

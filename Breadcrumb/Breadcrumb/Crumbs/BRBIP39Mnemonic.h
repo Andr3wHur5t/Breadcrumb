@@ -6,7 +6,8 @@
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
+//  of this software and associated documentation files (the "Software"), to
+//  deal
 //  in the Software without restriction, including without limitation the rights
 //  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //  copies of the Software, and to permit persons to whom the Software is
@@ -19,17 +20,20 @@
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
 #import "BRMnemonic.h"
 
-// BIP39 is method for generating a deterministic wallet seed from a mnemonic phrase
+// BIP39 is method for generating a deterministic wallet seed from a mnemonic
+// phrase
 // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
 
 #define BIP39_CREATION_TIME (1388534400.0 - NSTimeIntervalSince1970)
+#define WORDS @"BIP39EnglishWords"
 
 @interface BRBIP39Mnemonic : NSObject<BRMnemonic>
 
@@ -40,6 +44,8 @@
 - (BOOL)phraseIsValid:(NSString *)phrase;
 
 - (NSString *)normalizePhrase:(NSString *)phrase;
-- (NSData *)deriveKeyFromPhrase:(NSString *)phrase withPassphrase:(NSString *)passphrase;
+- (NSData *)deriveKeyFromPhrase:(NSString *)phrase
+                 withPassphrase:(NSString *)passphrase;
 
++ (NSBundle *)bundle;
 @end

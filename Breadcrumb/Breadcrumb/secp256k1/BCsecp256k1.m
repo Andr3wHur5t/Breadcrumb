@@ -50,7 +50,7 @@
       NSLog(@"Failed to create public key!");  // TODO: Report as errors
       return NULL;
     } else {
-      return [[NSData alloc] initWithBytes:pubKey length:pubKeyLength];
+      return [[NSData alloc] initWithBytes:pubKey length:(NSUInteger)pubKeyLength];
     }
   }
 }
@@ -79,7 +79,7 @@
       return NULL;
     } else {
       key = NULL;
-      signiture = [[NSData alloc] initWithBytes:signature length:sigLength];
+      signiture = [[NSData alloc] initWithBytes:signature length:(NSUInteger)sigLength];
 
       return [signiture isKindOfClass:[NSData class]] ? signiture : NULL;
     }

@@ -352,7 +352,7 @@
 
 #pragma mark errors
 
-+ (NSError *)walletGenerationErrorWithCode:(NSUInteger)code {
++ (NSError *)walletGenerationErrorWithCode:(NSInteger)code {
   return [NSError
       errorWithDomain:@"com.breadcrumb.walletGeneration"
                  code:code

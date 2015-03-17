@@ -10,6 +10,11 @@
 //
 //
 
+#import <Breadcrumb/BCWallet+TransactionSigning.h>
+#import <Breadcrumb/BCWallet+Restoration.h>
+#import <Breadcrumb/_BCWallet.h>
+
+
 #import <Breadcrumb/NSMutableData+Bitcoin.h>
 #import <Breadcrumb/NSData+Bitcoin.h>
 #import <Breadcrumb/NSData+Encryption.h>
