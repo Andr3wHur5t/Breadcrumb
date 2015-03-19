@@ -53,7 +53,8 @@
 #pragma mark Public Key Tweeks
 
 - (NSData *)publicKey:(NSData *)publicKey add:(NSData *)tweek;
-//- (NSData *)publicKey:(NSData *)publicKey multiply:(NSData *)tweek;
+
+- (NSData *)privateKey:(NSData *)privateKey add:(NSData *)tweek;
 
 #pragma mark Shared access
 

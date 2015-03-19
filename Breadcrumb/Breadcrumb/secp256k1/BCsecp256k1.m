@@ -127,6 +127,15 @@
   return [NSData dataWithData:mPubKey];
 }
 
+- (NSData *)privateKey:(NSData *)privateKey add:(NSData *)tweek {
+  @autoreleasepool {
+    NSMutableData *mPrivKey = [NSMutableData dataWithData:privateKey];
+    if (!secp256k1_ec_privkey_tweak_add((unsigned char *)tweek.bytes, [mPrivKey mutableBytes])) {
+      return NULL;
+    }
+    return [NSData dataWithData:mPrivKey];
+  }
+}
 
 #pragma mark Shared access
 
