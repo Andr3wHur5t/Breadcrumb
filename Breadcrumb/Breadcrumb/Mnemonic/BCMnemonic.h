@@ -13,6 +13,11 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum : NSUInteger {
+  BCMnemonicLang_English,
+  BCMnemonicLang_Japanese,
+} BCMnemonicLang;
+
 /*!
  @brief Utility class for mnemonic BIP39 generation, processing, and conversion.
 
@@ -83,5 +88,7 @@
            withPassphrase:(NSString *)passphrase;
 
 + (BOOL)wordIsValid:(NSString *)word;
+
++ (NSArray *)wordListForLanguage:(BCMnemonicLang)lang;
 
 @end

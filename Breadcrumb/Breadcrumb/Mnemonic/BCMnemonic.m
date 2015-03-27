@@ -100,10 +100,7 @@
 
 + (BOOL)wordIsValid:(NSString *)word {
   NSString *currentWord;
-  NSArray *words =
-      [NSArray arrayWithContentsOfFile:[[BRBIP39Mnemonic bundle]
-                                           pathForResource:WORDS
-                                                    ofType:@"plist"]];
+  NSArray *words = [self wordListForLanguage:BCMnemonicLang_English];
   if (![words isKindOfClass:[NSArray class]]) {
     NSLog(@"Missing BIP 39 words file.");
     return FALSE;
@@ -116,6 +113,12 @@
   }
 
   return FALSE;
+}
+
++ (NSArray *)wordListForLanguage:(BCMnemonicLang)lang {
+  return [NSArray arrayWithContentsOfFile:[[BRBIP39Mnemonic bundle]
+                                              pathForResource:WORDS
+                                                       ofType:@"plist"]];
 }
 
 @end
