@@ -51,9 +51,10 @@ static NSString *const kBCWalletError_Domain =
     __block uint64_t sAmount = amount;
     __block BCAddress *sAddress = address;
     void (^sCallback)(NSData *, NSError *) = ^(NSData *data, NSError *error) {
-        if (callback)
-          dispatch_async(dispatch_get_main_queue(),
-                         ^{ callback(data, error); });
+      if (callback)
+        dispatch_async(dispatch_get_main_queue(), ^{
+          callback(data, error);
+        });
     };
 
     // Validate password
@@ -61,40 +62,41 @@ static NSString *const kBCWalletError_Domain =
 
     // Ensure we have the required funds
     [self getBalance:^(uint64_t balance, NSError *error) {
-        if ([error isKindOfClass:[NSError class]]) {
-          sCallback(NULL, error);
+      if ([error isKindOfClass:[NSError class]]) {
+        sCallback(NULL, error);
+        return;
+      }
+      if (balance <= sAmount) {
+        sCallback(NULL, [[self class] InsufficientFundsForTransactionError]);
+        return;
+      }
+
+      dispatch_async(self.queue, ^{
+        if (![self.addressManager.coin typeIsValidForCoin:address]) {
+          sCallback(
+              NULL,
+              [[self class]
+                  addressInvalidForCoinError:[self.addressManager.coin class]]);
           return;
         }
-        if (balance <= sAmount) {
-          sCallback(NULL, [[self class] InsufficientFundsForTransactionError]);
+
+        // Get the key
+        NSData *key = [[self class] _keyFromPassword:password];
+        if (![key isKindOfClass:[NSData class]]) {
+          sCallback(NULL, [[self class] failedToSignTransactionError]);
           return;
         }
 
-        dispatch_async(self.queue, ^{
-            if (![self.addressManager.coin typeIsValidForCoin:address]) {
-              sCallback(NULL,
-                        [[self class] addressInvalidForCoinError:
-                                          [self.addressManager.coin class]]);
-              return;
-            }
-
-            // Get the key
-            NSData *key = [[self class] _keyFromPassword:password];
-            if (![key isKindOfClass:[NSData class]]) {
-              sCallback(NULL, [[self class] failedToSignTransactionError]);
-              return;
-            }
-
-            // Create Unsigned transaction, and Sign
-            [self _unsignedTransactionForAmount:sAmount
-                                       feePerKB:feePerKB
-                                             to:sAddress
-                                   withCallback:
-                                       [self  // Set the callback to sign the
-                                              // transaction
-                                           _signTransactionBlockForCallback:
-                                               sCallback andKey:key]];
-        });
+        // Create Unsigned transaction, and Sign
+        [self
+            _unsignedTransactionForAmount:sAmount
+                                 feePerKB:feePerKB
+                                       to:sAddress
+                             withCallback:[self  // Set the callback to sign the
+                                                 // transaction
+                                              _signTransactionBlockForCallback:
+                                                  sCallback andKey:key]];
+      });
     }];
   }
 }
@@ -121,34 +123,35 @@ static NSString *const kBCWalletError_Domain =
        andAddresses:self.addressManager  // Pass the address manager so they can
                                          // get the right addresses
        withCallback:^(NSArray *UTXOs, NSError *error) {
-           NSError *transactionBuildingError;
-           BCMutableTransaction *transaction;
+         NSError *transactionBuildingError;
+         BCMutableTransaction *transaction;
 
-           if ([error isKindOfClass:[NSError class]]) {
-             // Report error
-             sCallback(NULL, error);
+         if ([error isKindOfClass:[NSError class]]) {
+           // Report error
+           sCallback(NULL, error);
 
-           } else if ([UTXOs isKindOfClass:[NSArray class]]) {
-             // Build the transaction with the inputted UTXOs
-             transaction = [BCMutableTransaction
-                 buildTransactionWith:UTXOs
-                            forAmount:sAmount
-                                   to:sAddress
-                              feePerK:sFee
-                        changeAddress:self.addressManager.firstUnusedInternal
-                            withError:&transactionBuildingError];
+         } else if ([UTXOs isKindOfClass:[NSArray class]]) {
+           // Build the transaction with the inputted UTXOs
+           transaction = [BCMutableTransaction
+               buildTransactionWith:UTXOs
+                          forAmount:sAmount
+                                 to:sAddress
+                            feePerK:sFee
+                      changeAddress:self.addressManager.firstUnusedInternal
+                          withError:&transactionBuildingError
+                            andCoin:self.coin];
 
-             if ([transactionBuildingError isKindOfClass:[NSError class]]) {
-               callback(NULL, transactionBuildingError);
-               return;
-             }
-
-             // Report the unsigned transaction
-             sCallback(transaction, NULL);
-           } else {
-             // Report failure
-             sCallback(NULL, [[self class] failedToRetriveUTXOsError]);
+           if ([transactionBuildingError isKindOfClass:[NSError class]]) {
+             callback(NULL, transactionBuildingError);
+             return;
            }
+
+           // Report the unsigned transaction
+           sCallback(transaction, NULL);
+         } else {
+           // Report failure
+           sCallback(NULL, [[self class] failedToRetriveUTXOsError]);
+         }
        }];
 }
 
@@ -166,35 +169,34 @@ static NSString *const kBCWalletError_Domain =
     sCallback = callback;
 
     return ^(BCMutableTransaction *unsignedTransaction, NSError *error) {
-        BCMutableTransaction *signedTransaction;
-        NSError *signingError;
+      BCMutableTransaction *signedTransaction;
+      NSError *signingError;
 
-        // Get Status
-        if ([error isKindOfClass:[NSError class]]) {
-          // The operation failed report error
-          sCallback(NULL, error);
+      // Get Status
+      if ([error isKindOfClass:[NSError class]]) {
+        // The operation failed report error
+        sCallback(NULL, error);
 
-        } else if ([unsignedTransaction
-                       isKindOfClass:[BCMutableTransaction class]]) {
-          // We Created the unsigned transaction, we need to sign it
-          signedTransaction = [self _signTransaction:unsignedTransaction
-                                             withKey:key
-                                            andError:&signingError];
-          if ([signingError isKindOfClass:[NSError class]]) {
-            // We Failed to sign the transaction  report and stop.
-            sCallback(NULL, signingError);
-            return;
-          }
-
-          // Publish the transaction to the provider.
-          [self.provider publishTransaction:signedTransaction
-                                    forCoin:self.addressManager.coin
-                             withCompletion:sCallback];
-        } else {
-          // Failed to create an unsigned transaction
-          sCallback(NULL,
-                    [[self class] failedToCreateUnsignedTransactionError]);
+      } else if ([unsignedTransaction
+                     isKindOfClass:[BCMutableTransaction class]]) {
+        // We Created the unsigned transaction, we need to sign it
+        signedTransaction = [self _signTransaction:unsignedTransaction
+                                           withKey:key
+                                          andError:&signingError];
+        if ([signingError isKindOfClass:[NSError class]]) {
+          // We Failed to sign the transaction  report and stop.
+          sCallback(NULL, signingError);
+          return;
         }
+
+        // Publish the transaction to the provider.
+        [self.provider publishTransaction:signedTransaction
+                                  forCoin:self.addressManager.coin
+                           withCompletion:sCallback];
+      } else {
+        // Failed to create an unsigned transaction
+        sCallback(NULL, [[self class] failedToCreateUnsignedTransactionError]);
+      }
     };
   }
 }

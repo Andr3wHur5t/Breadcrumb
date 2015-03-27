@@ -80,12 +80,13 @@
 }
 
 + (instancetype)standardOutputForAmount:(uint64_t)amount
-                              toAddress:(BCAddress *)address {
+                              toAddress:(BCAddress *)address
+                                forCoin:(BCCoin *)coin {
   BCScript *transactionScript;
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
   if (![address isKindOfClass:[BCAddress class]]) return NULL;
 
-  transactionScript = [BCScript standardTransactionScript:address];
+  transactionScript = [BCScript standardTransactionScript:address andCoin:coin];
   if (![transactionScript isKindOfClass:[BCScript class]]) return NULL;
 
   return [self outputWithScript:transactionScript andValue:amount];

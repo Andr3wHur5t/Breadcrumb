@@ -211,7 +211,8 @@ static NSString *const kTransactionBuildingErrorDomain =
                                             to:(BCAddress *)address
                                        feePerK:(uint64_t)feePerK
                                  changeAddress:(BCAddress *)changeAddress
-                                     withError:(NSError **)error {
+                                     withError:(NSError **)error
+                                       andCoin:(BCCoin *)coin {
   uint64_t changeAmount = 0, feeAmount = 0, utxoSumAmount = 0,
            transactionSize = 0;
   BCTransactionOutput *targetOutput, *changeOutput;
@@ -254,8 +255,9 @@ static NSString *const kTransactionBuildingErrorDomain =
   }
 
   // Set Target Outputs
-  targetOutput =
-      [BCTransactionOutput standardOutputForAmount:amount toAddress:address];
+  targetOutput = [BCTransactionOutput standardOutputForAmount:amount
+                                                    toAddress:address
+                                                      forCoin:coin];
   if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) {
     if (error) *error = [self failedToCreateOutputError];
     return NULL;
@@ -286,7 +288,8 @@ static NSString *const kTransactionBuildingErrorDomain =
 
   // Set Change Output
   changeOutput = [BCTransactionOutput standardOutputForAmount:changeAmount
-                                                    toAddress:changeAddress];
+                                                    toAddress:changeAddress
+                                                      forCoin:coin];
   if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) {
     if (error) *error = [self failedToCreateOutputError];
     return NULL;

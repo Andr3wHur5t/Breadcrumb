@@ -31,7 +31,8 @@
 
   BCScript *src =
       [BCScript standardTransactionScript:
-                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]];
+                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]
+                                  andCoin:[BCCoin TestNet3Bitcoin]];
   NSLog(@"%@", [src P2SHAddressForCoin:[BCCoin TestNet3Bitcoin]]);
 
   src = [BCScript
@@ -84,15 +85,16 @@
 
   // Check Type parsing
   NSAssert(script.type == BCScriptType_MofN, @"failed");
+  NSAssert([BCScript standardTransactionScript:
+                         [script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]
+                                       andCoin:[BCCoin MainNetBitcoin]].type ==
+               BCScriptType_P2SH,
+           @"failed");
   NSAssert(
       [BCScript standardTransactionScript:
-                    [script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]].type ==
-          BCScriptType_P2SH,
-      @"failed");
-  NSAssert(
-      [BCScript standardTransactionScript:
-                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]]
-              .type == BCScriptType_P2PKH,
+                    [@"mjD8pSfS6A6SzyVkyPHruvHuTwNM79HHrb" toBitcoinAddress]
+                                  andCoin:[BCCoin MainNetBitcoin]].type ==
+          BCScriptType_P2PKH,
       @"failed");
   NSAssert(
       [BCScript
@@ -100,8 +102,10 @@
                                      dataUsingEncoding:NSUTF8StringEncoding]]
               .type == BCScriptType_OPReturn,
       @"failed");
-  script = [BCScript standardTransactionScript:
-                         [script P2SHAddressForCoin:[BCCoin MainNetBitcoin]]];
+  script = [BCScript
+      standardTransactionScript:[script
+                                    P2SHAddressForCoin:[BCCoin MainNetBitcoin]]
+                        andCoin:[BCCoin MainNetBitcoin]];
 }
 
 - (void)compare:(NSData *)a to:(NSData *)b {
@@ -203,11 +207,11 @@
                  sequenceType:BCKeySequenceType_BIP44
                      password:password
                   andCallback:^(NSError *error) {
-                      if (![error isKindOfClass:[NSError class]])
-                        NSLog(@"Generated wallet");
-                      else
-                        NSLog(@"Failed to generate wallet because '%@'",
-                              error.localizedDescription);
+                    if (![error isKindOfClass:[NSError class]])
+                      NSLog(@"Generated wallet");
+                    else
+                      NSLog(@"Failed to generate wallet because '%@'",
+                            error.localizedDescription);
                   }];
 
   //  BCWallet *wallet =
@@ -223,28 +227,29 @@
   // the password
   [wallet mnemonicPhraseWithPassword:password
                        usingCallback:^(NSString *mnemonic) {
-                           // Show the user their mnemonic phrase.
-                           [self showAlertWithTitle:@"Your Phrase"
-                                         andMessage:mnemonic];
-                           NSLog(@"Phrase '%@'", mnemonic);
+                         // Show the user their mnemonic phrase.
+                         [self showAlertWithTitle:@"Your Phrase"
+                                       andMessage:mnemonic];
+                         NSLog(@"Phrase '%@'", mnemonic);
                        }];
 
   // Get your current address
   [wallet getCurrentAddress:^(BCAddress *currentAddress) {
-      [self showAlertWithTitle:@"Your Address"
-                    andMessage:[currentAddress toString]];
-      NSLog(@"\nAddress: '%@'", currentAddress);
+    [self showAlertWithTitle:@"Your Address"
+                  andMessage:[currentAddress toString]];
+    NSLog(@"\nAddress: '%@'", currentAddress);
   }];
 
   // Get balance
   [wallet getBalance:^(uint64_t balance, NSError *error) {
-      NSLog(@"balance: %@", [BCAmount prettyPrint:balance]);
+    NSLog(@"balance: %@", [BCAmount prettyPrint:balance]);
   }];
 
   // Sending Bitcoin is as easy just specify the amount of satoshi,
   // the address to send to, and a completion. The wallet, and service provider
   // will handle the rest.
-  BCAddress *address = [@"37SqqZNsA5LLKVhQQXEgQKeECzC57Ktkpu" toBitcoinAddress];
+  BCAddress *address =
+      [@"2N2FUpSbNody37HMQdxPSo2Lz1wj6kKELSd" toBitcoinAddress];
 
   // BCAmount converts to and from satoshi.
   uint64_t amount = [BCAmount Bits:5];
@@ -252,19 +257,18 @@
                  to:address
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
-           if ([error isKindOfClass:[NSError class]])
-             [self showAlertWithTitle:@"Woops"
-                           andMessage:error.localizedDescription];
-           else {
-             [self
-                 showAlertWithTitle:
+         if ([error isKindOfClass:[NSError class]])
+           [self showAlertWithTitle:@"Woops"
+                         andMessage:error.localizedDescription];
+         else {
+           [self showAlertWithTitle:
                      [NSString stringWithFormat:@"Sent %@ to",
                                                 [BCAmount prettyPrint:amount]]
                          andMessage:[NSString stringWithFormat:@"%@", address]];
-             NSLog(@"See the transaction at "
-                   @"'https://test.helloblock.io/transactions/%@'",
-                   [transactionHash toHex]);
-           }
+           NSLog(@"See the transaction at "
+                 @"'https://test.helloblock.io/transactions/%@'",
+                 [transactionHash toHex]);
+         }
        }];
   NSLog(@"\nSending %@ to: %@", [BCAmount prettyPrint:amount], address);
 }
@@ -287,67 +291,66 @@
   [wallet
       keySequenceWithPassword:password
                 usingCallback:^(BCKeySequence *sequence, NSData *memoryKey) {
-                    BCDerivablePublicKey *root1;
-                    BCKeyPair *kp1;
+                  BCDerivablePublicKey *root1;
+                  BCKeyPair *kp1;
 
-                    root1 =
-                        (BCDerivablePublicKey *)
-                            [sequence keyPairForComponents:@[ @0, @0 ]
-                                              andMemoryKey:memoryKey].publicKey;
-                    kp1 = [sequence keyPairForComponents:@[ @(0), @0 ]
-                                            andMemoryKey:memoryKey];
+                  root1 =
+                      (BCDerivablePublicKey *)
+                          [sequence keyPairForComponents:@[ @0, @0 ]
+                                            andMemoryKey:memoryKey].publicKey;
+                  kp1 = [sequence keyPairForComponents:@[ @(0), @0 ]
+                                          andMemoryKey:memoryKey];
 
-                    NSAssert([[root1 childKeyAtIndex:0].data
-                                 isEqualToData:[kp1 childKeyPairAt:0
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
-                    NSAssert([[root1 childKeyAtIndex:1].data
-                                 isEqualToData:[kp1 childKeyPairAt:1
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
-                    NSAssert([[root1 childKeyAtIndex:2].data
-                                 isEqualToData:[kp1 childKeyPairAt:2
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:0].data
+                               isEqualToData:[kp1 childKeyPairAt:0
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:1].data
+                               isEqualToData:[kp1 childKeyPairAt:1
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:2].data
+                               isEqualToData:[kp1 childKeyPairAt:2
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
 
-                    NSAssert([[root1 childKeyAtIndex:3].data
-                                 isEqualToData:[kp1 childKeyPairAt:3
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:3].data
+                               isEqualToData:[kp1 childKeyPairAt:3
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
 
-                    root1 =
-                        (BCDerivablePublicKey *)[sequence
-                            keyPairForComponents:@[ @(BIP32_PRIME | 0), @0 ]
-                                    andMemoryKey:memoryKey].publicKey;
-                    kp1 = [sequence
-                        keyPairForComponents:@[ @(BIP32_PRIME | 0), @0 ]
-                                andMemoryKey:memoryKey];
+                  root1 = (BCDerivablePublicKey *)[sequence
+                              keyPairForComponents:@[ @(BIP32_PRIME | 0), @0 ]
+                                      andMemoryKey:memoryKey].publicKey;
+                  kp1 = [sequence
+                      keyPairForComponents:@[ @(BIP32_PRIME | 0), @0 ]
+                              andMemoryKey:memoryKey];
 
-                    NSAssert([[root1 childKeyAtIndex:0].data
-                                 isEqualToData:[kp1 childKeyPairAt:0
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
-                    NSAssert([[root1 childKeyAtIndex:1].data
-                                 isEqualToData:[kp1 childKeyPairAt:1
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
-                    NSAssert([[root1 childKeyAtIndex:2].data
-                                 isEqualToData:[kp1 childKeyPairAt:2
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:0].data
+                               isEqualToData:[kp1 childKeyPairAt:0
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:1].data
+                               isEqualToData:[kp1 childKeyPairAt:1
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:2].data
+                               isEqualToData:[kp1 childKeyPairAt:2
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
 
-                    NSAssert([[root1 childKeyAtIndex:3].data
-                                 isEqualToData:[kp1 childKeyPairAt:3
-                                                     withMemoryKey:memoryKey]
-                                                   .publicKey.data],
-                             @"Failed");
+                  NSAssert([[root1 childKeyAtIndex:3].data
+                               isEqualToData:[kp1 childKeyPairAt:3
+                                                   withMemoryKey:memoryKey]
+                                                 .publicKey.data],
+                           @"Failed");
 
                 }];
 }

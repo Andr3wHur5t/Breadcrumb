@@ -31,7 +31,8 @@
 + (instancetype)outputWithScript:(BCScript *)script andValue:(uint64_t)value;
 
 + (instancetype)standardOutputForAmount:(uint64_t)amount
-                              toAddress:(BCAddress *)address;
+                              toAddress:(BCAddress *)address
+                                forCoin:(BCCoin *)coin;
 
 #pragma mark Metadata
 /*!

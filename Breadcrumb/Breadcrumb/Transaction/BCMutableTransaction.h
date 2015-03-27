@@ -84,5 +84,6 @@
                                             to:(BCAddress *)address
                                        feePerK:(uint64_t)feePerK
                                  changeAddress:(BCAddress *)changeAddress
-                                     withError:(NSError **)error;
+                                     withError:(NSError **)error
+                                       andCoin:(BCCoin *)coin;
 @end

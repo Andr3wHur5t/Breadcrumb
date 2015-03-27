@@ -16,6 +16,10 @@
 @implementation BCScript (DefaultScripts)
 
 + (instancetype)standardTransactionScript:(BCAddress *)address {
+  return [self standardTransactionScript:address andCoin:[BCCoin MainNetBitcoin]];
+}
+
++ (instancetype)standardTransactionScript:(BCAddress *)address andCoin:(BCCoin *)coin {
   BCMutableScript *script;
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
   if (![address isKindOfClass:[BCAddress class]]) return NULL;
@@ -24,7 +28,7 @@
   if (![script isKindOfClass:[BCMutableScript class]]) return NULL;
 
   // Check if it is a P2SH address
-  if (address.typeCode == 0x05) {
+  if (address.typeCode == coin.P2SHCode) {
     [script writeOpCode:OP_HASH160];
     [script writeBytes:[address toDataWithoutType]];
     [script writeOpCode:OP_EQUAL];

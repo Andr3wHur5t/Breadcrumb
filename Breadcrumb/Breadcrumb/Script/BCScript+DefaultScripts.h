@@ -21,7 +21,16 @@
 
  @param address The output address for the transaction.
  */
-+ (instancetype)standardTransactionScript:(BCAddress *)address;
+//+ (instancetype)standardTransactionScript:(BCAddress *)address;
+
+/*!
+ @brief Creates a standard transaction script using the inputted address.
+
+ @param address The output address for the transaction.
+ @param coin The coin which the transaction should be generated for.
+ */
++ (instancetype)standardTransactionScript:(BCAddress *)address
+                                  andCoin:(BCCoin *)coin;
 
 /*!
  @brief Creates a multi-signiture reedem script for the provided inputs
