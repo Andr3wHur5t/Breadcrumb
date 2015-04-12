@@ -39,6 +39,15 @@
  */
 @property(assign, nonatomic, readwrite) uint32_t lockTime;
 
+#pragma mark Metadata
+
+/*!
+ @brief Extra data about the transaction
+
+ @discussion This is usefull when passing info to the provider object.
+ */
+@property(strong, nonatomic, readwrite) id extra;
+
 #pragma mark mutation
 /*!
  @brief Adds an input object to the transaction.

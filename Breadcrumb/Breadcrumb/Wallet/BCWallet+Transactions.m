@@ -45,9 +45,24 @@ static NSString *const kBCWalletError_Domain =
          feePerKB:(uint64_t)feePerKB
     usingPassword:(NSData *)password
      withCallback:(void (^)(NSData *, NSError *))callback {
+  [self send:amount
+                 to:address
+           feePerKB:feePerKB
+      usingPassword:password
+       withCallback:callback
+           andExtra:NULL];
+}
+
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+         feePerKB:(uint64_t)feePerKB
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSData *, NSError *))callback
+         andExtra:(id)extra {
   NSParameterAssert([address isKindOfClass:[BCAddress class]]);
   if (![address isKindOfClass:[BCAddress class]]) return;
   @autoreleasepool {
+    __block id sExtra = extra;
     __block uint64_t sAmount = amount;
     __block BCAddress *sAddress = address;
     void (^sCallback)(NSData *, NSError *) = ^(NSData *data, NSError *error) {
@@ -92,10 +107,12 @@ static NSString *const kBCWalletError_Domain =
             _unsignedTransactionForAmount:sAmount
                                  feePerKB:feePerKB
                                        to:sAddress
-                             withCallback:[self  // Set the callback to sign the
-                                                 // transaction
-                                              _signTransactionBlockForCallback:
-                                                  sCallback andKey:key]];
+                             withCallback:
+                                 [self  // Set the callback to sign the
+                                     // transaction
+                                     _signTransactionBlockForCallback:sCallback
+                                                               andKey:key
+                                                            withExtra:sExtra]];
       });
     }];
   }
@@ -157,8 +174,11 @@ static NSString *const kBCWalletError_Domain =
 
 - (void (^)(id, NSError *))_signTransactionBlockForCallback:
                                (void (^)(NSData *, NSError *))callback
-                                                     andKey:(NSData *)key {
+                                                     andKey:(NSData *)key
+                                                  withExtra:(id)extra {
   @autoreleasepool {
+    __block id sExtra = extra;
+    __block NSData *sKey = key;
     __block void (^sCallback)(NSData *, NSError *);
     NSParameterAssert(
         [(id)callback isKindOfClass:NSClassFromString(@"NSBlock")]);
@@ -181,13 +201,16 @@ static NSString *const kBCWalletError_Domain =
                      isKindOfClass:[BCMutableTransaction class]]) {
         // We Created the unsigned transaction, we need to sign it
         signedTransaction = [self _signTransaction:unsignedTransaction
-                                           withKey:key
+                                           withKey:sKey
                                           andError:&signingError];
+        sKey = NULL;
         if ([signingError isKindOfClass:[NSError class]]) {
           // We Failed to sign the transaction  report and stop.
           sCallback(NULL, signingError);
           return;
         }
+
+        signedTransaction.extra = sExtra;
 
         // Publish the transaction to the provider.
         [self.provider publishTransaction:signedTransaction

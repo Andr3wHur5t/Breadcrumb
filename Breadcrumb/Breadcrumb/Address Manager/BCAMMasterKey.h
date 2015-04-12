@@ -60,4 +60,12 @@
 
 - (BCAddress *)addressAtIndex:(uint16_t)index;
 - (void)expandAddressToIndex:(uint16_t)index;
+
+/*!
+ @brief Checks if the inputted address is in the cache.
+ 
+ @param address The address to check for.
+ */
+- (BOOL)hasAddressInCache:(BCAddress *)address;
+
 @end

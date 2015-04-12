@@ -36,6 +36,22 @@ static const uint64_t kBCStandardFeePerKB = 20000;
  @brief Sends the inputted amount to the address, and invokes the callback with
  any errors.
 
+ @param amount    The amount to send in satoshi.
+ @param address   The address to send the amount to.
+ @param callback  The callback to call when the operation completes or fails
+ @param extra     Extra info to pass to the provider.
+ */
+- (void)send:(uint64_t)amount
+               to:(BCAddress *)address
+         feePerKB:(uint64_t)feePerKB
+    usingPassword:(NSData *)password
+     withCallback:(void (^)(NSData *, NSError *))callback
+         andExtra:(id)extra;
+
+/*!
+ @brief Sends the inputted amount to the address, and invokes the callback with
+ any errors.
+
  @param amount  The amount to send in satoshi.
  @param address  The address to send the amount to.
  @param callback The callback to call when the operation completes or fails

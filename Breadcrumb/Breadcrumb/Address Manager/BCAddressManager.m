@@ -184,4 +184,14 @@
   return @[];
 }
 
+#pragma mark Address checks
+
+- (BOOL)hasAddressInCache:(BCAddress *)address {
+  if ([self.bip32External hasAddressInCache:address]) return TRUE;
+  if ([self.bip32Internal hasAddressInCache:address]) return TRUE;
+  if ([self.bip44External hasAddressInCache:address]) return TRUE;
+  if ([self.bip44Internal hasAddressInCache:address]) return TRUE;
+  return FALSE;
+}
+
 @end

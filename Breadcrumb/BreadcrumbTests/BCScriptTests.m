@@ -22,9 +22,9 @@
 #pragma mark Default Scripts
 - (void)testStandardTransactionScriptGeneration {
   XCTAssert(
-      [[[BCScript
-          standardTransactionScript:
-              [@"mufBQc5iD1T5dGdfahS7u9vhmg5kpWWXPn" toBitcoinAddress]] toData]
+      [[[BCScript standardTransactionScript:
+                      [@"mufBQc5iD1T5dGdfahS7u9vhmg5kpWWXPn" toBitcoinAddress]
+                                    andCoin:[BCCoin TestNet3Bitcoin]] toData]
           isEqualToData:@"76a9149b2008e9998794e0ef27a878f57852d2311d091c88ac"
                             .hexToData],
       @"Pass");

@@ -108,4 +108,13 @@ shouldn't be given to third parties.
 - (NSArray *)keyPairsForScript:(BCScript *)script
                 usingMemoryKey:(NSData *)memoryKey;
 
+
+#pragma mark Checks
+/*!
+ @brief Checks if the inputted address is in the cache.
+ 
+ @param address The address to check for.
+ */
+- (BOOL)hasAddressInCache:(BCAddress *)address;
+
 @end

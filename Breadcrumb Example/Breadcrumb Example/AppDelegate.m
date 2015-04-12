@@ -253,8 +253,10 @@
 
   // BCAmount converts to and from satoshi.
   uint64_t amount = [BCAmount Bits:5];
+
   [wallet send:amount
                  to:address
+           feePerKB:2000
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
          if ([error isKindOfClass:[NSError class]])
@@ -269,7 +271,8 @@
                  @"'https://test.helloblock.io/transactions/%@'",
                  [transactionHash toHex]);
          }
-       }];
+       } andExtra:@"Test test"];
+  
   NSLog(@"\nSending %@ to: %@", [BCAmount prettyPrint:amount], address);
 }
 

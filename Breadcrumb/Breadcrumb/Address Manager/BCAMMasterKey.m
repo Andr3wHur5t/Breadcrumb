@@ -130,4 +130,15 @@
   }
 }
 
+#pragma mark Checks
+
+- (BOOL)hasAddressInCache:(BCAddress *)address {
+  for (BCAddress *addr in self.addresses) {
+    if (![addr isKindOfClass:[BCAddress class]]) continue;
+    if ([addr isEqual:address]) return TRUE;
+  }
+
+  return FALSE;
+}
+
 @end
