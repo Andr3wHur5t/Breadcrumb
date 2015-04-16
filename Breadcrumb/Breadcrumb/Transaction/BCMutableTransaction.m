@@ -13,6 +13,22 @@
 #import "BCMutableTransaction.h"
 #import "BreadcrumbCore.h"
 
+// I use these biases to score transaction inputs, this way we can optimize
+// usage
+#define kInputBiasWithAmount(__v__) \
+  (uint32_t)((CGFloat)kInputStandardBias * __v__)
+static const uint32_t kInputStandardBias = UINT32_MAX / 20;
+
+// We really want to use the target utxos if possible
+static const uint32_t kInputBelongsToTargetAddressBias =
+    kInputBiasWithAmount(10);
+
+// We want to reduce the usage of diffrent addresses in transactions
+static const uint32_t kInputUsageBias = kInputBiasWithAmount(1);
+
+// We want to prioritize high value coins to reduce number of inputs.
+static const uint32_t kInputValueBias = kInputBiasWithAmount(14);
+
 #define BC_BITCOIN_VERSION 1
 static NSString *const kTransactionBuildingErrorDomain =
     @"com.breadcrumb.transactionBuilder";
@@ -198,14 +214,207 @@ static NSString *const kTransactionBuildingErrorDomain =
   return [self toString];
 }
 
+#pragma mark UTXO Selection
+
++ (NSArray *)inputsFromUTXOs:(NSArray *)utxos
+               andScoreBlock:(uint64_t (^)(BCTransaction *tx,
+                                           bool isCommited))scoreBlock {
+  NSMutableArray *scoredInputs, *prioritizedInputs;
+  NSArray *sortedInputs;
+  NSParameterAssert([scoreBlock isKindOfClass:NSClassFromString(@"NSBlock")]);
+  NSParameterAssert([utxos isKindOfClass:[NSArray class]]);
+
+  // Let the score block get stats
+  for (BCTransaction *tx in utxos) scoreBlock(tx, false);
+
+  // Score each input
+  scoredInputs = [[NSMutableArray alloc] init];
+  for (BCTransaction *tx in utxos)
+    [scoredInputs addObject:@{
+      @"score" : @(scoreBlock(tx, true)),
+      @"tx" : tx
+    }];
+
+  // Sort inputs by score
+  sortedInputs = [scoredInputs
+      sortedArrayWithOptions:NSSortConcurrent
+             usingComparator:^NSComparisonResult(id obj1, id obj2) {
+               uint64_t score1 = (uint64_t)[
+                            [obj1 objectForKey:@"score"] unsignedLongLongValue],
+                        score2 = (uint64_t)[
+                            [obj2 objectForKey:@"score"] unsignedLongLongValue];
+               if (score1 == score2)
+                 return NSOrderedSame;
+               else if (score1 > score2)
+                 return NSOrderedAscending;
+               else
+                 return NSOrderedDescending;
+             }];
+
+  // Return juts the tx in order
+  prioritizedInputs = [[NSMutableArray alloc] init];
+  for (NSDictionary *dict in sortedInputs)
+    [prioritizedInputs addObject:[dict objectForKey:@"tx"]];
+
+  return prioritizedInputs;
+}
+
++ (uint64_t (^)(BCTransaction *tx, BOOL isCommitted))scoreBlockForTargetAddress:
+        (BCAddress *)targetAddress {
+  __block BCAddress *sTargetAddress;
+  __block NSMutableDictionary *sAddressUsage;
+  __block uint64_t maxValue = 0;
+
+  sAddressUsage = [[NSMutableDictionary alloc] init];
+  sTargetAddress = targetAddress;
+  return ^uint64_t(BCTransaction *tx, BOOL committed) {
+    uint64_t score = 0;
+    NSNumber *usageCount;
+
+    // Our score is not committed, collect data
+    if (!committed) {
+      // Get the most valuable transaction
+      maxValue = MAX(maxValue, tx.value);
+
+      // Get address usage data
+      for (BCAddress *address in tx.addresses) {
+        usageCount = [sAddressUsage objectForKey:address.toString];
+        if ([usageCount isKindOfClass:[NSNumber class]])
+          usageCount = @([usageCount integerValue] + 1);
+        else
+          usageCount = @1;
+
+        [sAddressUsage setObject:usageCount forKeyedSubscript:address.toString];
+      }
+      return 0;
+    }
+
+    // Prefer UTXOs received from output addresses to mitigate double spending
+    // and requesting a refund
+    if ([tx.addresses containsObject:targetAddress])
+      score += kInputBelongsToTargetAddressBias;
+
+    // avoid combining addresses in a single transaction to reduce information
+    // leakage
+    uint64_t reuseScore = 0;
+    for (BCAddress *address in tx.addresses) {
+      reuseScore +=
+          [[sAddressUsage objectForKey:address.toString] unsignedIntegerValue];
+    }
+
+    NSUInteger rSum = 0;
+    for (NSString *key in sAddressUsage.allKeys) {
+      rSum += [[sAddressUsage objectForKey:key] unsignedIntegerValue];
+    }
+
+    score += (uint64_t)MIN(kInputUsageBias,
+                           ((CGFloat)kInputUsageBias *
+                            ((CGFloat)reuseScore /
+                             ((CGFloat)rSum / (CGFloat)sAddressUsage.count))));
+
+    // Prefer high value coins
+    score +=
+        (uint32_t)(kInputValueBias * ((CGFloat)tx.value / (CGFloat)maxValue));
+
+    return score;
+  };
+}
+
+#pragma mark Output Selection
+
++ (NSArray *)outputsForInputAmount:(uint64_t)inputAmount
+                targetOutputAmount:(uint64_t)targetOutputAmount
+                          feeBlock:
+                              (uint64_t (^)(NSUInteger outputByteSize))feeBlock
+               changeDustTolerance:(uint64_t)changeDustTolerance
+                     targetAddress:(BCAddress *)targetAddress
+                     changeAddress:(BCAddress *)changeAddress
+                           andCoin:(BCCoin *)coin {
+  BCTransactionOutput *target, *change;
+  NSMutableArray *outputs;
+  uint64_t changeAmount;
+
+  NSParameterAssert([coin isKindOfClass:[BCCoin class]]);
+  NSParameterAssert([targetAddress isKindOfClass:[BCAddress class]]);
+  NSParameterAssert([targetAddress isKindOfClass:[BCAddress class]]);
+  outputs = [[NSMutableArray alloc] init];
+
+  // Create the target output
+  target = [BCTransactionOutput standardOutputForAmount:targetOutputAmount
+                                              toAddress:targetAddress
+                                                forCoin:coin];
+  [outputs addObject:target];
+
+  // Check if we are below our change output dust tolerance, if so then ignore
+  // the
+  changeAmount =
+      (inputAmount - feeBlock([target toData].length * 2)) - targetOutputAmount;
+  if (changeAmount >= changeDustTolerance) {
+    change = [BCTransactionOutput standardOutputForAmount:changeAmount
+                                                toAddress:changeAddress
+                                                  forCoin:coin];
+    [outputs addObject:change];
+  }
+  return outputs;
+}
+
 #pragma mark Transaction Building
 
-// TODO: avoid combining addresses in a single transaction when possible to
-// reduce information leakage
-// TODO: use any UTXOs received from output addresses to mitigate an
-// attacker double spending and requesting a refund
-// TODO: randomly swap order of outputs so the change address isn't publicly
-// known
++ (NSComparisonResult (^)(id obj1, id obj2))randomSortComparator {
+  return ^NSComparisonResult(id obj1, id obj2) {
+    switch (
+        (uint16_t)([NSData pseudoRandomDataWithLength:sizeof(uint32_t)].bytes) %
+        3) {
+      case 1:
+        return NSOrderedDescending;
+        break;
+      case 2:
+        return NSOrderedAscending;
+        break;
+      default:
+        return NSOrderedSame;
+        break;
+    }
+  };
+}
+
++ (uint64_t (^)(NSUInteger, NSUInteger))defaultFeeBlock:(uint64_t)feePerKb {
+  __block uint64_t sFeePerKb = feePerKb;
+  return ^uint64_t(NSUInteger inputByteLength, NSUInteger outputByteLength) {
+    // 10 is the other header information byte size
+    return (uint64_t)(
+        ((CGFloat)(inputByteLength + outputByteLength + 10) / 1000.0f) *
+        (CGFloat)sFeePerKb);
+  };
+}
+
++ (BCMutableTransaction *)buildTransactionWithInputs:(NSArray *)inputs
+                                          andOutputs:(NSArray *)outputs {
+  NSArray *randomOrderOutputs, *randomOrderInputs;
+  BCMutableTransaction *transaction;
+  NSParameterAssert([inputs isKindOfClass:[NSArray class]]);
+  NSParameterAssert([outputs isKindOfClass:[NSArray class]]);
+  for (id obj in inputs)
+    NSParameterAssert([obj isKindOfClass:[BCTransactionInput class]]);
+  for (id obj in outputs)
+    NSParameterAssert([obj isKindOfClass:[BCTransactionOutput class]]);
+
+  transaction = [[[self class] alloc] init];
+
+  // Randomly swap order of outputs so the change address isn't publicly known,
+  // and inputs so its harder to guess what wallet you are using.
+  randomOrderOutputs =
+      [outputs sortedArrayUsingComparator:[self randomSortComparator]];
+  randomOrderInputs =
+      [inputs sortedArrayUsingComparator:[self randomSortComparator]];
+
+  // Set the inputs and outputs to the transaction.
+  [transaction.inputs setArray:randomOrderInputs];
+  [transaction.outputs setArray:randomOrderOutputs];
+
+  return transaction;
+}
+
 + (BCMutableTransaction *)buildTransactionWith:(NSArray *)utxos
                                      forAmount:(uint64_t)amount
                                             to:(BCAddress *)address
@@ -213,10 +422,30 @@ static NSString *const kTransactionBuildingErrorDomain =
                                  changeAddress:(BCAddress *)changeAddress
                                      withError:(NSError **)error
                                        andCoin:(BCCoin *)coin {
-  uint64_t changeAmount = 0, feeAmount = 0, utxoSumAmount = 0,
-           transactionSize = 0;
-  BCTransactionOutput *targetOutput, *changeOutput;
-  BCTransactionInput *utxoInput;
+  return [self buildTransactionWith:utxos
+                          forAmount:amount
+                                 to:address
+                      dustTolerance:[BCAmount Bits:20]
+                       feeCalcBlock:[self defaultFeeBlock:feePerK]
+                      changeAddress:changeAddress
+                          withError:error
+                            andCoin:coin];
+}
+
++ (BCMutableTransaction *)
+    buildTransactionWith:(NSArray *)utxos
+               forAmount:(uint64_t)amount
+                      to:(BCAddress *)address
+           dustTolerance:(uint64_t)dustTolerance
+            feeCalcBlock:(uint64_t (^)(NSUInteger inputByteLength,
+                                       NSUInteger outputByteLength))feeBlock
+           changeAddress:(BCAddress *)changeAddress
+               withError:(NSError **)error
+                 andCoin:(BCCoin *)coin {
+  uint64_t feeAmount = 0, utxoSumAmount = 0;
+  NSUInteger numberOfOutputs = 2;  // This is an estimated value
+  NSArray *scoredInputs, *outputsToUse;
+  NSMutableArray *inputsToUse;
   BCMutableTransaction *newTransaction;
 
   // Validate addresses
@@ -231,72 +460,77 @@ static NSString *const kTransactionBuildingErrorDomain =
     if (error) *error = [self invalidUTXOsError];
     return NULL;
   }
-  for (NSUInteger i = 0; i < utxos.count; ++i) {
-    BCTransaction *tx = [utxos objectAtIndex:i];
-    if (![tx isKindOfClass:[BCTransaction class]]) {
+  for (BCTransaction *obj in utxos) {
+    if (![obj isKindOfClass:[BCTransaction class]]) {
       if (error) *error = [self invalidUTXOsError];
       return NULL;
     }
   }
 
-  // Create Mutable Transaction
-  newTransaction = [BCMutableTransaction mutableTransaction];
+  // Sort our inputs,
+  // This sorts our inputs to optimize for value, address reuse, and  and target
+  // address usage. Based on a set of defined biases.
+  scoredInputs =
+      [self inputsFromUTXOs:utxos
+              andScoreBlock:[self scoreBlockForTargetAddress:address]];
 
-  // Set Inputs From UTXOs
-  for (BCTransaction *utxo in utxos) {
-    // Convert utxo into transactionInput
-    utxoInput = [[BCTransactionInput alloc] initWithTransaction:utxo];
+  // Choose our inputs
+  inputsToUse = [[NSMutableArray alloc] init];
+  BCTransactionInput *utxo;
+  NSUInteger previousInputByteLength = 0;
+  for (BCTransaction *input in scoredInputs) {
+    // Convert Input to UTXO class
+    utxo = [[BCTransactionInput alloc] initWithTransaction:input];
+    if (![utxo isKindOfClass:[BCTransactionInput class]]) continue;
 
-    // Add Transaction Input
-    [newTransaction addInput:utxoInput];
+    // Add the Input
+    [inputsToUse addObject:utxo];
 
-    // Sum the UTXOs values
-    utxoSumAmount += utxo.value;
+    // Keep count of our input sum value
+    utxoSumAmount += input.value;
+
+    // recalculate our fee
+    previousInputByteLength += [utxo toData].length;
+    feeAmount = feeBlock(previousInputByteLength, numberOfOutputs * 34);
+
+    // if we have enough to pay for the amount & the fee stop adding inputs
+    if (utxoSumAmount >= amount + feeAmount) break;  // Stop Adding Inputs
   }
-
-  // Set Target Outputs
-  targetOutput = [BCTransactionOutput standardOutputForAmount:amount
-                                                    toAddress:address
-                                                      forCoin:coin];
-  if (![targetOutput isKindOfClass:[BCTransactionOutput class]]) {
-    if (error) *error = [self failedToCreateOutputError];
-    return NULL;
-  }
-  [newTransaction addOutput:targetOutput];
-
-  // Calculate the fee Based off of the transaction size. Assume Change Output
-  transactionSize = [newTransaction currentSize] + 39;
-  feeAmount = (uint64_t)((CGFloat)transactionSize / 1000.0f) * feePerK;
 
   // Check For Funds
   if (utxoSumAmount < (amount + feeAmount)) {
-    if (error) *error = [self insufficientUTXOFundsError];
+    if (error)
+      *error = [self insufficientUTXOFundsError:utxoSumAmount - feeAmount];
     return NULL;
   }
 
-  // Because transactions in bitcoin require you to spend an entire transaction
-  // to keep the leftover we need a change address so that you only spend the
-  // desired amount. Anything left over in the transaction is considered the
-  // mining fee.
-  changeAmount = utxoSumAmount - (amount + feeAmount);
+  // Create Outputs
+  outputsToUse =
+      [self outputsForInputAmount:utxoSumAmount
+               targetOutputAmount:amount
+                         feeBlock:^uint64_t(NSUInteger outputByteSize) {
+                           return feeBlock(previousInputByteLength,
+                                           outputByteSize);
+                         }
+              changeDustTolerance:dustTolerance
+                    targetAddress:address
+                    changeAddress:changeAddress
+                          andCoin:coin];
+  if (![outputsToUse isKindOfClass:[NSArray class]]) {
+    if (error) *error = [self failedToCreateOutputError];
+    return NULL;
+  }
+
+  // Create the transaction
+  newTransaction =
+      [self buildTransactionWithInputs:inputsToUse andOutputs:outputsToUse];
 
   // Check if we are over the limit for standard transactions
-  if (transactionSize >= 100000) {
+  if ([newTransaction toData].length >= 100000) {
     if (error) *error = [self nonStandardTransactionError];
     return NULL;
   }
 
-  // Set Change Output
-  changeOutput = [BCTransactionOutput standardOutputForAmount:changeAmount
-                                                    toAddress:changeAddress
-                                                      forCoin:coin];
-  if (![changeOutput isKindOfClass:[BCTransactionOutput class]]) {
-    if (error) *error = [self failedToCreateOutputError];
-    return NULL;
-  }
-  [newTransaction addOutput:changeOutput];
-
-  // Return the built transaction
   return newTransaction;
 }
 
@@ -311,14 +545,18 @@ static NSString *const kTransactionBuildingErrorDomain =
                          }];
 }
 
-+ (NSError *)insufficientUTXOFundsError {
-  return
-      [NSError errorWithDomain:kTransactionBuildingErrorDomain
-                          code:506
-                      userInfo:@{
-                        NSLocalizedDescriptionKey :
-                            @"Insufficient funds in UTXOs to build transaction."
-                      }];
++ (NSError *)insufficientUTXOFundsError:(uint64_t)canSpend {
+  return [NSError
+      errorWithDomain:kTransactionBuildingErrorDomain
+                 code:506
+             userInfo:@{
+               @"canSpend" : @(canSpend),
+               NSLocalizedDescriptionKey : [NSString
+                   stringWithFormat:@"Insufficient funds in UTXOs to build "
+                                    @"transaction. you can spend %@ and still "
+                                    @"pay for fees.",
+                                    [BCAmount prettyPrint:canSpend]]
+             }];
 }
 
 + (NSError *)invalidAddressesError {

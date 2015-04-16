@@ -44,7 +44,7 @@
 /*!
  @brief Extra data about the transaction
 
- @discussion This is usefull when passing info to the provider object.
+ @discussion This is useful when passing info to the provider object.
  */
 @property(strong, nonatomic, readwrite) id extra;
 
@@ -75,6 +75,55 @@
  */
 - (NSData *)toData;
 
+#pragma mark UTXO Selection
+
+/*!
+ @brief This takes a set of UTXOs and sorts them by their score.
+
+ @param utxos      The utxos to score.
+ @param scoreBlock The block used to give the score of the transaction.
+
+ @return A sorted array of transactions.
+ */
++ (NSArray *)inputsFromUTXOs:(NSArray *)utxos
+               andScoreBlock:(uint64_t (^)(BCTransaction *tx,
+                                           bool isCommitted))scoreBlock;
+
+/*!
+ @brief This scores transactions for their usability with other transactions
+ passed into this block.
+
+ @param targetAddress The address of the target wallet. (The one you want to
+ send btc too)
+ */
++ (uint64_t (^)(BCTransaction *tx, BOOL isCommitted))scoreBlockForTargetAddress:
+        (BCAddress *)targetAddress;
+
+#pragma mark Output Creation
+
+/*!
+ @brief Creates a set standard set of outputs baed on the input values.
+
+ @param inputAmount         The amount available in transaction inputs.
+ @param targetOutputAmount  The amount you want to send to the target address.
+ @param feeBlock            The block used to calculate the fees.
+ @param changeDustTolerance The threshold which stats the smallest change amount
+ you will except.
+ @param targetAddress       The address you want to send to.
+ @param changeAddress       The address you want the change sent to.
+ @param coin                The coin the scripts should be built for.
+
+ @return An array of outputs to be used in a transaction.
+ */
++ (NSArray *)outputsForInputAmount:(uint64_t)inputAmount
+                targetOutputAmount:(uint64_t)targetOutputAmount
+                          feeBlock:
+                              (uint64_t (^)(NSUInteger outputByteSize))feeBlock
+               changeDustTolerance:(uint64_t)changeDustTolerance
+                     targetAddress:(BCAddress *)targetAddress
+                     changeAddress:(BCAddress *)changeAddress
+                           andCoin:(BCCoin *)coin;
+
 #pragma mark Transaction Building
 
 /*!
@@ -95,4 +144,49 @@
                                  changeAddress:(BCAddress *)changeAddress
                                      withError:(NSError **)error
                                        andCoin:(BCCoin *)coin;
+
+/*!
+ @brief Builds a standard optimized transaction with the given set of
+ parameters.
+
+ @param utxos         The unoptimized UTXOs to use.
+ @param amount        The amount to send to the target address.
+ @param address       The address you want to send to.
+ @param dustTolerance The threshold of which you don't want change for.
+ @param feeBlock      The block used to calculate the fee.
+ @param changeAddress The change address you want sent back to.
+ @param error         The error to report the status of transaction building.
+ @param coin          The coin used for scripts.
+
+ @return The built unsigned transaction.
+ */
++ (BCMutableTransaction *)
+    buildTransactionWith:(NSArray *)utxos
+               forAmount:(uint64_t)amount
+                      to:(BCAddress *)address
+           dustTolerance:(uint64_t)dustTolerance
+            feeCalcBlock:(uint64_t (^)(NSUInteger inputByteLength,
+                                       NSUInteger outputByteLength))feeBlock
+           changeAddress:(BCAddress *)changeAddress
+               withError:(NSError **)error
+                 andCoin:(BCCoin *)coin;
+
+/*!
+ @brief Constructs a transaction with the array of inputs and outputs.
+
+ @param inputs  The array of inputs for the transaction
+ @param outputs The array of outputs for the transaction.
+ */
++ (BCMutableTransaction *)buildTransactionWithInputs:(NSArray *)inputs
+                                          andOutputs:(NSArray *)outputs;
+
+#pragma mark Fee Calculation
+
+/*!
+ @brief The default fee calculation block.
+
+ @param feePerKb The fee per kilobyte of data to use.
+ */
++ (uint64_t (^)(NSUInteger, NSUInteger))defaultFeeBlock:(uint64_t)feePerKb;
+
 @end

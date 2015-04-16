@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		371A58EA1ADF145E008801DE /* BCProviderDoubleChain.m in Sources */ = {isa = PBXBuildFile; fileRef = 371A58E91ADF145E008801DE /* BCProviderDoubleChain.m */; };
 		3752B19C1A836DFB0029C91C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3752B19B1A836DFB0029C91C /* main.m */; };
 		3752B19F1A836DFB0029C91C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3752B19E1A836DFB0029C91C /* AppDelegate.m */; };
 		3752B1A21A836DFB0029C91C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3752B1A11A836DFB0029C91C /* ViewController.m */; };
@@ -43,6 +44,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		371A58E81ADF145E008801DE /* BCProviderDoubleChain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCProviderDoubleChain.h; sourceTree = "<group>"; };
+		371A58E91ADF145E008801DE /* BCProviderDoubleChain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCProviderDoubleChain.m; sourceTree = "<group>"; };
 		3752B1961A836DFB0029C91C /* Breadcrumb Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Breadcrumb Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3752B19A1A836DFB0029C91C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3752B19B1A836DFB0029C91C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -100,6 +103,8 @@
 		3752B1981A836DFB0029C91C /* Breadcrumb Example */ = {
 			isa = PBXGroup;
 			children = (
+				371A58E81ADF145E008801DE /* BCProviderDoubleChain.h */,
+				371A58E91ADF145E008801DE /* BCProviderDoubleChain.m */,
 				3752B19D1A836DFB0029C91C /* AppDelegate.h */,
 				3752B19E1A836DFB0029C91C /* AppDelegate.m */,
 				3752B1A01A836DFB0029C91C /* ViewController.h */,
@@ -239,6 +244,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				371A58EA1ADF145E008801DE /* BCProviderDoubleChain.m in Sources */,
 				3752B1A21A836DFB0029C91C /* ViewController.m in Sources */,
 				3752B19F1A836DFB0029C91C /* AppDelegate.m in Sources */,
 				3752B19C1A836DFB0029C91C /* main.m in Sources */,
