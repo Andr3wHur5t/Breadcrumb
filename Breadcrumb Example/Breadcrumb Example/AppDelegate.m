@@ -256,7 +256,7 @@
 
   [wallet send:amount
                  to:address
-           feePerKB:2000
+           feePerKB:kBCStandardFee
       usingPassword:password
        withCallback:^(NSData *transactionHash, NSError *error) {
          if ([error isKindOfClass:[NSError class]])

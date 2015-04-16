@@ -77,6 +77,7 @@
               previousIndex:transactionIndex
                      script:script
                     address:NULL
+                      value:INFINITY
                 andSequence:sequence];
 }
 
@@ -88,6 +89,7 @@
               previousIndex:transaction.outputIndex
                      script:transaction.script
                     address:[transaction.addresses objectAtIndex:0]
+                      value:transaction.value
                 andSequence:UINT32_MAX];
 }
 
@@ -95,6 +97,7 @@
                previousIndex:(uint32_t)index
                       script:(BCScript *)script
                      address:(BCAddress *)address
+                       value:(uint64_t)value
                  andSequence:(uint32_t)sequence {
   NSParameterAssert([hash isKindOfClass:[NSData class]]);
   if (![hash isKindOfClass:[NSData class]]) return NULL;
@@ -104,6 +107,7 @@
     _previousOutputIndex = index;
     _scriptSig = script;
     _sequence = sequence;
+    _value = value;
     _controllingAddress = address;
   }
   return self;

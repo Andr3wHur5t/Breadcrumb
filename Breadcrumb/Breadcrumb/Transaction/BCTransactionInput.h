@@ -33,6 +33,7 @@
                previousIndex:(uint32_t)index
                       script:(BCScript *)script
                      address:(BCAddress *)address
+                       value:(uint64_t)value
                  andSequence:(uint32_t)sequence;
 
 #pragma mark Meta Data
@@ -69,6 +70,8 @@
  transactions though the network currently doesn't support it.
  */
 @property(assign, nonatomic, readonly) uint32_t sequence;
+
+@property(assign, nonatomic, readonly) uint64_t value;
 
 #pragma mark Fee Calculation
 

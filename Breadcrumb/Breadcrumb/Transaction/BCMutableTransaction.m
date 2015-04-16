@@ -100,6 +100,28 @@ static NSString *const kTransactionBuildingErrorDomain =
   return [[[self class] alloc] init];
 }
 
+#pragma mark Metadata
+
+- (uint64_t)value {
+  uint64_t sum = 0;
+  for (BCTransactionInput *input in self.inputs) {
+    sum += input.value;
+  }
+  return sum;
+}
+
+- (uint64_t)outputAmount {
+  uint64_t sum = 0;
+  for (BCTransactionOutput *output in self.outputs) {
+    sum += output.value;
+  }
+  return sum;
+}
+
+- (uint64_t)fee {
+  return self.value - self.outputAmount;
+}
+
 #pragma mark Configuration
 
 - (NSMutableArray *)inputs {
@@ -425,7 +447,7 @@ static NSString *const kTransactionBuildingErrorDomain =
   return [self buildTransactionWith:utxos
                           forAmount:amount
                                  to:address
-                      dustTolerance:[BCAmount Bits:20]
+                      dustTolerance:kBCDefaultDustThreshold
                        feeCalcBlock:[self defaultFeeBlock:feePerK]
                       changeAddress:changeAddress
                           withError:error

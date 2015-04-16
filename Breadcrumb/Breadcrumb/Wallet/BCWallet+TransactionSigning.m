@@ -48,19 +48,21 @@
 
     originalInputs = [transaction.inputs copy];
 
-    // We need empty versions of the input for each transaction for when we sign.
+    // We need empty versions of the input for each transaction for when we
+    // sign.
     // https://github.com/minium/Bitcoin-Spec/blob/master/Images/SIGHASH_ALL.pdf
     emptyScriptInputs = [[NSMutableArray alloc] init];
     BCTransactionInput *newEmpty, *org;
     for (NSUInteger i = 0; i < originalInputs.count; ++i) {
       org = [originalInputs objectAtIndex:i];
-      
+
       // Create the empty transaction
       newEmpty = [[BCTransactionInput alloc]
            initWithHash:org.previousOutputHash
           previousIndex:org.previousOutputIndex
                  script:[BCScript scriptWithData:NULL]
                 address:org.controllingAddress
+                  value:org.value
             andSequence:org.sequence];
 
       [emptyScriptInputs setObject:newEmpty atIndexedSubscript:i];
@@ -69,16 +71,17 @@
     // For Multi-signiture check if the Input For the Pub Key Or Pub Key Hash
     // Need to detect tx type P2PKSH/P2SH , P2PK, and MULTI-SIG
     // Detect In Address Manager?
-    
+
     // Sign Transaction Inputs
     signedInputs = [[NSMutableArray alloc] init];
     for (NSUInteger i = 0; i < originalInputs.count; ++i) {
       // Set all inputs to empty
       [transaction.inputs setArray:emptyScriptInputs];
-      
+
       // Set the current index to its original script
-      [transaction.inputs setObject:[originalInputs objectAtIndex:i] atIndexedSubscript:i];
-      
+      [transaction.inputs setObject:[originalInputs objectAtIndex:i]
+                 atIndexedSubscript:i];
+
       // Get The Hash of the current transaction
       currentHash = [[transaction toData] SHA256_2];
       if (![currentHash isKindOfClass:[NSData class]]) {
@@ -145,6 +148,7 @@
           previousIndex:updatedInput.previousOutputIndex
                  script:unlockScript
                 address:updatedInput.controllingAddress
+                  value:updatedInput.value
             andSequence:updatedInput.sequence];
       if (![updatedInput isKindOfClass:[BCTransactionInput class]]) {
         if (error) *error = [[self class] internalSigningError:607];

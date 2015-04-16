@@ -14,6 +14,9 @@
 #import "BCTransactionInput.h"
 #import "BCTransactionOutput.h"
 
+static const uint64_t kBCStandardFee = 10000;
+static const uint64_t kBCDefaultDustThreshold = 2100;  // 21 bits ;)
+
 @interface BCMutableTransaction : NSObject
 #pragma mark Construction
 /*!
@@ -40,6 +43,16 @@
 @property(assign, nonatomic, readwrite) uint32_t lockTime;
 
 #pragma mark Metadata
+
+/*!
+ @brief The value of all inputs in the transaction
+ */
+@property(nonatomic, readonly) uint64_t value;
+
+/*!
+ @brief The fee for this transaction.
+ */
+@property(nonatomic, readonly) uint64_t fee;
 
 /*!
  @brief Extra data about the transaction
