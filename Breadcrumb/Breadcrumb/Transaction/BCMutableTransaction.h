@@ -100,7 +100,7 @@ static const uint64_t kBCDefaultDustThreshold = 2100;  // 21 bits ;)
  */
 + (NSArray *)inputsFromUTXOs:(NSArray *)utxos
                andScoreBlock:(uint64_t (^)(BCTransaction *tx,
-                                           bool isCommitted))scoreBlock;
+                                           BOOL isCommitted))scoreBlock;
 
 /*!
  @brief This scores transactions for their usability with other transactions

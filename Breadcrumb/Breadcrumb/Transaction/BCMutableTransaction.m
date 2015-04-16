@@ -240,20 +240,20 @@ static NSString *const kTransactionBuildingErrorDomain =
 
 + (NSArray *)inputsFromUTXOs:(NSArray *)utxos
                andScoreBlock:(uint64_t (^)(BCTransaction *tx,
-                                           bool isCommited))scoreBlock {
+                                           BOOL isCommited))scoreBlock {
   NSMutableArray *scoredInputs, *prioritizedInputs;
   NSArray *sortedInputs;
   NSParameterAssert([scoreBlock isKindOfClass:NSClassFromString(@"NSBlock")]);
   NSParameterAssert([utxos isKindOfClass:[NSArray class]]);
 
   // Let the score block get stats
-  for (BCTransaction *tx in utxos) scoreBlock(tx, false);
+  for (BCTransaction *tx in utxos) scoreBlock(tx, FALSE);
 
   // Score each input
   scoredInputs = [[NSMutableArray alloc] init];
   for (BCTransaction *tx in utxos)
     [scoredInputs addObject:@{
-      @"score" : @(scoreBlock(tx, true)),
+      @"score" : @(scoreBlock(tx, TRUE)),
       @"tx" : tx
     }];
 
